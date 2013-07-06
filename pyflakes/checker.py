@@ -5,6 +5,7 @@ Implement the central Checker class.
 Also, it models the Bindings and Scopes.
 """
 import doctest
+import itertools
 import os
 import sys
 try:
@@ -121,8 +122,9 @@ class Assignment(Binding):
 
 
 class FunctionDefinition(Definition):
-    pass
-
+    def __init__(self, name, source):
+        super(FunctionDefinition, self).__init__(name, source)
+        self.signature = FunctionSignature.parseFromAstNode(source)
 
 class ClassDefinition(Definition):
     pass
@@ -198,6 +200,137 @@ class GeneratorScope(Scope):
 
 class ModuleScope(Scope):
     pass
+
+
+class FunctionDefinitionParser(object):
+    def __init__(self, node):
+        self.node = node
+
+    def getDefaultCount(self):
+        return len(self.node.args.defaults)
+
+    def hasVarArg(self):
+        return self.node.args.vararg is not None
+
+    def hasKwArg(self):
+        return self.node.args.kwarg is not None
+
+    if PY2:
+        def getArgumentNames(self):
+            result = []
+            for arg in self.node.args.args:
+                if isinstance(arg, ast.Name):
+                    result.append(arg.id)
+                else:
+                    result.append(None)
+            return result
+
+        def getKwOnlyArgumentNames(self):
+            return []
+
+        def getKwOnlyDefaultCount(self):
+            return 0
+    else:
+        def getArgumentNames(self):
+            return [arg.arg for arg in self.node.args.args]
+
+        def getKwOnlyArgumentNames(self):
+            return [arg.arg for arg in self.node.args.kwonlyargs]
+
+        def getKwOnlyDefaultCount(self):
+            return sum(1 for n in self.node.args.kw_defaults if n is not None)
+
+
+class FunctionSignature(object):
+    def __init__(self, argumentNames, defaultCount, hasVarArg, hasKwArg,
+                 kwOnlyArgumentNames, kwOnlyDefaultCount, decorated):
+        self.decorated = decorated
+        self.argumentNames = argumentNames
+        self.defaultCount = defaultCount
+        self.kwOnlyArgumentNames = kwOnlyArgumentNames
+        self.kwOnlyDefaultCount = kwOnlyDefaultCount
+        self.hasVarArg = hasVarArg
+        self.hasKwArg = hasKwArg
+
+    def minArgumentCount(self):
+        return len(self.argumentNames) - self.defaultCount
+
+    def maxArgumentCount(self):
+        return len(self.argumentNames)
+
+    def checkCall(self, callNode, reporter, name):
+        if self.decorated:
+            return
+        filledSlots = set()
+        filledKwOnlySlots = set()
+        for i, arg in enumerate(callNode.args):
+            if i >= len(self.argumentNames):
+                if not self.hasVarArg:
+                    reporter.report(messages.TooManyArguments, callNode,
+                                    name, self.maxArgumentCount())
+                    return
+                break
+            filledSlots.add(i)
+
+        for kw in callNode.keywords:
+            slots = None
+            try:
+                argIndex = self.argumentNames.index(kw.arg)
+                slots = filledSlots
+            except ValueError:
+                try:
+                    argIndex = self.kwOnlyArgumentNames.index(kw.arg)
+                    slots = filledKwOnlySlots
+                except ValueError:
+                    if self.hasKwArg:
+                        continue
+                    else:
+                        reporter.report(messages.UnexpectedArgument, callNode,
+                                        name, kw.arg)
+                        return
+            if argIndex in slots:
+                reporter.report(messages.MultipleValuesForArgument,
+                                callNode, name, kw.arg)
+                return
+            slots.add(argIndex)
+
+        filledSlots.update(
+            range(len(self.argumentNames) - self.defaultCount,
+                  len(self.argumentNames)))
+        filledKwOnlySlots.update(
+            range(len(self.kwOnlyArgumentNames) - self.kwOnlyDefaultCount,
+                  len(self.kwOnlyArgumentNames)))
+
+        if (len(filledSlots) < len(self.argumentNames) and
+            not callNode.starargs and not callNode.kwargs):
+            reporter.report(messages.TooFewArguments, callNode,
+                            name, self.minArgumentCount())
+            return
+        if (len(filledKwOnlySlots) < len(self.kwOnlyArgumentNames) and
+            not callNode.kwargs):
+            missingArguments = [repr(arg) for i,arg in enumerate(self.kwOnlyArgumentNames)
+                                if i not in filledKwOnlySlots]
+            reporter.report(messages.NeedKwOnlyArgument, callNode, name,
+                            ', '.join(missingArguments))
+            return
+
+    @staticmethod
+    def parseFromAstNode(lambdaNode):
+        decorated = bool(any(lambdaNode.decorator_list))
+        parser = FunctionDefinitionParser(lambdaNode)
+        argumentNames = parser.getArgumentNames()
+        defaultCount = parser.getDefaultCount()
+        kwOnlyArgumentNames = parser.getKwOnlyArgumentNames()
+        kwOnlyDefaultCount = parser.getKwOnlyDefaultCount()
+        hasVarArg = parser.hasVarArg()
+        hasKwArg = parser.hasKwArg()
+        return FunctionSignature(argumentNames=argumentNames,
+                                 defaultCount=defaultCount,
+                                 kwOnlyArgumentNames=kwOnlyArgumentNames,
+                                 kwOnlyDefaultCount=kwOnlyDefaultCount,
+                                 hasVarArg=hasVarArg,
+                                 hasKwArg=hasKwArg,
+                                 decorated=decorated)
 
 
 # Globally defined names which are not attributes of the builtins module, or
@@ -432,6 +565,14 @@ class Checker(object):
         self._nodeHandlers[node_class] = handler = getattr(self, nodeType)
         return handler
 
+    def iterVisibleScopes(self, includeLocal=True):
+        endIndex = None if includeLocal else len(self.scopeStack) - 1
+        scopes = [scope for scope in itertools.islice(self.scopeStack, endIndex)
+                  if isinstance(scope, (FunctionScope, ModuleScope))]
+        if isinstance(self.scope, GeneratorScope) and scopes[-1] != self.scopeStack[-2]:
+            scopes.append(self.scopeStack[-2])
+        return iter(reversed(scopes))
+
     def handleNodeLoad(self, node):
         name = getNodeName(node)
         if not name:
@@ -444,14 +585,9 @@ class Checker(object):
         else:
             return
 
-        scopes = [scope for scope in self.scopeStack[:-1]
-                  if isinstance(scope, (FunctionScope, ModuleScope))]
-        if isinstance(self.scope, GeneratorScope) and scopes[-1] != self.scopeStack[-2]:
-            scopes.append(self.scopeStack[-2])
-
         # try enclosing function scopes and global scope
         importStarred = self.scope.importStarred
-        for scope in reversed(scopes):
+        for scope in self.iterVisibleScopes(includeLocal=False):
             importStarred = importStarred or scope.importStarred
             try:
                 scope[name].used = (self.scope, node)
@@ -598,7 +734,7 @@ class Checker(object):
 
     # "expr" type nodes
     BOOLOP = BINOP = UNARYOP = IFEXP = DICT = SET = YIELD = YIELDFROM = \
-        COMPARE = CALL = REPR = ATTRIBUTE = SUBSCRIPT = LIST = TUPLE = \
+        COMPARE = REPR = ATTRIBUTE = SUBSCRIPT = LIST = TUPLE = \
         STARRED = handleChildren
 
     NUM = STR = BYTES = ELLIPSIS = ignore
@@ -694,6 +830,19 @@ class Checker(object):
             # must be a Param context -- this only happens for names in function
             # arguments, but these aren't dispatched through here
             raise RuntimeError("Got impossible expression context: %r" % (node.ctx,))
+
+    def CALL(self, node):
+        f = node.func
+        if isinstance(f, ast.Name):
+            for scope in self.iterVisibleScopes():
+                definition = scope.get(f.id)
+                if definition:
+                    if isinstance(definition, FunctionDefinition):
+                        definition.signature.checkCall(node, self, f.id)
+                    break
+
+
+        self.handleChildren(node)
 
     def FUNCTIONDEF(self, node):
         for deco in node.decorator_list:
@@ -848,3 +997,4 @@ class Checker(object):
         if isinstance(node.name, str):
             self.handleNodeStore(node)
         self.handleChildren(node)
+

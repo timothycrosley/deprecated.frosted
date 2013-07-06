@@ -126,3 +126,33 @@ class UnusedVariable(Message):
     def __init__(self, filename, loc, names):
         Message.__init__(self, filename, loc)
         self.message_args = (names,)
+
+class MultipleValuesForArgument(Message):
+    message = '%s() got multiple values for argument %r'
+    def __init__(self, filename, loc, functionname, argname):
+        Message.__init__(self, filename, loc)
+        self.message_args = (functionname, argname)
+
+class TooFewArguments(Message):
+    message = '%s() takes at least %d argument(s)'
+    def __init__(self, filename, loc, functionname, minargs):
+        Message.__init__(self, filename, loc)
+        self.message_args = (functionname, minargs)
+
+class TooManyArguments(Message):
+    message = '%s() takes at most %d argument(s)'
+    def __init__(self, filename, loc, functionname, maxargs):
+        Message.__init__(self, filename, loc)
+        self.message_args = (functionname, maxargs)
+
+class UnexpectedArgument(Message):
+    message = '%s() got unexpected keyword argument: %r'
+    def __init__(self, filename, loc, functionname, argname):
+        Message.__init__(self, filename, loc)
+        self.message_args = (functionname, argname)
+
+class NeedKwOnlyArgument(Message):
+    message = '%s() needs kw-only argument(s): %s'
+    def __init__(self, filename, loc, functionname, missingArguments):
+        Message.__init__(self, filename, loc)
+        self.message_args = (functionname, missingArguments)
