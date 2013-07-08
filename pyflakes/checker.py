@@ -565,29 +565,23 @@ class Checker(object):
         self._nodeHandlers[node_class] = handler = getattr(self, nodeType)
         return handler
 
-    def iterVisibleScopes(self, includeLocal=True):
-        endIndex = None if includeLocal else len(self.scopeStack) - 1
-        scopes = [scope for scope in itertools.islice(self.scopeStack, endIndex)
+    def iterVisibleScopes(self):
+        outerScopes = itertools.islice(self.scopeStack, len(self.scopeStack) - 1)
+        scopes = [scope for scope in outerScopes
                   if isinstance(scope, (FunctionScope, ModuleScope))]
-        if isinstance(self.scope, GeneratorScope) and scopes[-1] != self.scopeStack[-2]:
+        if (isinstance(self.scope, GeneratorScope)
+            and scopes[-1] != self.scopeStack[-2]):
             scopes.append(self.scopeStack[-2])
+        scopes.append(self.scopeStack[-1])
         return iter(reversed(scopes))
 
     def handleNodeLoad(self, node):
         name = getNodeName(node)
         if not name:
             return
-        # try local scope
-        try:
-            self.scope[name].used = (self.scope, node)
-        except KeyError:
-            pass
-        else:
-            return
 
-        # try enclosing function scopes and global scope
-        importStarred = self.scope.importStarred
-        for scope in self.iterVisibleScopes(includeLocal=False):
+        importStarred = False
+        for scope in self.iterVisibleScopes():
             importStarred = importStarred or scope.importStarred
             try:
                 scope[name].used = (self.scope, node)
