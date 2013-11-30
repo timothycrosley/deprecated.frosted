@@ -599,7 +599,7 @@ class Checker(object):
     # "expr" type nodes
     BOOLOP = BINOP = UNARYOP = IFEXP = DICT = SET = YIELD = YIELDFROM = \
         COMPARE = CALL = REPR = ATTRIBUTE = SUBSCRIPT = LIST = TUPLE = \
-        STARRED = handleChildren
+        STARRED = NAMECONSTANT = handleChildren
 
     NUM = STR = BYTES = ELLIPSIS = ignore
 
