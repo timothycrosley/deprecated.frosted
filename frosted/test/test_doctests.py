@@ -1,10 +1,10 @@
 import textwrap
 
-from pyflakes import messages as m
-from pyflakes.test.test_other import Test as TestOther
-from pyflakes.test.test_imports import Test as TestImports
-from pyflakes.test.test_undefined_names import Test as TestUndefinedNames
-from pyflakes.test.harness import skip
+from frosted import messages as m
+from frosted.test.test_other import Test as TestOther
+from frosted.test.test_imports import Test as TestImports
+from frosted.test.test_undefined_names import Test as TestUndefinedNames
+from frosted.test.harness import skip
 
 
 class Test(TestOther, TestImports, TestUndefinedNames):

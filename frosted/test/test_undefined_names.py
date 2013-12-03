@@ -2,8 +2,8 @@
 from _ast import PyCF_ONLY_AST
 from sys import version_info
 
-from pyflakes import messages as m, checker
-from pyflakes.test.harness import TestCase, skip, skipIf
+from frosted import messages as m, checker
+from frosted.test.harness import TestCase, skip, skipIf
 
 
 class Test(TestCase):

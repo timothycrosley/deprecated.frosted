@@ -1,5 +1,5 @@
 """
-API for the command-line I{pyflakes} tool.
+API for the command-line I{frosted} tool.
 """
 from __future__ import with_statement
 
@@ -8,8 +8,8 @@ import os
 import _ast
 from optparse import OptionParser
 
-from pyflakes import checker, __version__
-from pyflakes import reporter as modReporter
+from frosted import checker, __version__
+from frosted import reporter as modReporter
 
 __all__ = ['check', 'checkPath', 'checkRecursive', 'iterSourceCode', 'main']
 

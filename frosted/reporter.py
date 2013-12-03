@@ -7,7 +7,7 @@ import sys
 
 class Reporter(object):
     """
-    Formats the results of pyflakes checks to users.
+    Formats the results of frosted checks to users.
     """
 
     def __init__(self, warningStream, errorStream):
@@ -61,9 +61,9 @@ class Reporter(object):
 
     def flake(self, message):
         """
-        pyflakes found something wrong with the code.
+        frosted found something wrong with the code.
 
-        @param: A L{pyflakes.messages.Message}.
+        @param: A L{frosted.messages.Message}.
         """
         self._stdout.write(str(message))
         self._stdout.write('\n')

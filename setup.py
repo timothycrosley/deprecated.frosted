@@ -1,51 +1,50 @@
-#!/usr/bin/env python
-# Copyright 2005-2011 Divmod, Inc.
-# Copyright 2013 Florent Xicluna.  See LICENSE file for details
-from __future__ import with_statement
+"""
+    frosted/setup.py
+
+    Defines how frosted should be installed on a standard Python system.
+
+    Copyright (C) 2013  Timothy Edmund Crosley
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+    documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+    the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
+    to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all copies or
+    substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+    TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+    THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+    CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+    OTHER DEALINGS IN THE SOFTWARE.
+"""
 
 import os.path
 
 try:
     from setuptools import setup
-except ImportError:
-    from distutils.core import setup
-    extra = {'scripts': ["bin/pyflakes"]}
-else:
     extra = {
-        'test_suite': 'pyflakes.test',
+        'test_suite': 'frosted.test',
         'entry_points': {
-            'console_scripts': ['pyflakes = pyflakes.api:main'],
+            'console_scripts': ['frosted = frosted.api:main'],
         },
     }
-
-
-def get_version(fname=os.path.join('pyflakes', '__init__.py')):
-    with open(fname) as f:
-        for line in f:
-            if line.startswith('__version__'):
-                return eval(line.split('=')[-1])
-
-
-def get_long_description():
-    descr = []
-    for fname in ('README.rst',):
-        with open(fname) as f:
-            descr.append(f.read())
-    return '\n\n'.join(descr)
-
+except ImportError:
+    from distutils.core import setup
+    extra = {'scripts': ["bin/frosted"]}
 
 setup(
-    name="pyflakes",
+    name="frosted",
     license="MIT",
-    version=get_version(),
-    description="passive checker of Python programs",
-    long_description=get_long_description(),
-    author="Phil Frost",
-    author_email="indigo@bitglue.com",
-    maintainer="Florent Xicluna",
-    maintainer_email="pyflakes-dev@lists.launchpad.net",
-    url="https://launchpad.net/pyflakes",
-    packages=["pyflakes", "pyflakes.scripts", "pyflakes.test"],
+    version="1.0.0",
+    description="A passive Python syntax checker",
+    author="Timothy Crosley",
+    author_email="timothy.crosley@gmail.com",
+    maintainer="Timothy Crosley",
+    maintainer_email="timothy.crosley@gmail.com",
+    url="https://github.com/timothycrosley/frosted",
+    packages=["frosted", "frosted.scripts", "frosted.test"],
     classifiers=[
         "Development Status :: 6 - Mature",
         "Environment :: Console",

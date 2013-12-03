@@ -3,7 +3,7 @@ import sys
 import textwrap
 import unittest
 
-from pyflakes import checker
+from frosted import checker
 
 __all__ = ['TestCase', 'skip', 'skipIf']
 

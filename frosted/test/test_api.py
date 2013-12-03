@@ -1,5 +1,5 @@
 """
-Tests for L{pyflakes.scripts.pyflakes}.
+Tests for L{frosted.scripts.frosted}.
 """
 
 import os
@@ -8,14 +8,14 @@ import shutil
 import subprocess
 import tempfile
 
-from pyflakes.messages import UnusedImport
-from pyflakes.reporter import Reporter
-from pyflakes.api import (
+from frosted.messages import UnusedImport
+from frosted.reporter import Reporter
+from frosted.api import (
     checkPath,
     checkRecursive,
     iterSourceCode,
 )
-from pyflakes.test.harness import TestCase, skipIf
+from frosted.test.harness import TestCase, skipIf
 
 if sys.version_info < (3,):
     from cStringIO import StringIO
@@ -212,7 +212,7 @@ class TestReporter(TestCase):
     def test_flake(self):
         """
         C{flake} reports a code warning from Pyflakes.  It is exactly the
-        str() of a L{pyflakes.messages.Message}.
+        str() of a L{frosted.messages.Message}.
         """
         out = StringIO()
         reporter = Reporter(out, None)
@@ -252,9 +252,9 @@ class CheckTests(TestCase):
 
     def getErrors(self, path):
         """
-        Get any warnings or errors reported by pyflakes for the file at C{path}.
+        Get any warnings or errors reported by frosted for the file at C{path}.
 
-        @param path: The path to a Python file on disk that pyflakes will check.
+        @param path: The path to a Python file on disk that frosted will check.
         @return: C{(count, log)}, where C{count} is the number of warnings or
             errors generated, and log is a list of those warnings, presented
             as structured data.  See L{LoggingReporter} for more details.
@@ -265,8 +265,8 @@ class CheckTests(TestCase):
         return count, log
 
     def test_legacyScript(self):
-        from pyflakes.scripts import pyflakes as script_pyflakes
-        self.assertIs(script_pyflakes.checkPath, checkPath)
+        from frosted.scripts import frosted as script_frosted
+        self.assertIs(script_frosted.checkPath, checkPath)
 
     def test_missingTrailingNewline(self):
         """
@@ -410,9 +410,9 @@ foo = '\\xyz'
             errors,
             [('unexpectedError', sourcePath, "Permission denied")])
 
-    def test_pyflakesWarning(self):
+    def test_frostedWarning(self):
         """
-        If the source file has a pyflakes warning, this is reported as a
+        If the source file has a frosted warning, this is reported as a
         'flake'.
         """
         sourcePath = self.makeTempFile("import foo")
@@ -478,7 +478,7 @@ x = "%s"
 
 class IntegrationTests(TestCase):
     """
-    Tests of the pyflakes script that actually spawn the script.
+    Tests of the frosted script that actually spawn the script.
     """
 
     def setUp(self):
@@ -490,19 +490,19 @@ class IntegrationTests(TestCase):
 
     def getPyflakesBinary(self):
         """
-        Return the path to the pyflakes binary.
+        Return the path to the frosted binary.
         """
-        import pyflakes
-        package_dir = os.path.dirname(pyflakes.__file__)
-        return os.path.join(package_dir, '..', 'bin', 'pyflakes')
+        import frosted
+        package_dir = os.path.dirname(frosted.__file__)
+        return os.path.join(package_dir, '..', 'bin', 'frosted')
 
     def runPyflakes(self, paths, stdin=None):
         """
-        Launch a subprocess running C{pyflakes}.
+        Launch a subprocess running C{frosted}.
 
-        @param args: Command-line arguments to pass to pyflakes.
+        @param args: Command-line arguments to pass to frosted.
         @param kwargs: Options passed on to C{subprocess.Popen}.
-        @return: C{(returncode, stdout, stderr)} of the completed pyflakes
+        @return: C{(returncode, stdout, stderr)} of the completed frosted
             process.
         """
         env = dict(os.environ)
@@ -547,7 +547,7 @@ class IntegrationTests(TestCase):
 
     def test_errors(self):
         """
-        When pyflakes finds errors with the files it's given, (if they don't
+        When frosted finds errors with the files it's given, (if they don't
         exist, say), then the return code is non-zero and the errors are
         printed to stderr.
         """
@@ -557,7 +557,7 @@ class IntegrationTests(TestCase):
 
     def test_readFromStdin(self):
         """
-        If no arguments are passed to C{pyflakes} then it reads from stdin.
+        If no arguments are passed to C{frosted} then it reads from stdin.
         """
         d = self.runPyflakes([], stdin='import contraband'.encode('ascii'))
         expected = UnusedImport('<stdin>', Node(1), 'contraband')
