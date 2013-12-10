@@ -13,7 +13,7 @@ Installing frosted
 
 Installing frosted is as simple as:
 
-    pip install frosted
+    pip install frosted --upgrade
 
 or if you prefer
 
