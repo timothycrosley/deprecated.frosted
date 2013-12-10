@@ -211,7 +211,7 @@ class TestReporter(TestCase):
 
     def test_flake(self):
         """
-        C{flake} reports a code warning from Pyflakes.  It is exactly the
+        C{flake} reports a code warning from Frosted.  It is exactly the
         str() of a L{frosted.messages.Message}.
         """
         out = StringIO()
@@ -488,7 +488,7 @@ class IntegrationTests(TestCase):
     def tearDown(self):
         shutil.rmtree(self.tempdir)
 
-    def getPyflakesBinary(self):
+    def getFrostedBinary(self):
         """
         Return the path to the frosted binary.
         """
@@ -496,7 +496,7 @@ class IntegrationTests(TestCase):
         package_dir = os.path.dirname(frosted.__file__)
         return os.path.join(package_dir, '..', 'bin', 'frosted')
 
-    def runPyflakes(self, paths, stdin=None):
+    def runFrosted(self, paths, stdin=None):
         """
         Launch a subprocess running C{frosted}.
 
@@ -505,9 +505,9 @@ class IntegrationTests(TestCase):
         @return: C{(returncode, stdout, stderr)} of the completed frosted
             process.
         """
-        env = dict(os.environ)
+        env = native_dict(os.environ)
         env['PYTHONPATH'] = os.pathsep.join(sys.path)
-        command = [sys.executable, self.getPyflakesBinary()]
+        command = [sys.executable, self.getFrostedBinary()]
         command.extend(paths)
         if stdin:
             p = subprocess.Popen(command, env=env, stdin=subprocess.PIPE,
@@ -530,7 +530,7 @@ class IntegrationTests(TestCase):
         """
         fd = open(self.tempfilepath, 'a')
         fd.close()
-        d = self.runPyflakes([self.tempfilepath])
+        d = self.runFrosted([self.tempfilepath])
         self.assertEqual(d, ('', '', 0))
 
     def test_fileWithFlakes(self):
@@ -541,7 +541,7 @@ class IntegrationTests(TestCase):
         fd = open(self.tempfilepath, 'wb')
         fd.write("import contraband\n".encode('ascii'))
         fd.close()
-        d = self.runPyflakes([self.tempfilepath])
+        d = self.runFrosted([self.tempfilepath])
         expected = UnusedImport(self.tempfilepath, Node(1), 'contraband')
         self.assertEqual(d, ("%s\n" % expected, '', 1))
 
@@ -551,7 +551,7 @@ class IntegrationTests(TestCase):
         exist, say), then the return code is non-zero and the errors are
         printed to stderr.
         """
-        d = self.runPyflakes([self.tempfilepath])
+        d = self.runFrosted([self.tempfilepath])
         error_msg = '%s: No such file or directory\n' % (self.tempfilepath,)
         self.assertEqual(d, ('', error_msg, 1))
 
@@ -559,6 +559,6 @@ class IntegrationTests(TestCase):
         """
         If no arguments are passed to C{frosted} then it reads from stdin.
         """
-        d = self.runPyflakes([], stdin='import contraband'.encode('ascii'))
+        d = self.runFrosted([], stdin='import contraband'.encode('ascii'))
         expected = UnusedImport('<stdin>', Node(1), 'contraband')
         self.assertEqual(d, ("%s\n" % expected, '', 1))

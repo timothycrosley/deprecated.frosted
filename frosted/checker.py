@@ -6,44 +6,18 @@ Also, it models the Bindings and Scopes.
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import ast
 import doctest
 import os
 import sys
 
+import builtins
 from pies.overrides import *
 
 from frosted import messages
 
-try:
-    builtin_vars = dir(__import__('builtins'))
-    PY2 = False
-except ImportError:
-    builtin_vars = dir(__import__('__builtin__'))
-    PY2 = True
+BUILTIN_VARS = dir(__import__('builtins'))
 
-try:
-    import ast
-    iter_child_nodes = ast.iter_child_nodes
-except ImportError:     # Python 2.5
-    import _ast as ast
-
-    if 'decorator_list' not in ast.ClassDef._fields:
-        # Patch the missing attribute 'decorator_list'
-        ast.ClassDef.decorator_list = ()
-        ast.FunctionDef.decorator_list = property(lambda s: s.decorators)
-
-    def iter_child_nodes(node):
-        """
-        Yield all direct child nodes of *node*, that is, all fields that
-        are nodes and all items of fields that are lists of nodes.
-        """
-        for name in node._fields:
-            field = getattr(node, name, None)
-            if isinstance(field, ast.AST):
-                yield field
-            elif isinstance(field, list):
-                for item in field:
-                    yield item
 # Python >= 3.3 uses ast.Try instead of (ast.TryExcept + ast.TryFinally)
 if hasattr(ast, 'Try'):
     ast_TryExcept = ast.Try
@@ -53,14 +27,8 @@ else:
     ast_TryFinally = ast.TryFinally
 
 
-
-if PY2:
-    def getNodeType(node_class):
-        # workaround str.upper() which is locale-dependent
-        return str(unicode(node_class.__name__).upper())
-else:
-    def getNodeType(node_class):
-        return node_class.__name__.upper()
+def getNodeType(node_class):
+    return str(node_class.__name__).upper()
 
 
 class Binding(object):
@@ -160,7 +128,7 @@ class ExportBinding(Binding):
         return names
 
 
-class Scope(dict):
+class Scope(native_dict):
     importStarred = False       # set to True when import * is found
 
     def __repr__(self):
@@ -237,7 +205,7 @@ class Checker(object):
     traceTree = False
     withDoctest = ('PYFLAKES_NODOCTEST' not in os.environ)
 
-    builtIns = set(builtin_vars).union(_MAGIC_GLOBALS)
+    builtIns = set(BUILTIN_VARS).union(_MAGIC_GLOBALS)
     _customBuiltIns = os.environ.get('PYFLAKES_BUILTINS')
     if _customBuiltIns:
         builtIns.update(_customBuiltIns.split(','))
@@ -522,7 +490,7 @@ class Checker(object):
                 self.report(messages.UndefinedName, node, name)
 
     def handleChildren(self, tree):
-        for node in iter_child_nodes(tree):
+        for node in ast.iter_child_nodes(tree):
             self.handleNode(node, tree)
 
     def isDocstring(self, node):
@@ -668,7 +636,7 @@ class Checker(object):
             elif isinstance(n, ast.expr_context):
                 return
             else:
-                for c in iter_child_nodes(n):
+                for c in ast.iter_child_nodes(n):
                     collectLoopVars(c)
 
         collectLoopVars(node.target)
@@ -842,7 +810,7 @@ class Checker(object):
             self.handleNode(child, node)
         self.exceptHandlers.pop()
         # Process the other nodes: "except:", "else:", "finally:"
-        for child in iter_child_nodes(node):
+        for child in ast.iter_child_nodes(node):
             if child not in node.body:
                 self.handleNode(child, node)
 
