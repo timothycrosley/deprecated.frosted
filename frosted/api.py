@@ -3,13 +3,13 @@ API for the command-line I{frosted} tool.
 """
 from __future__ import with_statement
 
-import sys
 import os
-import _ast
+import sys
 from optparse import OptionParser
 
-from frosted import checker, __version__
+import _ast
 from frosted import reporter as modReporter
+from frosted import __version__, checker
 
 __all__ = ['check', 'checkPath', 'checkRecursive', 'iterSourceCode', 'main']
 

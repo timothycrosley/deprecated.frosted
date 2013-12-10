@@ -3,19 +3,15 @@ Tests for L{frosted.scripts.frosted}.
 """
 
 import os
-import sys
 import shutil
 import subprocess
+import sys
 import tempfile
 
+from frosted.api import checkPath, checkRecursive, iterSourceCode
 from frosted.messages import UnusedImport
 from frosted.reporter import Reporter
-from frosted.api import (
-    checkPath,
-    checkRecursive,
-    iterSourceCode,
-)
-from frosted.test.harness import TestCase, skipIf
+from frosted.test.harness import skipIf, TestCase
 
 if sys.version_info < (3,):
     from cStringIO import StringIO

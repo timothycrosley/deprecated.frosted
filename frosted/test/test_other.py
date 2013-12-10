@@ -5,7 +5,7 @@ Tests for various Pyflakes behavior.
 from sys import version_info
 
 from frosted import messages as m
-from frosted.test.harness import TestCase, skip, skipIf
+from frosted.test.harness import skip, skipIf, TestCase
 
 
 class Test(TestCase):

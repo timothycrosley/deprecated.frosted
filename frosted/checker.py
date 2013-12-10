@@ -7,6 +7,9 @@ Also, it models the Bindings and Scopes.
 import doctest
 import os
 import sys
+
+from frosted import messages
+
 try:
     builtin_vars = dir(__import__('builtins'))
     PY2 = False
@@ -45,7 +48,6 @@ else:
     ast_TryExcept = ast.TryExcept
     ast_TryFinally = ast.TryFinally
 
-from frosted import messages
 
 
 if PY2:

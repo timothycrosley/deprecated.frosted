@@ -1,9 +1,10 @@
 
-from _ast import PyCF_ONLY_AST
 from sys import version_info
 
-from frosted import messages as m, checker
-from frosted.test.harness import TestCase, skip, skipIf
+from _ast import PyCF_ONLY_AST
+from frosted import messages as m
+from frosted import checker
+from frosted.test.harness import skip, skipIf, TestCase
 
 
 class Test(TestCase):

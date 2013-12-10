@@ -1,10 +1,10 @@
 import textwrap
 
 from frosted import messages as m
-from frosted.test.test_other import Test as TestOther
-from frosted.test.test_imports import Test as TestImports
-from frosted.test.test_undefined_names import Test as TestUndefinedNames
 from frosted.test.harness import skip
+from frosted.test.test_imports import Test as TestImports
+from frosted.test.test_other import Test as TestOther
+from frosted.test.test_undefined_names import Test as TestUndefinedNames
 
 
 class Test(TestOther, TestImports, TestUndefinedNames):
