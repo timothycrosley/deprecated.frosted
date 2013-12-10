@@ -2,7 +2,11 @@
 Tests for various Pyflakes behavior.
 """
 
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from sys import version_info
+
+from pies.overrides import *
 
 from frosted import messages as m
 from frosted.test.harness import skip, skipIf, TestCase

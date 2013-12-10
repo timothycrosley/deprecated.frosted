@@ -4,9 +4,13 @@ Main module.
 Implement the central Checker class.
 Also, it models the Bindings and Scopes.
 """
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import doctest
 import os
 import sys
+
+from pies.overrides import *
 
 from frosted import messages
 

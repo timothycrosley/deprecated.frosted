@@ -2,11 +2,15 @@
 Tests for L{frosted.scripts.frosted}.
 """
 
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import os
 import shutil
 import subprocess
 import sys
 import tempfile
+
+from pies.overrides import *
 
 from frosted.api import checkPath, checkRecursive, iterSourceCode
 from frosted.messages import UnusedImport
