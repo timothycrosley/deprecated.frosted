@@ -17,6 +17,9 @@ class Message(object):
         self.col = getattr(loc, 'col_offset', 0)
 
     def __str__(self):
+        return self.__unicode__()
+
+    def __unicode__(self):
         return '%s:%s: %s' % (self.filename, self.lineno,
                               self.message % self.message_args)
 

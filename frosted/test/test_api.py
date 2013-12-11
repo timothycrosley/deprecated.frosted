@@ -1,5 +1,21 @@
 """
-Tests for L{frosted.scripts.frosted}.
+    frosted/test/test_api.py
+
+    Tests all major functionality of the Frosted API
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+    documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+    the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
+    to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all copies or
+    substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+    TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+    THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+    CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+    OTHER DEALINGS IN THE SOFTWARE.
 """
 
 from __future__ import absolute_import, division, print_function, unicode_literals
@@ -9,6 +25,8 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from collections import namedtuple
+from io import StringIO
 
 from pies.overrides import *
 
@@ -17,45 +35,20 @@ from frosted.messages import UnusedImport
 from frosted.reporter import Reporter
 from frosted.test.harness import skipIf, TestCase
 
-if sys.version_info < (3,):
-    from cStringIO import StringIO
-else:
-    from io import StringIO
-    unichr = chr
 
-
-def withStderrTo(stderr, f, *args, **kwargs):
+class Node(namedtuple('Node', ['lineno', 'col_offset'])):
     """
-    Call C{f} with C{sys.stderr} redirected to C{stderr}.
-    """
-    (outer, sys.stderr) = (sys.stderr, stderr)
-    try:
-        return f(*args, **kwargs)
-    finally:
-        sys.stderr = outer
-
-
-class Node(object):
-    """
-    Mock an AST node.
-    """
-    def __init__(self, lineno, col_offset=0):
-        self.lineno = lineno
-        self.col_offset = col_offset
-
-
-class LoggingReporter(object):
-    """
-    Implementation of Reporter that just appends any error to a list.
+        A mock AST Node.
     """
 
-    def __init__(self, log):
-        """
-        Construct a C{LoggingReporter}.
+    def __new__(cls, lineno, col_offset=0):
+        return super(Node, cls).__new__(cls, lineno, col_offset)
 
-        @param log: A list to append log messages to.
-        """
-        self.log = log
+
+class LoggingReporter(namedtuple('LoggingReporter', ['log'])):
+    """
+        A mock Reporter implementation.
+    """
 
     def flake(self, message):
         self.log.append(('flake', str(message)))
@@ -223,7 +216,7 @@ class TestReporter(TestCase):
 
 class CheckTests(TestCase):
     """
-    Tests for L{check} and L{checkPath} which check a file for flakes.
+    Tests for L{check} and L{chefackPath} which check a file for flakes.
     """
 
     def makeTempFile(self, content):
@@ -238,17 +231,21 @@ class CheckTests(TestCase):
         fd.close()
         return fpath
 
-    def assertHasErrors(self, path, errorList):
+    def assert_contains_errors(self, path, errorList):
         """
-        Assert that C{path} causes errors.
+            Assert that provided causes at minimal the errors provided in the error list.
+        """
+        error = StringIO()
+        (outer, sys.stderr) = (sys.stderr, error)
+        try:
+            count = checkPath(path)
+        finally:
+            sys.stderr = outer
 
-        @param path: A path to a file to check.
-        @param errorList: A list of errors expected to be printed to stderr.
-        """
-        err = StringIO()
-        count = withStderrTo(err, checkPath, path)
-        self.assertEqual(
-            (count, err.getvalue()), (len(errorList), ''.join(errorList)))
+        error_string = error.getvalue()
+        self.assertTrue((errorList) >= count)
+        for error in errorList:
+            self.assertTrue(error in error_string)
 
     def getErrors(self, path):
         """
@@ -275,7 +272,7 @@ class CheckTests(TestCase):
         L{check}.
         """
         fName = self.makeTempFile("def foo():\n\tpass\n\t")
-        self.assertHasErrors(fName, [])
+        self.assert_contains_errors(fName, [])
 
     def test_checkPathNonExisting(self):
         """
@@ -317,7 +314,7 @@ def baz():
             self.fail()
 
         sourcePath = self.makeTempFile(source)
-        self.assertHasErrors(
+        self.assert_contains_errors(
             sourcePath,
             ["""\
 %s:8: invalid syntax
@@ -331,7 +328,7 @@ def baz():
         syntax error reflects the cause for the syntax error.
         """
         sourcePath = self.makeTempFile("def foo(")
-        self.assertHasErrors(
+        self.assert_contains_errors(
             sourcePath,
             ["""\
 %s:1: unexpected EOF while parsing
@@ -351,7 +348,7 @@ def foo(bar=baz, bax):
 """
         sourcePath = self.makeTempFile(source)
         last_line = '        ^\n' if sys.version_info >= (3, 2) else ''
-        self.assertHasErrors(
+        self.assert_contains_errors(
             sourcePath,
             ["""\
 %s:1: non-default argument follows default argument
@@ -369,7 +366,7 @@ foo(bar=baz, bax)
 """
         sourcePath = self.makeTempFile(source)
         last_line = '             ^\n' if sys.version_info >= (3, 2) else ''
-        self.assertHasErrors(
+        self.assert_contains_errors(
             sourcePath,
             ["""\
 %s:1: non-keyword arg after keyword arg
@@ -380,22 +377,13 @@ foo(bar=baz, bax)
         """
         The invalid escape syntax raises ValueError in Python 2
         """
-        ver = sys.version_info
         # ValueError: invalid \x escape
+        ver = sys.version_info
         sourcePath = self.makeTempFile(r"foo = '\xyz'")
-        if ver < (3,):
-            decoding_error = "%s: problem decoding source\n" % (sourcePath,)
-        else:
-            last_line = '       ^\n' if ver >= (3, 2) else ''
-            # Column has been "fixed" since 3.2.4 and 3.3.1
-            col = 1 if ver >= (3, 3, 1) or ((3, 2, 4) <= ver < (3, 3)) else 2
-            decoding_error = """\
-%s:1: (unicode error) 'unicodeescape' codec can't decode bytes \
-in position 0-%d: truncated \\xXX escape
-foo = '\\xyz'
-%s""" % (sourcePath, col, last_line)
-        self.assertHasErrors(
-            sourcePath, [decoding_error])
+        last_line = '       ^\n' if ver >= (3, 2) else ''
+        # Column has been "fixed" since 3.2.4 and 3.3.1
+        col = 1 if ver >= (3, 3, 1) or ((3, 2, 4) <= ver < (3, 3)) else 2
+        self.assert_contains_errors(sourcePath, ("(unicode error) 'unicodeescape' codec can't decode bytes",))
 
     def test_permissionDenied(self):
         """
@@ -427,13 +415,13 @@ foo = '\\xyz'
         If a source file contains bytes which cannot be decoded, this is
         reported on stderr.
         """
-        SNOWMAN = unichr(0x2603)
+        SNOWMAN = chr(0x2603)
         source = ("""\
 # coding: ascii
 x = "%s"
 """ % SNOWMAN).encode('utf-8')
         sourcePath = self.makeTempFile(source)
-        self.assertHasErrors(
+        self.assert_contains_errors(
             sourcePath, ["%s: problem decoding source\n" % (sourcePath,)])
 
     def test_misencodedFileUTF16(self):
@@ -441,13 +429,13 @@ x = "%s"
         If a source file contains bytes which cannot be decoded, this is
         reported on stderr.
         """
-        SNOWMAN = unichr(0x2603)
+        SNOWMAN = chr(0x2603)
         source = ("""\
 # coding: ascii
 x = "%s"
 """ % SNOWMAN).encode('utf-16')
         sourcePath = self.makeTempFile(source)
-        self.assertHasErrors(
+        self.assert_contains_errors(
             sourcePath, ["%s: problem decoding source\n" % (sourcePath,)])
 
     def test_checkRecursive(self):
@@ -518,9 +506,10 @@ class IntegrationTests(TestCase):
                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             (stdout, stderr) = p.communicate()
         rv = p.wait()
-        if sys.version_info >= (3,):
+        if PY3:
             stdout = stdout.decode('utf-8')
             stderr = stderr.decode('utf-8')
+
         return (stdout, stderr, rv)
 
     def test_goodFile(self):
@@ -542,7 +531,7 @@ class IntegrationTests(TestCase):
         fd.write("import contraband\n".encode('ascii'))
         fd.close()
         d = self.runFrosted([self.tempfilepath])
-        expected = UnusedImport(self.tempfilepath, Node(1), 'contraband')
+        expected = UnusedImport(self.tempfilepath, Node(1), 'contraband'.encode('ascii'))
         self.assertEqual(d, ("%s\n" % expected, '', 1))
 
     def test_errors(self):
@@ -560,5 +549,5 @@ class IntegrationTests(TestCase):
         If no arguments are passed to C{frosted} then it reads from stdin.
         """
         d = self.runFrosted([], stdin='import contraband'.encode('ascii'))
-        expected = UnusedImport('<stdin>', Node(1), 'contraband')
-        self.assertEqual(d, ("%s\n" % expected, '', 1))
+        expected = UnusedImport('<stdin>', Node(1), 'contraband'.encode('ascii'))
+        self.assertEqual(d, (str(expected) + "\n", '', 1))

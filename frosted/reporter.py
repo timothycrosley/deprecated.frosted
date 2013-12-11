@@ -58,7 +58,7 @@ class Reporter(object):
         if offset is not None:
             offset = offset - (len(text) - len(line))
         self._stderr.write('%s:%d: %s\n' % (filename, lineno, msg))
-        self._stderr.write(line)
+        self._stderr.write(str(line))
         self._stderr.write('\n')
         if offset is not None:
             self._stderr.write(" " * (offset + 1) + "^\n")
