@@ -20,8 +20,6 @@
     OTHER DEALINGS IN THE SOFTWARE.
 """
 
-import os.path
-
 try:
     from setuptools import setup
     extra = {
