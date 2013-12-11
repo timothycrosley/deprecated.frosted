@@ -3,8 +3,8 @@
 
 import sys
 
-from pyflakes import messages as m
-from pyflakes.test import harness
+from frosted import messages as m
+from frosted.test import harness
 
 class Test(harness.TestCase):
     def test_ok(self):
