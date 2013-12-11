@@ -292,6 +292,9 @@ class Checker(object):
 
             # Look for imported names that aren't used.
             for importation in scope.values():
+                # don't check unused imports in namespace definitions
+                if self.filename == '__init__.py':
+                    continue
                 if isinstance(importation, Importation):
                     if not importation.used and importation.name not in all:
                         self.report(messages.UnusedImport,
