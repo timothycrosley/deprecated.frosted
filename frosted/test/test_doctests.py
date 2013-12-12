@@ -5,10 +5,10 @@ import textwrap
 from pies.overrides import *
 
 from frosted import messages as m
-from frosted.test.harness import skip
 from frosted.test.test_imports import Test as TestImports
 from frosted.test.test_other import Test as TestOther
 from frosted.test.test_undefined_names import Test as TestUndefinedNames
+from pies.unittest import skip
 
 
 class Test(TestOther, TestImports, TestUndefinedNames):
@@ -230,3 +230,4 @@ class Test(TestOther, TestImports, TestUndefinedNames):
         self.assertEqual(exc.lineno, 4)
         exc = exceptions[1]
         self.assertEqual(exc.lineno, 6)
+

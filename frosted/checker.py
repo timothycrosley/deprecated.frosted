@@ -1,48 +1,52 @@
 """
-Main module.
+    frosted/checker.py
 
-Implement the central Checker class.
-Also, it models the Bindings and Scopes.
+    The core functionality of frosted lives here. Implements the core checking capability and
+    models Bindings and Scopes
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+    documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+    the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
+    to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all copies or
+    substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+    TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+    THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+    CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+    OTHER DEALINGS IN THE SOFTWARE.
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import ast
+import builtins
 import doctest
 import itertools
 import os
 import sys
-
-import builtins
-from pies.overrides import *
+from collections import namedtuple
 
 from frosted import messages
+from pies import ast
+from pies.overrides import *
 
-BUILTIN_VARS = dir(__import__('builtins'))
-
-# Python >= 3.3 uses ast.Try instead of (ast.TryExcept + ast.TryFinally)
-if hasattr(ast, 'Try'):
-    ast_TryExcept = ast.Try
-    ast_TryFinally = ()
-else:
-    ast_TryExcept = ast.TryExcept
-    ast_TryFinally = ast.TryFinally
-
-
-def getNodeType(node_class):
-    return str(node_class.__name__).upper()
+BUILTIN_VARS = set(dir(builtins) + ['__file__', '__builtins__', 'WindowsError'] +
+                   os.environ.get('PYFLAKES_BUILTINS', '').split(','))
 
 
 class Binding(object):
     """
-    Represents the binding of a value to a name.
+        Represents the binding of a value to a name.
 
-    The checker uses this to keep track of which names have been bound and
-    which names have not. See L{Assignment} for a special type of binding that
-    is checked with stricter rules.
+        The checker uses this to keep track of which names have been bound and
+        which names have not. See L{Assignment} for a special type of binding that
+        is checked with stricter rules.
 
-    @ivar used: pair of (L{Scope}, line-number) indicating the scope and
-                line number that this binding was last used
+        @ivar used: pair of (L{Scope}, line-number) indicating the scope and
+                    line number that this binding was last used
     """
+    __slots__ = ('name', 'source', 'used')
 
     def __init__(self, name, source):
         self.name = name
@@ -61,12 +65,14 @@ class Binding(object):
 
 class Importation(Binding):
     """
-    A binding created by an import statement.
+        A binding created by an import statement.
 
-    @ivar fullName: The complete name given to the import statement,
-        possibly including multiple dotted components.
-    @type fullName: C{str}
+        @ivar fullName: The complete name given to the import statement,
+            possibly including multiple dotted components.
+        @type fullName: C{str}
     """
+    __slots__ = ('fullName', )
+
     def __init__(self, name, source):
         self.fullName = name
         name = name.split('.')[0]
@@ -75,49 +81,56 @@ class Importation(Binding):
 
 class Argument(Binding):
     """
-    Represents binding a name as an argument.
+        Represents binding a name as an argument.
     """
+    __slots__ = ()
 
 
 class Definition(Binding):
     """
-    A binding that defines a function or a class.
+        A binding that defines a function or a class.
     """
+    __slots__ = ()
 
 
 class Assignment(Binding):
     """
-    Represents binding a name with an explicit assignment.
+        Represents binding a name with an explicit assignment.
 
-    The checker will raise warnings for any Assignment that isn't used. Also,
-    the checker does not consider assignments in tuple/list unpacking to be
-    Assignments, rather it treats them as simple Bindings.
+        The checker will raise warnings for any Assignment that isn't used. Also,
+        the checker does not consider assignments in tuple/list unpacking to be
+        Assignments, rather it treats them as simple Bindings.
     """
+    __slots__ = ()
 
 
 class FunctionDefinition(Definition):
+    __slots__ = ('signature', )
+
     def __init__(self, name, source):
         super(FunctionDefinition, self).__init__(name, source)
         self.signature = FunctionSignature.parseFromAstNode(source)
 
 class ClassDefinition(Definition):
-    pass
+    __slots__ = ()
 
 
 class ExportBinding(Binding):
     """
-    A binding created by an C{__all__} assignment.  If the names in the list
-    can be determined statically, they will be treated as names for export and
-    additional checking applied to them.
+        A binding created by an C{__all__} assignment.  If the names in the list
+        can be determined statically, they will be treated as names for export and
+        additional checking applied to them.
 
-    The only C{__all__} assignment that can be recognized is one which takes
-    the value of a literal list containing literal strings.  For example::
+        The only C{__all__} assignment that can be recognized is one which takes
+        the value of a literal list containing literal strings.  For example::
 
-        __all__ = ["foo", "bar"]
+            __all__ = ["foo", "bar"]
 
-    Names which are imported and not otherwise used but appear in the value of
-    C{__all__} will not have an unused import warning reported for them.
+        Names which are imported and not otherwise used but appear in the value of
+        C{__all__} will not have an unused import warning reported for them.
     """
+    __slots__ = ()
+
     def names(self):
         """
         Return a list of the names referenced by this binding.
@@ -144,9 +157,9 @@ class ClassScope(Scope):
 
 class FunctionScope(Scope):
     """
-    I represent a name scope for a function.
+        I represent a name scope for a function.
 
-    @ivar globals: Names declared 'global' in this function.
+        @ivar globals: Names declared 'global' in this function.
     """
     usesLocals = False
     alwaysUsed = set(['__tracebackhide__',
@@ -177,6 +190,8 @@ class ModuleScope(Scope):
 
 
 class FunctionDefinitionParser(object):
+    __slots__ = ('node', )
+
     def __init__(self, node):
         self.node = node
 
@@ -216,6 +231,9 @@ class FunctionDefinitionParser(object):
 
 
 class FunctionSignature(object):
+    __slots__ = ('decorated', 'argumentNames', 'defaultCount', 'kwOnlyArgumentNames', 'defaultCount',
+                 'kwOnlyArgumentNames', 'kwOnlyDefaultCount', 'hasVarArg', 'hasKwArg')
+
     def __init__(self, argumentNames, defaultCount, hasVarArg, hasKwArg,
                  kwOnlyArgumentNames, kwOnlyDefaultCount, decorated):
         self.decorated = decorated
@@ -307,11 +325,6 @@ class FunctionSignature(object):
                                  decorated=decorated)
 
 
-# Globally defined names which are not attributes of the builtins module, or
-# are only present on some platforms.
-_MAGIC_GLOBALS = ['__file__', '__builtins__', 'WindowsError']
-
-
 def getNodeName(node):
     # Returns node.id, or node.name, or None
     if hasattr(node, 'id'):     # One of the many nodes with an id
@@ -337,12 +350,7 @@ class Checker(object):
     offset = None
     traceTree = False
     withDoctest = ('PYFLAKES_NODOCTEST' not in os.environ)
-
-    builtIns = set(BUILTIN_VARS).union(_MAGIC_GLOBALS)
-    _customBuiltIns = os.environ.get('PYFLAKES_BUILTINS')
-    if _customBuiltIns:
-        builtIns.update(_customBuiltIns.split(','))
-    del _customBuiltIns
+    builtin_vars = BUILTIN_VARS
 
     def __init__(self, tree, filename='(none)', builtins=None):
         self._nodeHandlers = {}
@@ -352,7 +360,7 @@ class Checker(object):
         self.messages = []
         self.filename = filename
         if builtins:
-            self.builtIns = self.builtIns.union(builtins)
+            self.builtin_vars = self.builtin_vars.union(builtins)
         self.scopeStack = [ModuleScope()]
         self.exceptHandlers = [()]
         self.futuresAllowed = True
@@ -484,12 +492,12 @@ class Checker(object):
             for fork in (ancestor.body, ancestor.orelse):
                 if self.onFork(ancestor, lnode, rnode, fork):
                     return True
-        elif isinstance(ancestor, ast_TryExcept):
+        elif isinstance(ancestor, ast.Try):
             body = ancestor.body + ancestor.orelse
             for fork in [body] + [[hdl] for hdl in ancestor.handlers]:
                 if self.onFork(ancestor, lnode, rnode, fork):
                     return True
-        elif isinstance(ancestor, ast_TryFinally):
+        elif isinstance(ancestor, ast.TryFinally):
             if self.onFork(ancestor, lnode, rnode, ancestor.body):
                 return True
         return False
@@ -538,7 +546,7 @@ class Checker(object):
         try:
             return self._nodeHandlers[node_class]
         except KeyError:
-            nodeType = getNodeType(node_class)
+            nodeType = str(node_class.__name__).upper()
         self._nodeHandlers[node_class] = handler = getattr(self, nodeType)
         return handler
 
@@ -568,7 +576,7 @@ class Checker(object):
                 return
 
         # look in the built-ins
-        if importStarred or name in self.builtIns:
+        if importStarred or name in self.builtin_vars:
             return
         if name == '__path__' and os.path.basename(self.filename) == '__init__.py':
             # the special name __path__ is valid only in packages
@@ -1013,4 +1021,3 @@ class Checker(object):
         if isinstance(node.name, str):
             self.handleNodeStore(node)
         self.handleChildren(node)
-

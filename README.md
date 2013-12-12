@@ -6,7 +6,7 @@
 [![Build Status](https://travis-ci.org/timothycrosley/frosted.png?branch=master)](https://travis-ci.org/timothycrosley/frosted)
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/timothycrosley/frosted/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
-Frosted is a fork of pyflakes that aims at more open contribution from the outside public, and a better python checker for all.
+Frosted is a fork of pyflakes that aims at more open contribution from the outside public, a smaller more maintainable code base,  and a better Python checker for all.
 
 Installing frosted
 ===================

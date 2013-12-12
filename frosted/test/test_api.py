@@ -28,12 +28,12 @@ import tempfile
 from collections import namedtuple
 from io import StringIO
 
-from pies.overrides import *
-
 from frosted.api import checkPath, checkRecursive, iterSourceCode
 from frosted.messages import UnusedImport
 from frosted.reporter import Reporter
-from frosted.test.harness import skipIf, TestCase
+from frosted.test.harness import TestCase
+from pies.overrides import *
+from pies.unittest import skipIf
 
 
 class Node(namedtuple('Node', ['lineno', 'col_offset'])):

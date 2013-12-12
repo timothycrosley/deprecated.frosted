@@ -1,10 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import sys
 
 from frosted import messages as m
 from frosted.test import harness
+from pies.overrides import *
+
 
 class Test(harness.TestCase):
     def test_ok(self):
@@ -101,7 +105,7 @@ class Test(harness.TestCase):
         foo(1)
         ''', m.TooFewArguments)
 
-    if sys.version_info[0] == 3:
+    if PY3:
         def test_kwOnlyArguments(self):
             self.flakes('''
             def foo(a, *, b=0):
@@ -126,7 +130,7 @@ class Test(harness.TestCase):
                 pass
             foo(5, **{})
             ''')
-       
+
             self.flakes('''
             def foo(a, *, b):
                 pass
@@ -138,8 +142,7 @@ class Test(harness.TestCase):
                 pass
             foo(1, 2, 3, 4)
             ''', m.NeedKwOnlyArgument)
-
-    if sys.version_info[0] == 2:
+    elif PY2:
         def test_compoundArguments(self):
             self.flakes('''
             def foo(a, (b, c)):

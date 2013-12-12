@@ -6,10 +6,10 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from sys import version_info
 
-from pies.overrides import *
-
 from frosted import messages as m
-from frosted.test.harness import skip, skipIf, TestCase
+from frosted.test.harness import TestCase
+from pies.overrides import *
+from pies.unittest import skip, skipIf
 
 
 class Test(TestCase):

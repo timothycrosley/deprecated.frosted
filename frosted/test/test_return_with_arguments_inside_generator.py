@@ -2,7 +2,8 @@
 from sys import version_info
 
 from frosted import messages as m
-from frosted.test.harness import TestCase, skipIf
+from frosted.test.harness import TestCase
+from pies.unittest import skipIf
 
 
 class Test(TestCase):
