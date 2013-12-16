@@ -6,4 +6,4 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from pies.overrides import *
 
-from frosted.api import check, checkPath, checkRecursive, iterSourceCode, main
+from frosted.api import check, check_path, check_recursive, iter_source_code, main

@@ -13,7 +13,7 @@ import _ast
 from frosted import reporter as modReporter
 from frosted import __version__, checker
 
-__all__ = ['check', 'checkPath', 'checkRecursive', 'iterSourceCode', 'main']
+__all__ = ['check', 'check_path', 'check_recursive', 'iter_source_code', 'main']
 
 
 def check(codeString, filename, reporter=None):
@@ -34,7 +34,7 @@ def check(codeString, filename, reporter=None):
     @rtype: C{int}
     """
     if reporter is None:
-        reporter = modReporter._makeDefaultReporter()
+        reporter = modReporter._make_default_reporter()
     # First, compile into an AST and handle syntax errors.
     try:
         tree = compile(codeString, filename, "exec", _ast.PyCF_ONLY_AST)
@@ -49,12 +49,12 @@ def check(codeString, filename, reporter=None):
             # Avoid using msg, since for the only known case, it contains a
             # bogus message that claims the encoding the file declared was
             # unknown.
-            reporter.unexpectedError(filename, 'problem decoding source')
+            reporter.unexpected_error(filename, 'problem decoding source')
         else:
-            reporter.syntaxError(filename, msg, lineno, offset, text)
+            reporter.syntax_error(filename, msg, lineno, offset, text)
         return 1
     except Exception:
-        reporter.unexpectedError(filename, 'problem decoding source')
+        reporter.unexpected_error(filename, 'problem decoding source')
         return 1
     # Okay, it's syntactically valid.  Now check it.
     w = checker.Checker(tree, filename)
@@ -64,7 +64,7 @@ def check(codeString, filename, reporter=None):
     return len(w.messages)
 
 
-def checkPath(filename, reporter=None):
+def check_path(filename, reporter=None):
     """
     Check the given path, printing out any warnings detected.
 
@@ -74,21 +74,21 @@ def checkPath(filename, reporter=None):
     @return: the number of warnings printed
     """
     if reporter is None:
-        reporter = modReporter._makeDefaultReporter()
+        reporter = modReporter._make_default_reporter()
     try:
         with open(filename, 'U') as f:
             codestr = f.read() + '\n'
     except UnicodeError:
-        reporter.unexpectedError(filename, 'problem decoding source')
+        reporter.unexpected_error(filename, 'problem decoding source')
         return 1
     except IOError:
         msg = sys.exc_info()[1]
-        reporter.unexpectedError(filename, msg.args[1])
+        reporter.unexpected_error(filename, msg.args[1])
         return 1
     return check(codestr, filename, reporter)
 
 
-def iterSourceCode(paths):
+def iter_source_code(paths):
     """
     Iterate over all Python source files in C{paths}.
 
@@ -106,7 +106,7 @@ def iterSourceCode(paths):
             yield path
 
 
-def checkRecursive(paths, reporter):
+def check_recursive(paths, reporter):
     """
     Recursively check all source files in C{paths}.
 
@@ -117,17 +117,17 @@ def checkRecursive(paths, reporter):
     @return: The number of warnings found.
     """
     warnings = 0
-    for sourcePath in iterSourceCode(paths):
-        warnings += checkPath(sourcePath, reporter)
+    for sourcePath in iter_source_code(paths):
+        warnings += check_path(sourcePath, reporter)
     return warnings
 
 
 def main(prog=None):
     parser = OptionParser(prog=prog, version=__version__)
     __, args = parser.parse_args()
-    reporter = modReporter._makeDefaultReporter()
+    reporter = modReporter._make_default_reporter()
     if args:
-        warnings = checkRecursive(args, reporter)
+        warnings = check_recursive(args, reporter)
     else:
         warnings = check(sys.stdin.read(), '<stdin>', reporter)
     raise SystemExit(warnings > 0)

@@ -140,7 +140,7 @@ class Test(TestOther, TestImports, TestUndefinedNames):
         self.assertEqual(exc.lineno, 8)
         self.assertEqual(exc.col, 0)
 
-    def test_syntaxErrorInDoctest(self):
+    def test_syntax_errorInDoctest(self):
         exceptions = super(Test, self).flakes(
             '''
             def doctest_stuff():

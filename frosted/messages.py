@@ -17,11 +17,7 @@ class Message(object):
         self.col = getattr(loc, 'col_offset', 0)
 
     def __str__(self):
-        return self.__unicode__()
-
-    def __unicode__(self):
-        return '%s:%s: %s' % (self.filename, self.lineno,
-                              self.message % self.message_args)
+        return '%s:%s: %s' % (self.filename, self.lineno, self.message % self.message_args)
 
 
 class UnusedImport(Message):
@@ -125,8 +121,8 @@ class LateFutureImport(Message):
 
 class UnusedVariable(Message):
     """
-    Indicates that a variable has been explicity assigned to but not actually
-    used.
+        Indicates that a variable has been explicity assigned to but not actually
+        used.
     """
     message = 'local variable %r is assigned to but never used'
 
@@ -165,13 +161,13 @@ class UnexpectedArgument(Message):
 
 class NeedKwOnlyArgument(Message):
     message = '%s() needs kw-only argument(s): %s'
-    def __init__(self, filename, loc, functionname, missingArguments):
+    def __init__(self, filename, loc, functionname, missing_arguments):
         Message.__init__(self, filename, loc)
-        self.message_args = (functionname, missingArguments)
+        self.message_args = (functionname, missing_arguments)
 
 
 class ReturnWithArgsInsideGenerator(Message):
     """
-    Indicates a return statement with arguments inside a generator.
+        Indicates a return statement with arguments inside a generator.
     """
     message = '\'return\' with argument inside generator'

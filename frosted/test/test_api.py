@@ -28,7 +28,7 @@ import tempfile
 from collections import namedtuple
 from io import StringIO
 
-from frosted.api import checkPath, checkRecursive, iterSourceCode
+from frosted.api import check_path, check_recursive, iter_source_code
 from frosted.messages import UnusedImport
 from frosted.reporter import Reporter
 from frosted.test.harness import TestCase
@@ -53,16 +53,16 @@ class LoggingReporter(namedtuple('LoggingReporter', ['log'])):
     def flake(self, message):
         self.log.append(('flake', str(message)))
 
-    def unexpectedError(self, filename, message):
-        self.log.append(('unexpectedError', filename, message))
+    def unexpected_error(self, filename, message):
+        self.log.append(('unexpected_error', filename, message))
 
-    def syntaxError(self, filename, msg, lineno, offset, line):
-        self.log.append(('syntaxError', filename, msg, lineno, offset, line))
+    def syntax_error(self, filename, msg, lineno, offset, line):
+        self.log.append(('syntax_error', filename, msg, lineno, offset, line))
 
 
 class TestIterSourceCode(TestCase):
     """
-    Tests for L{iterSourceCode}.
+    Tests for L{iter_source_code}.
     """
 
     def setUp(self):
@@ -82,22 +82,22 @@ class TestIterSourceCode(TestCase):
         """
         There are no Python files in an empty directory.
         """
-        self.assertEqual(list(iterSourceCode([self.tempdir])), [])
+        self.assertEqual(list(iter_source_code([self.tempdir])), [])
 
     def test_singleFile(self):
         """
-        If the directory contains one Python file, C{iterSourceCode} will find
+        If the directory contains one Python file, C{iter_source_code} will find
         it.
         """
         childpath = self.makeEmptyFile('foo.py')
-        self.assertEqual(list(iterSourceCode([self.tempdir])), [childpath])
+        self.assertEqual(list(iter_source_code([self.tempdir])), [childpath])
 
     def test_onlyPythonSource(self):
         """
         Files that are not Python source files are not included.
         """
         self.makeEmptyFile('foo.pyc')
-        self.assertEqual(list(iterSourceCode([self.tempdir])), [])
+        self.assertEqual(list(iter_source_code([self.tempdir])), [])
 
     def test_recurses(self):
         """
@@ -110,12 +110,12 @@ class TestIterSourceCode(TestCase):
         bpath = self.makeEmptyFile('bar', 'b.py')
         cpath = self.makeEmptyFile('c.py')
         self.assertEqual(
-            sorted(iterSourceCode([self.tempdir])),
+            sorted(iter_source_code([self.tempdir])),
             sorted([apath, bpath, cpath]))
 
     def test_multipleDirectories(self):
         """
-        L{iterSourceCode} can be given multiple directories.  It will recurse
+        L{iter_source_code} can be given multiple directories.  It will recurse
         into each of them.
         """
         foopath = os.path.join(self.tempdir, 'foo')
@@ -125,16 +125,16 @@ class TestIterSourceCode(TestCase):
         os.mkdir(barpath)
         bpath = self.makeEmptyFile('bar', 'b.py')
         self.assertEqual(
-            sorted(iterSourceCode([foopath, barpath])),
+            sorted(iter_source_code([foopath, barpath])),
             sorted([apath, bpath]))
 
     def test_explicitFiles(self):
         """
-        If one of the paths given to L{iterSourceCode} is not a directory but
+        If one of the paths given to L{iter_source_code} is not a directory but
         a file, it will include that in its output.
         """
         epath = self.makeEmptyFile('e.py')
-        self.assertEqual(list(iterSourceCode([epath])),
+        self.assertEqual(list(iter_source_code([epath])),
                          [epath])
 
 
@@ -143,30 +143,30 @@ class TestReporter(TestCase):
     Tests for L{Reporter}.
     """
 
-    def test_syntaxError(self):
+    def test_syntax_error(self):
         """
-        C{syntaxError} reports that there was a syntax error in the source
+        C{syntax_error} reports that there was a syntax error in the source
         file.  It reports to the error stream and includes the filename, line
         number, error message, actual line of source and a caret pointing to
         where the error is.
         """
         err = StringIO()
         reporter = Reporter(None, err)
-        reporter.syntaxError('foo.py', 'a problem', 3, 7, 'bad line of source')
+        reporter.syntax_error('foo.py', 'a problem', 3, 7, 'bad line of source')
         self.assertEqual(
             ("foo.py:3:7: a problem\n"
              "bad line of source\n"
              "       ^\n"),
             err.getvalue())
 
-    def test_syntaxErrorNoOffset(self):
+    def test_syntax_errorNoOffset(self):
         """
-        C{syntaxError} doesn't include a caret pointing to the error if
+        C{syntax_error} doesn't include a caret pointing to the error if
         C{offset} is passed as C{None}.
         """
         err = StringIO()
         reporter = Reporter(None, err)
-        reporter.syntaxError('foo.py', 'a problem', 3, None,
+        reporter.syntax_error('foo.py', 'a problem', 3, None,
                              'bad line of source')
         self.assertEqual(
             ("foo.py:3: a problem\n"
@@ -185,7 +185,7 @@ class TestReporter(TestCase):
             'more bad lines of source',
         ]
         reporter = Reporter(None, err)
-        reporter.syntaxError('foo.py', 'a problem', 3, len(lines[0]) + 7,
+        reporter.syntax_error('foo.py', 'a problem', 3, len(lines[0]) + 7,
                              '\n'.join(lines))
         self.assertEqual(
             ("foo.py:3:6: a problem\n" +
@@ -193,13 +193,13 @@ class TestReporter(TestCase):
              "      ^\n"),
             err.getvalue())
 
-    def test_unexpectedError(self):
+    def test_unexpected_error(self):
         """
-        C{unexpectedError} reports an error processing a source file.
+        C{unexpected_error} reports an error processing a source file.
         """
         err = StringIO()
         reporter = Reporter(None, err)
-        reporter.unexpectedError('source.py', 'error message')
+        reporter.unexpected_error('source.py', 'error message')
         self.assertEqual('source.py: error message\n', err.getvalue())
 
     def test_flake(self):
@@ -238,7 +238,7 @@ class CheckTests(TestCase):
         error = StringIO()
         (outer, sys.stderr) = (sys.stderr, error)
         try:
-            count = checkPath(path)
+            count = check_path(path)
         finally:
             sys.stderr = outer
 
@@ -258,12 +258,12 @@ class CheckTests(TestCase):
         """
         log = []
         reporter = LoggingReporter(log)
-        count = checkPath(path, reporter)
+        count = check_path(path, reporter)
         return count, log
 
     def test_legacyScript(self):
         from frosted.scripts import frosted as script_frosted
-        self.assertIs(script_frosted.checkPath, checkPath)
+        self.assertIs(script_frosted.check_path, check_path)
 
     def test_missingTrailingNewline(self):
         """
@@ -274,15 +274,15 @@ class CheckTests(TestCase):
         fName = self.makeTempFile("def foo():\n\tpass\n\t")
         self.assert_contains_errors(fName, [])
 
-    def test_checkPathNonExisting(self):
+    def test_check_pathNonExisting(self):
         """
-        L{checkPath} handles non-existing files.
+        L{check_path} handles non-existing files.
         """
         count, errors = self.getErrors('extremo')
         self.assertEqual(count, 1)
         self.assertEqual(
             errors,
-            [('unexpectedError', 'extremo', 'No such file or directory')])
+            [('unexpected_error', 'extremo', 'No such file or directory')])
 
     def test_multilineSyntaxError(self):
         """
@@ -398,7 +398,7 @@ foo(bar=baz, bax)
         self.assertEqual(count, 1)
         self.assertEqual(
             errors,
-            [('unexpectedError', sourcePath, "Permission denied")])
+            [('unexpected_error', sourcePath, "Permission denied")])
 
     def test_frostedWarning(self):
         """
@@ -440,9 +440,9 @@ x = "%s"
         self.assert_contains_errors(
             sourcePath, ["%s: problem decoding source\n" % (sourcePath,)])
 
-    def test_checkRecursive(self):
+    def test_check_recursive(self):
         """
-        L{checkRecursive} descends into each directory, finding Python files
+        L{check_recursive} descends into each directory, finding Python files
         and reporting problems.
         """
         tempdir = tempfile.mkdtemp()
@@ -457,7 +457,7 @@ x = "%s"
         fd.close()
         log = []
         reporter = LoggingReporter(log)
-        warnings = checkRecursive([tempdir], reporter)
+        warnings = check_recursive([tempdir], reporter)
         self.assertEqual(warnings, 2)
         self.assertEqual(
             sorted(log),

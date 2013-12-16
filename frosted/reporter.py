@@ -28,7 +28,7 @@ class Reporter(object):
         self._stdout = warningStream
         self._stderr = errorStream
 
-    def unexpectedError(self, filename, msg):
+    def unexpected_error(self, filename, msg):
         """
         An unexpected error occurred trying to process C{filename}.
 
@@ -39,7 +39,7 @@ class Reporter(object):
         """
         self._stderr.write("%s: %s\n" % (filename, msg))
 
-    def syntaxError(self, filename, msg, lineno, offset, text):
+    def syntax_error(self, filename, msg, lineno, offset, text):
         """
         There was a syntax errror in C{filename}.
 
@@ -76,7 +76,7 @@ class Reporter(object):
         self._stdout.write('\n')
 
 
-def _makeDefaultReporter():
+def _make_default_reporter():
     """
     Make a reporter that can be used when no reporter is specified.
     """
