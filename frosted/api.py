@@ -1,5 +1,20 @@
 """
-API for the command-line I{frosted} tool.
+    frosted/api.py
+
+    Defines the api for the command-line frosted utility
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+    documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+    the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
+    to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all copies or
+    substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+    TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+    THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+    CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 
@@ -18,20 +33,7 @@ __all__ = ['check', 'check_path', 'check_recursive', 'iter_source_code', 'main']
 
 def check(codeString, filename, reporter=None):
     """
-    Check the Python source given by C{codeString} for flakes.
-
-    @param codeString: The Python source to check.
-    @type codeString: C{str}
-
-    @param filename: The name of the file the source came from, used to report
-        errors.
-    @type filename: C{str}
-
-    @param reporter: A L{Reporter} instance, where errors and warnings will be
-        reported.
-
-    @return: The number of warnings emitted.
-    @rtype: C{int}
+        Check the Python source given by codeString for unfrosted flakes.
     """
     if reporter is None:
         reporter = modReporter._make_default_reporter()
@@ -66,12 +68,7 @@ def check(codeString, filename, reporter=None):
 
 def check_path(filename, reporter=None):
     """
-    Check the given path, printing out any warnings detected.
-
-    @param reporter: A L{Reporter} instance, where errors and warnings will be
-        reported.
-
-    @return: the number of warnings printed
+        Check the given path, printing out any warnings detected.
     """
     if reporter is None:
         reporter = modReporter._make_default_reporter()
@@ -90,11 +87,7 @@ def check_path(filename, reporter=None):
 
 def iter_source_code(paths):
     """
-    Iterate over all Python source files in C{paths}.
-
-    @param paths: A list of paths.  Directories will be recursed into and
-        any .py files found will be yielded.  Any non-directories will be
-        yielded as-is.
+        Iterate over all Python source files defined in paths
     """
     for path in paths:
         if os.path.isdir(path):
@@ -108,13 +101,7 @@ def iter_source_code(paths):
 
 def check_recursive(paths, reporter):
     """
-    Recursively check all source files in C{paths}.
-
-    @param paths: A list of paths to Python source files and directories
-        containing Python source files.
-    @param reporter: A L{Reporter} where all of the warnings and errors
-        will be reported to.
-    @return: The number of warnings found.
+        Recursively check all source files defined in paths
     """
     warnings = 0
     for sourcePath in iter_source_code(paths):

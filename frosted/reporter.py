@@ -1,5 +1,20 @@
 """
-Provide the Reporter class.
+    frosted/reporter.py
+
+    Defines how errors found by frosted should be displayed to the user
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+    documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+    the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
+    to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all copies or
+    substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+    TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+    THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+    CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 """
 
 from __future__ import absolute_import, division, print_function, unicode_literals
@@ -11,54 +26,30 @@ from pies.overrides import *
 
 class Reporter(object):
     """
-    Formats the results of frosted checks to users.
+        Formats the results of frosted checks and then presents them to the user
     """
 
-    def __init__(self, warningStream, errorStream):
+    def __init__(self, warning_stream, error_stream):
         """
-        Construct a L{Reporter}.
-
-        @param warningStream: A file-like object where warnings will be
-            written to.  The stream's C{write} method must accept unicode.
-            C{sys.stdout} is a good value.
-        @param errorStream: A file-like object where error output will be
-            written to.  The stream's C{write} method must accept unicode.
-            C{sys.stderr} is a good value.
+            Construct a Reporter
         """
-        self._stdout = warningStream
-        self._stderr = errorStream
+        self._stdout = warning_stream
+        self._stderr = error_stream
 
     def unexpected_error(self, filename, msg):
         """
-        An unexpected error occurred trying to process C{filename}.
-
-        @param filename: The path to a file that we could not process.
-        @ptype filename: C{unicode}
-        @param msg: A message explaining the problem.
-        @ptype msg: C{unicode}
+            Output an unexpected_error specific to the provided filename
         """
         self._stderr.write("%s: %s\n" % (filename, msg))
 
     def syntax_error(self, filename, msg, lineno, offset, text):
         """
-        There was a syntax errror in C{filename}.
-
-        @param filename: The path to the file with the syntax error.
-        @ptype filename: C{unicode}
-        @param msg: An explanation of the syntax error.
-        @ptype msg: C{unicode}
-        @param lineno: The line number where the syntax error occurred.
-        @ptype lineno: C{int}
-        @param offset: The column on which the syntax error occurred, or None.
-        @ptype offset: C{int}
-        @param text: The source code containing the syntax error.
-        @ptype text: C{unicode}
+            Output a syntax_error specific to the provided filename
         """
         line = text.splitlines()[-1]
         if offset is not None:
             offset = offset - (len(text) - len(line))
-            self._stderr.write('%s:%d:%d: %s\n' % (filename, lineno, offset,
-        msg))
+            self._stderr.write('%s:%d:%d: %s\n' % (filename, lineno, offset, msg))
         else:
             self._stderr.write('%s:%d: %s\n' % (filename, lineno, msg))
         self._stderr.write(str(line))
@@ -68,9 +59,7 @@ class Reporter(object):
 
     def flake(self, message):
         """
-        frosted found something wrong with the code.
-
-        @param: A L{frosted.messages.Message}.
+            Print an error message to stdout
         """
         self._stdout.write(str(message))
         self._stdout.write('\n')
@@ -78,6 +67,6 @@ class Reporter(object):
 
 def _make_default_reporter():
     """
-    Make a reporter that can be used when no reporter is specified.
+        Make a reporter that can be used when no reporter is specified.
     """
     return Reporter(sys.stdout, sys.stderr)

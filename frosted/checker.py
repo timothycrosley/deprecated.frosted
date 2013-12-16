@@ -1,8 +1,7 @@
 """
     frosted/checker.py
 
-    The core functionality of frosted lives here. Implements the core checking capability and
-    models Bindings and Scopes
+    The core functionality of frosted lives here. Implements the core checking capability models Bindings and Scopes
 
     Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
     documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -47,11 +46,8 @@ class Binding(object):
         Represents the binding of a value to a name
 
         The checker uses this to keep track of which names have been bound and
-        which names have not. See L{Assignment} for a special type of binding that
+        which names have not. See Assignment for a special type of binding that
         is checked with stricter rules.
-
-        @ivar used: pair of (L{Scope}, line-number) indicating the scope and
-                    line number that this binding was last used
     """
     __slots__ = ('name', 'source', 'used')
 
@@ -73,10 +69,6 @@ class Binding(object):
 class Importation(Binding):
     """
         A binding created by an import statement
-
-        @ivar fullName: The complete name given to the import statement,
-            possibly including multiple dotted components.
-        @type fullName: C{str}
     """
     __slots__ = ('fullName', )
 
@@ -294,7 +286,7 @@ class Checker(object):
 
             This is used for handling function bodies, which must be deferred
             because code later in the file might modify the global scope. When
-            `callable` is called, the scope at the time this is called will be
+            'callable' is called, the scope at the time this is called will be
             restored, however it will contain any new bindings added to it.
         """
         self._deferred_functions.append((callable, self.scope_stack[:], self.offset))
@@ -323,8 +315,8 @@ class Checker(object):
 
     def check_dead_scopes(self):
         """
-        Look at scopes which have been fully examined and report names in them
-        which were imported but unused.
+            Look at scopes which have been fully examined and report names in them
+            which were imported but unused.
         """
         for scope in self.dead_scopes:
             export = isinstance(scope.get('__all__'), ExportBinding)
@@ -407,13 +399,13 @@ class Checker(object):
 
     def add_binding(self, node, value, report_redef=True):
         """
-        Called when a binding is altered.
+            Called when a binding is altered.
 
-        - `node` is the statement responsible for the change
-        - `value` is the optional new value, a Binding instance, associated
-          with the binding; if None, the binding is deleted if it exists.
-        - if `report_redef` is True (default), rebinding while unused will be
-          reported.
+            - `node` is the statement responsible for the change
+            - `value` is the optional new value, a Binding instance, associated
+            with the binding; if None, the binding is deleted if it exists.
+            - if `report_redef` is True (default), rebinding while unused will be
+            reported.
         """
         redefinedWhileUnused = False
         if not isinstance(self.scope, ClassScope):
@@ -539,8 +531,8 @@ class Checker(object):
 
     def is_docstring(self, node):
         """
-        Determine if the given node is a docstring, as long as it is at the
-        correct place in the node tree.
+            Determine if the given node is a docstring, as long as it is at the
+            correct place in the node tree.
         """
         return isinstance(node, ast.Str) or (isinstance(node, ast.Expr) and
                                              isinstance(node.value, ast.Str))
@@ -607,10 +599,10 @@ class Checker(object):
 
     def find_return_with_argument(self, node):
         """
-        Finds and returns a return statment that has an argument.
+            Finds and returns a return statment that has an argument.
 
-        Note that we should use node.returns in Python 3, but this method is
-        never called in Python 3 so we don't bother checking.
+            Note that we should use node.returns in Python 3, but this method is
+            never called in Python 3 so we don't bother checking.
         """
         for item in node.body:
             if isinstance(item, ast.Return) and item.value:
@@ -622,8 +614,8 @@ class Checker(object):
 
     def is_generator(self, node):
         """
-        Checks whether a function is a generator by looking for a yield
-        statement or expression.
+            Checks whether a function is a generator by looking for a yield
+            statement or expression.
         """
         if not isinstance(node.body, list):
             # lambdas can not be generators
@@ -666,7 +658,7 @@ class Checker(object):
 
     def GLOBAL(self, node):
         """
-        Keep track of globals declarations.
+            Keep track of globals declarations.
         """
         if isinstance(self.scope, FunctionScope):
             self.scope.globals.update(node.names)
@@ -699,7 +691,7 @@ class Checker(object):
 
     def FOR(self, node):
         """
-        Process bindings for loop variables.
+            Process bindings for loop variables.
         """
         vars = []
 
@@ -724,7 +716,7 @@ class Checker(object):
 
     def NAME(self, node):
         """
-        Handle occurrence of Name (which can be a load/store/delete access.)
+            Handle occurrence of Name (which can be a load/store/delete access.)
         """
         # Locate the name in locals / function / globals scopes.
         if isinstance(node.ctx, (ast.Load, ast.AugLoad)):
