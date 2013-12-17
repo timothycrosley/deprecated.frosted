@@ -10,8 +10,10 @@ from frosted.test.test_other import Test as TestOther
 from frosted.test.test_undefined_names import Test as TestUndefinedNames
 from pies.unittest import skip
 
+from frosted.test.harness import TestCase
 
-class Test(TestOther, TestImports, TestUndefinedNames):
+
+class Test(TestCase):
 
     def doctestify(self, input):
         lines = []
@@ -37,8 +39,7 @@ class Test(TestOther, TestImports, TestUndefinedNames):
         return doctestificator % "\n       ".join(lines)
 
     def flakes(self, input, *args, **kw):
-        return super(Test, self).flakes(self.doctestify(input),
-                                        *args, **kw)
+        return super(Test, self).flakes(self.doctestify(input), *args, **kw)
 
     def test_doubleNestingReportsClosestName(self):
         """
