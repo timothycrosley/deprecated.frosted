@@ -5,48 +5,46 @@ import textwrap
 from pies.overrides import *
 
 from frosted import messages as m
-from frosted.test.test_imports import Test as TestImports
-from frosted.test.test_other import Test as TestOther
-from frosted.test.test_undefined_names import Test as TestUndefinedNames
 from pies.unittest import skip
+from .utils import flakes as flakes_utils
 
 from frosted.test.harness import TestCase
 
 
-class Test(TestCase):
+def doctestify(input):
+    lines = []
+    for line in textwrap.dedent(input).splitlines():
+        if line.strip() == '':
+            pass
+        elif (line.startswith(' ') or
+                line.startswith('except:') or
+                line.startswith('except ') or
+                line.startswith('finally:') or
+                line.startswith('else:') or
+                line.startswith('elif ')):
+            line = "... %s" % line
+        else:
+            line = ">>> %s" % line
+        lines.append(line)
+    doctestificator = textwrap.dedent('''\
+                def doctest_something():
+                    """
+                        %s
+                    """
+                ''')
+    return doctestificator % "\n       ".join(lines)
 
-    def doctestify(self, input):
-        lines = []
-        for line in textwrap.dedent(input).splitlines():
-            if line.strip() == '':
-                pass
-            elif (line.startswith(' ') or
-                  line.startswith('except:') or
-                  line.startswith('except ') or
-                  line.startswith('finally:') or
-                  line.startswith('else:') or
-                  line.startswith('elif ')):
-                line = "... %s" % line
-            else:
-                line = ">>> %s" % line
-            lines.append(line)
-        doctestificator = textwrap.dedent('''\
-            def doctest_something():
-                """
-                   %s
-                """
-            ''')
-        return doctestificator % "\n       ".join(lines)
 
-    def flakes(self, input, *args, **kw):
-        return super(Test, self).flakes(self.doctestify(input), *args, **kw)
+def flakes(input, *args, **kwargs):
+    return flakes_utils(doctestify(input), *args, **kwargs)
 
-    def test_doubleNestingReportsClosestName(self):
-        """
+
+def test_doubleNestingReportsClosestName():
+    """
         Lines in doctest are a bit different so we can't use the test
         from TestUndefinedNames
-        """
-        exc = super(Test, self).flakes('''
+    """
+    exc = flakes('''
         def doctest_stuff():
             """
                 >>> def a():
@@ -62,160 +60,174 @@ class Test(TestCase):
 
             """
         ''', m.UndefinedLocal).messages[0]
-        self.assertEqual(exc.message_args, ('x', 7))
+    assert exc.message_args == ('x', 7)
 
-    def test_futureImport(self):
-        """XXX This test can't work in a doctest"""
 
-    def test_importBeforeDoctest(self):
-        super(Test, self).flakes("""
-        import foo
+def test_futureImport():
+    """
+        XXX This test can't work in a doctest
+    """
 
-        def doctest_stuff():
-            '''
-                >>> foo
-            '''
-        """)
 
-    @skip("todo")
-    def test_importBeforeAndInDoctest(self):
-        super(Test, self).flakes('''
-        import foo
+def test_importBeforeDoctest():
+    flakes("""
+            import foo
 
-        def doctest_stuff():
-            """
-                >>> import foo
-                >>> foo
-            """
+            def doctest_stuff():
+                '''
+                    >>> foo
+                '''
+            """)
 
-        foo
-        ''', m.Redefined)
 
-    def test_importInDoctestAndAfter(self):
-        super(Test, self).flakes('''
-        def doctest_stuff():
-            """
-                >>> import foo
-                >>> foo
-            """
+@skip("todo")
+def test_importBeforeAndInDoctest():
+    flakes('''
+            import foo
 
-        import foo
-        foo()
-        ''')
+            def doctest_stuff():
+                """
+                    >>> import foo
+                    >>> foo
+                """
 
-    def test_offsetInDoctests(self):
-        exc = super(Test, self).flakes('''
+            foo
+            ''', m.Redefined)
 
-        def doctest_stuff():
-            """
-                >>> x # line 5
-            """
 
-        ''', m.UndefinedName).messages[0]
-        self.assertEqual(exc.lineno, 5)
-        self.assertEqual(exc.col, 12)
+def test_importInDoctestAndAfter():
+    flakes('''
+            def doctest_stuff():
+                """
+                    >>> import foo
+                    >>> foo
+                """
 
-    def test_offsetInLambdasInDoctests(self):
-        exc = super(Test, self).flakes('''
+            import foo
+            foo()
+            ''')
 
-        def doctest_stuff():
-            """
-                >>> lambda: x # line 5
-            """
 
-        ''', m.UndefinedName).messages[0]
-        self.assertEqual(exc.lineno, 5)
-        self.assertEqual(exc.col, 20)
+def test_offsetInDoctests():
+    flakes('''
 
-    def test_offsetAfterDoctests(self):
-        exc = super(Test, self).flakes('''
+            def doctest_stuff():
+                """
+                    >>> x # line 5
+                """
 
-        def doctest_stuff():
-            """
-                >>> x = 5
-            """
+            ''', m.UndefinedName).messages[0]
+    assert exc.lineno == 5
+    assert exc.col == 12
 
-        x
 
-        ''', m.UndefinedName).messages[0]
-        self.assertEqual(exc.lineno, 8)
-        self.assertEqual(exc.col, 0)
+def test_offsetInLambdasInDoctests():
+    flakes('''
 
-    def test_syntax_errorInDoctest(self):
-        exceptions = super(Test, self).flakes(
+            def doctest_stuff():
+                """
+                    >>> lambda: x # line 5
+                """
+
+            ''', m.UndefinedName).messages[0]
+    assert exc.lineno == 5
+    assert exc.col == 20
+
+
+def test_offsetAfterDoctests():
+    flakes('''
+
+            def doctest_stuff():
+                """
+                    >>> x = 5
+                """
+
+            x
+
+            ''', m.UndefinedName).messages[0]
+    assert exc.lineno == 8
+    assert exc.col == 0
+
+
+def test_syntax_errorInDoctest():
+    flakes(
             '''
             def doctest_stuff():
                 """
                     >>> from # line 4
-                    >>>     fortytwo = 42
+                    >>> fortytwo = 42
                     >>> except Exception:
                 """
             ''',
             m.DoctestSyntaxError,
             m.DoctestSyntaxError,
             m.DoctestSyntaxError).messages
-        exc = exceptions[0]
-        self.assertEqual(exc.lineno, 4)
-        self.assertEqual(exc.col, 26)
-        exc = exceptions[1]
-        self.assertEqual(exc.lineno, 5)
-        self.assertEqual(exc.col, 16)
-        exc = exceptions[2]
-        self.assertEqual(exc.lineno, 6)
-        self.assertEqual(exc.col, 18)
+    exc = exceptions[0]
+    assert exc.lineno == 4
+    assert exc.col == 26
+    exc = exceptions[1]
+    assert exc.lineno == 5
+    assert exc.col == 16
+    exc = exceptions[2]
+    assert exc.lineno == 6
+    assert exc.col == 18
 
-    def test_indentationErrorInDoctest(self):
-        exc = super(Test, self).flakes('''
-        def doctest_stuff():
-            """
-                >>> if True:
-                ... pass
-            """
-        ''', m.DoctestSyntaxError).messages[0]
-        self.assertEqual(exc.lineno, 5)
-        self.assertEqual(exc.col, 16)
 
-    def test_offsetWithMultiLineArgs(self):
-        (exc1, exc2) = super(Test, self).flakes(
+def test_indentationErrorInDoctest():
+    flakes('''
+            def doctest_stuff():
+                """
+                    >>> if True:
+                    ... pass
+                """
+            ''', m.DoctestSyntaxError).messages[0]
+    assert exc.lineno == 5
+    assert exc.col == 16
+
+
+def test_offsetWithMultiLineArgs():
+    flakes(
             '''
             def doctest_stuff(arg1,
-                              arg2,
-                              arg3):
+                                arg2,
+                                arg3):
                 """
                     >>> assert
                     >>> this
                 """
             ''',
-            m.DoctestSyntaxError,
-            m.UndefinedName).messages
-        self.assertEqual(exc1.lineno, 6)
-        self.assertEqual(exc1.col, 19)
-        self.assertEqual(exc2.lineno, 7)
-        self.assertEqual(exc2.col, 12)
+        m.DoctestSyntaxError,
+        m.UndefinedName).messages
+    assert exc1.lineno == 6
+    assert exc1.col == 19
+    assert exc2.lineno == 7
+    assert exc2.col == 12
 
-    def test_doctestCanReferToFunction(self):
-        super(Test, self).flakes("""
-        def foo():
-            '''
-                >>> foo
-            '''
-        """)
 
-    def test_doctestCanReferToClass(self):
-        super(Test, self).flakes("""
-        class Foo():
-            '''
-                >>> Foo
-            '''
-            def bar(self):
+def test_doctestCanReferToFunction():
+    flakes("""
+            def foo():
+                '''
+                    >>> foo
+                '''
+            """)
+
+
+def test_doctestCanReferToClass():
+    flakes("""
+            class Foo():
                 '''
                     >>> Foo
                 '''
-        """)
+                def bar(self):
+                    '''
+                        >>> Foo
+                    '''
+            """)
 
-    def test_noOffsetSyntaxErrorInDoctest(self):
-        exceptions = super(Test, self).flakes(
-            '''
+
+def test_noOffsetSyntaxErrorInDoctest():
+    flakes('''
             def buildurl(base, *args, **kwargs):
                 """
                 >>> buildurl('/blah.php', ('a', '&'), ('b', '=')
@@ -225,10 +237,9 @@ class Test(TestCase):
                 """
                 pass
             ''',
-            m.DoctestSyntaxError,
-            m.DoctestSyntaxError).messages
-        exc = exceptions[0]
-        self.assertEqual(exc.lineno, 4)
-        exc = exceptions[1]
-        self.assertEqual(exc.lineno, 6)
-
+        m.DoctestSyntaxError,
+        m.DoctestSyntaxError).messages
+    exc = exceptions[0]
+    assert exc.lineno == 4
+    exc = exceptions[1]
+    assert exc.lineno == 6

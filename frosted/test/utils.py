@@ -7,7 +7,7 @@ from frosted import checker
 from pies.overrides import *
 
 PyCF_ONLY_AST = 1024
-__all__ = ['flakes']
+__all__ = ['flakes', 'Node', 'LoggingReporter']
 
 
 def flakes(input, *expectedOutputs, **kw):
@@ -24,7 +24,7 @@ def flakes(input, *expectedOutputs, **kw):
                                         '%r\n'
                                         'but got:\n'
                                         '%s') % (input, expectedOutputs,
-                                                    '\n'.join([str(o) for o in results.messages]))
+                                                 '\n'.join([str(o) for o in results.messages]))
     return results
 
 
