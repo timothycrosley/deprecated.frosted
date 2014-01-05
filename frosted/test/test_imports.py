@@ -3,15 +3,20 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from sys import version_info
 
-from frosted import messages as m
-from frosted.test.harness import TestCase
+import pytest
 from pies.overrides import *
 from pies.unittest import skip, skipIf
+
+from frosted import messages as m
+from frosted.test.harness import TestCase
+
 from .utils import flakes
+
 
 def test_unusedImport():
     flakes('import fu, bar', m.UnusedImport, m.UnusedImport)
     flakes('from baz import fu, bar', m.UnusedImport, m.UnusedImport)
+
 
 def test_aliasedImport():
     flakes('import fu as FU, bar as FU',
@@ -19,15 +24,18 @@ def test_aliasedImport():
     flakes('from moo import fu as FU, bar as FU',
                 m.RedefinedWhileUnused, m.UnusedImport)
 
+
 def test_usedImport():
     flakes('import fu; print(fu)')
     flakes('from baz import fu; print(fu)')
     flakes('import fu; del fu')
 
+
 def test_redefinedWhileUnused():
     flakes('import fu; fu = 3', m.RedefinedWhileUnused)
     flakes('import fu; fu, bar = 3', m.RedefinedWhileUnused)
     flakes('import fu; [fu, bar] = 3', m.RedefinedWhileUnused)
+
 
 def test_redefinedIf():
     """
@@ -40,6 +48,7 @@ def test_redefinedIf():
         import os
         import os
     os.path''', m.RedefinedWhileUnused)
+
 
 def test_redefinedIfElse():
     """
@@ -54,6 +63,7 @@ def test_redefinedIfElse():
         import os
     os.path''')
 
+
 def test_redefinedTry():
     """
     Test that importing a module twice in an try block
@@ -67,6 +77,7 @@ def test_redefinedTry():
         pass
     os.path''', m.RedefinedWhileUnused)
 
+
 def test_redefinedTryExcept():
     """
     Test that importing a module twice in an try
@@ -78,6 +89,7 @@ def test_redefinedTryExcept():
     except:
         import os
     os.path''')
+
 
 def test_redefinedTryNested():
     """
@@ -93,6 +105,7 @@ def test_redefinedTryNested():
         import os
     os.path''')
 
+
 def test_redefinedTryExceptMulti():
     flakes("""
     try:
@@ -106,6 +119,7 @@ def test_redefinedTryExceptMulti():
     mixer(123)
     """)
 
+
 def test_redefinedTryElse():
     flakes("""
     try:
@@ -116,6 +130,7 @@ def test_redefinedTryElse():
         from bb import mixer
     mixer(123)
     """, m.RedefinedWhileUnused)
+
 
 def test_redefinedTryExceptElse():
     flakes("""
@@ -129,6 +144,7 @@ def test_redefinedTryExceptElse():
     print(funca, funcb)
     """)
 
+
 def test_redefinedTryExceptFinally():
     flakes("""
     try:
@@ -139,6 +155,7 @@ def test_redefinedTryExceptFinally():
         a = 42
     print(a)
     """)
+
 
 def test_redefinedTryExceptElseFinally():
     flakes("""
@@ -154,12 +171,14 @@ def test_redefinedTryExceptElseFinally():
     print(a, b)
     """)
 
+
 def test_redefinedByFunction():
     flakes('''
     import fu
     def fu():
         pass
     ''', m.RedefinedWhileUnused)
+
 
 def test_redefinedInNestedFunction():
     """
@@ -174,12 +193,14 @@ def test_redefinedInNestedFunction():
                 pass
     ''', m.RedefinedWhileUnused, m.UnusedImport)
 
+
 def test_redefinedByClass():
     flakes('''
     import fu
     class fu:
         pass
     ''', m.RedefinedWhileUnused)
+
 
 def test_redefinedBySubclass():
     """
@@ -191,6 +212,7 @@ def test_redefinedBySubclass():
     class bar(bar):
         pass
     ''')
+
 
 def test_redefinedInClass():
     """
@@ -204,12 +226,14 @@ def test_redefinedInClass():
     print(fu)
     ''')
 
+
 def test_usedInFunction():
     flakes('''
     import fu
     def fun():
         print(fu)
     ''')
+
 
 def test_shadowedByParameter():
     flakes('''
@@ -225,15 +249,19 @@ def test_shadowedByParameter():
     print(fu)
     ''')
 
+
 def test_newAssignment():
     flakes('fu = None')
+
 
 def test_usedInGetattr():
     flakes('import fu; fu.bar.baz')
     flakes('import fu; "bar".fu.baz', m.UnusedImport)
 
+
 def test_usedInSlice():
     flakes('import fu; print(fu.bar[1:])')
+
 
 def test_usedInIfBody():
     flakes('''
@@ -241,11 +269,13 @@ def test_usedInIfBody():
     if True: print(fu)
     ''')
 
+
 def test_usedInIfConditional():
     flakes('''
     import fu
     if fu: pass
     ''')
+
 
 def test_usedInElifConditional():
     flakes('''
@@ -254,6 +284,7 @@ def test_usedInElifConditional():
     elif fu: pass
     ''')
 
+
 def test_usedInElse():
     flakes('''
     import fu
@@ -261,8 +292,10 @@ def test_usedInElse():
     else: print(fu)
     ''')
 
+
 def test_usedInCall():
     flakes('import fu; fu.bar()')
+
 
 def test_usedInClass():
     flakes('''
@@ -271,12 +304,14 @@ def test_usedInClass():
         bar = fu
     ''')
 
+
 def test_usedInClassBase():
     flakes('''
     import fu
     class bar(object, fu.baz):
         pass
     ''')
+
 
 def test_notUsedInNestedScope():
     flakes('''
@@ -286,12 +321,14 @@ def test_notUsedInNestedScope():
     print(fu)
     ''')
 
+
 def test_usedInFor():
     flakes('''
     import fu
     for bar in range(9):
         print(fu)
     ''')
+
 
 def test_usedInForElse():
     flakes('''
@@ -302,12 +339,14 @@ def test_usedInForElse():
         print(fu)
     ''')
 
+
 def test_redefinedByFor():
     flakes('''
     import fu
     for fu in range(2):
         pass
     ''', m.RedefinedWhileUnused)
+
 
 def test_shadowedByFor():
     """
@@ -321,6 +360,7 @@ def test_shadowedByFor():
         pass
     ''', m.ImportShadowedByLoopVar)
 
+
 def test_shadowedByForDeep():
     """
     Test that shadowing a global name with a for loop variable nested in a
@@ -333,12 +373,14 @@ def test_shadowedByForDeep():
         pass
     ''', m.ImportShadowedByLoopVar)
 
+
 def test_usedInReturn():
     flakes('''
     import fu
     def fun():
         return fu
     ''')
+
 
 def test_usedInOperators():
     flakes('import fu; 3 + fu.bar')
@@ -357,22 +399,28 @@ def test_usedInOperators():
     flakes('import fu; 1 >> fu.bar')
     flakes('import fu; 1 << fu.bar')
 
+
 def test_usedInAssert():
     flakes('import fu; assert fu.bar')
 
+
 def test_usedInSubscript():
     flakes('import fu; fu.bar[1]')
+
 
 def test_usedInLogic():
     flakes('import fu; fu and False')
     flakes('import fu; fu or False')
     flakes('import fu; not fu.bar')
 
+
 def test_usedInList():
     flakes('import fu; [fu]')
 
+
 def test_usedInTuple():
     flakes('import fu; (fu,)')
+
 
 def test_usedInTry():
     flakes('''
@@ -381,12 +429,14 @@ def test_usedInTry():
     except: pass
     ''')
 
+
 def test_usedInExcept():
     flakes('''
     import fu
     try: fu
     except: pass
     ''')
+
 
 def test_redefinedByExcept():
     as_exc = ', ' if version_info < (2, 6) else ' as '
@@ -396,11 +446,13 @@ def test_redefinedByExcept():
     except Exception%sfu: pass
     ''' % as_exc, m.RedefinedWhileUnused)
 
+
 def test_usedInRaise():
     flakes('''
     import fu
     raise fu.bar
     ''')
+
 
 def test_usedInYield():
     flakes('''
@@ -409,9 +461,11 @@ def test_usedInYield():
         yield fu
     ''')
 
+
 def test_usedInDict():
     flakes('import fu; {fu:None}')
     flakes('import fu; {1:fu}')
+
 
 def test_usedInParameterDefault():
     flakes('''
@@ -420,22 +474,28 @@ def test_usedInParameterDefault():
         pass
     ''')
 
+
 def test_usedInAttributeAssign():
     flakes('import fu; fu.bar = 1')
 
+
 def test_usedInKeywordArg():
     flakes('import fu; fu.bar(stuff=fu)')
+
 
 def test_usedInAssignment():
     flakes('import fu; bar=fu')
     flakes('import fu; n=0; n+=fu')
 
+
 def test_usedInListComp():
     flakes('import fu; [fu for _ in range(1)]')
     flakes('import fu; [1 for _ in range(1) if fu]')
 
+
 def test_redefinedByListComp():
     flakes('import fu; [1 for fu in range(1)]', m.RedefinedWhileUnused)
+
 
 def test_usedInTryFinally():
     flakes('''
@@ -450,6 +510,7 @@ def test_usedInTryFinally():
     finally: pass
     ''')
 
+
 def test_usedInWhile():
     flakes('''
     import fu
@@ -462,15 +523,18 @@ def test_usedInWhile():
     while fu: pass
     ''')
 
+
 def test_usedInGlobal():
     flakes('''
     import fu
     def f(): global fu
     ''', m.UnusedImport)
 
-@skipIf(version_info >= (3,), 'deprecated syntax')
+
+@pytest.mark.skipif("version_info >= (3,)")
 def test_usedInBackquote():
     flakes('import fu; `fu`')
+
 
 def test_usedInExec():
     if version_info < (3,):
@@ -479,14 +543,18 @@ def test_usedInExec():
         exec_stmt = 'exec("print(1)", fu.bar)'
     flakes('import fu; %s' % exec_stmt)
 
+
 def test_usedInLambda():
     flakes('import fu; lambda: fu')
+
 
 def test_shadowedByLambda():
     flakes('import fu; lambda fu: fu', m.UnusedImport)
 
+
 def test_usedInSliceObj():
     flakes('import fu; "meow"[::fu]')
+
 
 def test_unusedInNestedScope():
     flakes('''
@@ -494,6 +562,7 @@ def test_unusedInNestedScope():
         import fu
     fu
     ''', m.UnusedImport, m.UndefinedName)
+
 
 def test_methodsDontUseClassScope():
     flakes('''
@@ -503,6 +572,7 @@ def test_methodsDontUseClassScope():
             fu
     ''', m.UnusedImport, m.UndefinedName)
 
+
 def test_nestedFunctionsNestScope():
     flakes('''
     def a():
@@ -510,6 +580,7 @@ def test_nestedFunctionsNestScope():
             fu
         import fu
     ''')
+
 
 def test_nestedClassAndFunctionScope():
     flakes('''
@@ -520,8 +591,10 @@ def test_nestedClassAndFunctionScope():
                 print(fu)
     ''')
 
+
 def test_importStar():
     flakes('from fu import *', m.ImportStarUsed)
+
 
 def test_packageImport():
     """
@@ -532,12 +605,14 @@ def test_packageImport():
     fu.bar
     ''')
 
+
 def test_unusedPackageImport():
     """
     If a dotted name is imported and not used, an unused import warning is
     reported.
     """
     flakes('import fu.bar', m.UnusedImport)
+
 
 def test_duplicateSubmoduleImport():
     """
@@ -554,6 +629,7 @@ def test_duplicateSubmoduleImport():
     fu.bar
     ''', m.RedefinedWhileUnused)
 
+
 def test_differentSubmoduleImport():
     """
     If two different submodules of a package are imported, no duplicate
@@ -569,11 +645,13 @@ def test_differentSubmoduleImport():
     fu.bar, fu.baz
     ''')
 
+
 def test_assignRHSFirst():
     flakes('import fu; fu = fu')
     flakes('import fu; fu, bar = fu')
     flakes('import fu; [fu, bar] = fu')
     flakes('import fu; fu += fu')
+
 
 def test_tryingMultipleImports():
     flakes('''
@@ -584,6 +662,7 @@ def test_tryingMultipleImports():
     fu
     ''')
 
+
 def test_nonGlobalDoesNotRedefine():
     flakes('''
     import fu
@@ -593,12 +672,14 @@ def test_nonGlobalDoesNotRedefine():
     fu
     ''')
 
+
 def test_functionsRunLater():
     flakes('''
     def a():
         fu
     import fu
     ''')
+
 
 def test_functionNamesAreBoundNow():
     flakes('''
@@ -608,10 +689,12 @@ def test_functionNamesAreBoundNow():
     fu
     ''', m.RedefinedWhileUnused)
 
+
 def test_ignoreNonImportRedefinitions():
     flakes('a = 1; a = 2')
 
-@skip("todo")
+
+@pytest.mark.skipif("'todo'")
 def test_importingForImportError():
     flakes('''
     try:
@@ -620,7 +703,8 @@ def test_importingForImportError():
         pass
     ''')
 
-@skip("todo: requires evaluating attribute access")
+
+@pytest.mark.skipif("'todo: requires evaluating attribute access'")
 def test_importedInClass():
     """Imports in class scope can be used through """
     flakes('''
@@ -630,6 +714,7 @@ def test_importedInClass():
             i
     ''')
 
+
 def test_futureImport():
     """__future__ is special."""
     flakes('from __future__ import division')
@@ -637,6 +722,7 @@ def test_futureImport():
     "docstring is allowed before future import"
     from __future__ import division
     ''')
+
 
 def test_futureImportFirst():
     """
@@ -652,6 +738,7 @@ def test_futureImportFirst():
     bar
     ''', m.LateFutureImport)
 
+
 def test_ignoredInFunction():
     """
     An C{__all__} definition does not suppress unused import warnings in a
@@ -662,6 +749,7 @@ def test_ignoredInFunction():
         import bar
         __all__ = ["bar"]
     ''', m.UnusedImport, m.UnusedVariable)
+
 
 def test_ignoredInClass():
     """
@@ -674,6 +762,7 @@ def test_ignoredInClass():
         __all__ = ["bar"]
     ''', m.UnusedImport)
 
+
 def test_warningSuppressed():
     """
     If a name is imported and unused but is named in C{__all__}, no warning
@@ -683,6 +772,7 @@ def test_warningSuppressed():
     import foo
     __all__ = ["foo"]
     ''')
+
 
 def test_unrecognizable():
     """
@@ -697,6 +787,7 @@ def test_unrecognizable():
     import foo
     __all__ = [] + ["foo"]
     ''', m.UnusedImport)
+
 
 def test_unboundExported():
     """
@@ -713,6 +804,7 @@ def test_unboundExported():
         __all__ = ["foo"]
         ''', filename=filename)
 
+
 def test_importStarExported():
     """
     Do not report undefined if import * is used
@@ -722,6 +814,7 @@ def test_importStarExported():
     __all__ = ["foo"]
     ''', m.ImportStarUsed)
 
+
 def test_usedInGenExp():
     """
     Using a global in a generator expression results in no warnings.
@@ -729,12 +822,14 @@ def test_usedInGenExp():
     flakes('import fu; (fu for _ in range(1))')
     flakes('import fu; (1 for _ in range(1) if fu)')
 
+
 def test_redefinedByGenExp():
     """
     Re-using a global name as the loop variable for a generator
     expression results in a redefinition warning.
     """
     flakes('import fu; (1 for fu in range(1))', m.RedefinedWhileUnused, m.UnusedImport)
+
 
 def test_usedAsDecorator():
     """

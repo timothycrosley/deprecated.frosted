@@ -2,13 +2,14 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import textwrap
 
+import pytest
 from pies.overrides import *
+from pies.unittest import skip
 
 from frosted import messages as m
-from pies.unittest import skip
-from .utils import flakes as flakes_utils
-
 from frosted.test.harness import TestCase
+
+from .utils import flakes as flakes_utils
 
 
 def doctestify(input):
@@ -80,7 +81,7 @@ def test_importBeforeDoctest():
             """)
 
 
-@skip("todo")
+@pytest.mark.skipif("'todo'")
 def test_importBeforeAndInDoctest():
     flakes('''
             import foo

@@ -6,18 +6,21 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from sys import version_info
 
-from frosted import messages as m
-from frosted.test.harness import TestCase
+import pytest
 from pies.overrides import *
 from pies.unittest import skip, skipIf
-from .utils import flakes
 
+from frosted import messages as m
+from frosted.test.harness import TestCase
+
+from .utils import flakes
 
 
 def test_duplicateArgs():
     flakes('def fu(bar, bar): pass', m.DuplicateArgument)
 
-@skip("todo: this requires finding all assignments in the function body first")
+
+@pytest.mark.skipif("'todo: this requires finding all assignments in the function body first'")
 def test_localReferencedBeforeAssignment():
     flakes('''
     a = 1
@@ -25,6 +28,7 @@ def test_localReferencedBeforeAssignment():
         a; a=1
     f()
     ''', m.UndefinedName)
+
 
 def test_redefinedInListComp():
     """
@@ -55,6 +59,7 @@ def test_redefinedInListComp():
     [1 for a, b in [(1, 2)]]
     ''')
 
+
 def test_redefinedInGenerator():
     """
     Test that reusing a variable in a generator does not raise
@@ -84,7 +89,8 @@ def test_redefinedInGenerator():
     (1 for a, b in [(1, 2)])
     ''')
 
-@skipIf(version_info < (2, 7), "Python >= 2.7 only")
+
+@pytest.mark.skipif('''version_info < (2, 7)''')
 def test_redefinedInSetComprehension():
     """
     Test that reusing a variable in a set comprehension does not raise
@@ -114,7 +120,8 @@ def test_redefinedInSetComprehension():
     {1 for a, b in [(1, 2)]}
     ''')
 
-@skipIf(version_info < (2, 7), "Python >= 2.7 only")
+
+@pytest.mark.skipif('''version_info < (2, 7)''')
 def test_redefinedInDictComprehension():
     """
     Test that reusing a variable in a dict comprehension does not raise
@@ -144,6 +151,7 @@ def test_redefinedInDictComprehension():
     {1: 42 for a, b in [(1, 2)]}
     ''')
 
+
 def test_redefinedFunction():
     """
     Test that shadowing a function definition with another one raises a
@@ -153,6 +161,7 @@ def test_redefinedFunction():
     def a(): pass
     def a(): pass
     ''', m.RedefinedWhileUnused)
+
 
 def test_redefinedClassFunction():
     """
@@ -164,6 +173,7 @@ def test_redefinedClassFunction():
         def a(): pass
         def a(): pass
     ''', m.RedefinedWhileUnused)
+
 
 def test_redefinedIfElseFunction():
     """
@@ -177,6 +187,7 @@ def test_redefinedIfElseFunction():
         def a(): pass
     ''')
 
+
 def test_redefinedIfFunction():
     """
     Test that shadowing a function definition within an if block
@@ -187,6 +198,7 @@ def test_redefinedIfFunction():
         def a(): pass
         def a(): pass
     ''', m.RedefinedWhileUnused)
+
 
 def test_redefinedTryExceptFunction():
     """
@@ -199,6 +211,7 @@ def test_redefinedTryExceptFunction():
     except:
         def a(): pass
     ''')
+
 
 def test_redefinedTryFunction():
     """
@@ -213,6 +226,7 @@ def test_redefinedTryFunction():
         pass
     ''', m.RedefinedWhileUnused)
 
+
 def test_redefinedIfElseInListComp():
     """
     Test that shadowing a variable in a list comprehension in
@@ -224,6 +238,7 @@ def test_redefinedIfElseInListComp():
     else:
         [a for a in '12']
     ''')
+
 
 def test_redefinedElseInListComp():
     """
@@ -238,6 +253,7 @@ def test_redefinedElseInListComp():
         [a for a in '12']
     ''', m.RedefinedInListComp)
 
+
 def test_functionDecorator():
     """
     Test that shadowing a function definition with a decorated version of
@@ -250,6 +266,7 @@ def test_functionDecorator():
     a = somedecorator(a)
     ''')
 
+
 def test_classFunctionDecorator():
     """
     Test that shadowing a function definition in a class suite with a
@@ -261,7 +278,8 @@ def test_classFunctionDecorator():
         a = classmethod(a)
     ''')
 
-@skipIf(version_info < (2, 6), "Python >= 2.6 only")
+
+@pytest.mark.skipif('''version_info < (2, 6)''')
 def test_modernProperty():
     flakes("""
     class A:
@@ -276,9 +294,11 @@ def test_modernProperty():
             pass
     """)
 
+
 def test_unaryPlus():
     """Don't die on unary +."""
     flakes('+1')
+
 
 def test_undefinedBaseClass():
     """
@@ -290,6 +310,7 @@ def test_undefinedBaseClass():
         pass
     ''', m.UndefinedName)
 
+
 def test_classNameUndefinedInClassBody():
     """
     If a class name is used in the body of that class's definition and
@@ -299,6 +320,7 @@ def test_classNameUndefinedInClassBody():
     class foo:
         foo
     ''', m.UndefinedName)
+
 
 def test_classNameDefinedPreviously():
     """
@@ -312,6 +334,7 @@ def test_classNameDefinedPreviously():
         foo
     ''')
 
+
 def test_classRedefinition():
     """
     If a class is defined twice in the same module, a warning is emitted.
@@ -322,6 +345,7 @@ def test_classRedefinition():
     class Foo:
         pass
     ''', m.RedefinedWhileUnused)
+
 
 def test_functionRedefinedAsClass():
     """
@@ -334,6 +358,7 @@ def test_functionRedefinedAsClass():
         pass
     ''', m.RedefinedWhileUnused)
 
+
 def test_classRedefinedAsFunction():
     """
     If a class is redefined as a function, a warning is emitted.
@@ -345,7 +370,8 @@ def test_classRedefinedAsFunction():
         pass
     ''', m.RedefinedWhileUnused)
 
-@skip("todo: Too hard to make this warn but other cases stay silent")
+
+@pytest.mark.skipif("'todo: Too hard to make this warn but other cases stay silent'")
 def test_doubleAssignment():
     """
     If a variable is re-assigned to without being used, no warning is
@@ -355,6 +381,7 @@ def test_doubleAssignment():
     x = 10
     x = 20
     ''', m.RedefinedWhileUnused)
+
 
 def test_doubleAssignmentConditionally():
     """
@@ -367,6 +394,7 @@ def test_doubleAssignmentConditionally():
         x = 20
     ''')
 
+
 def test_doubleAssignmentWithUse():
     """
     If a variable is re-assigned to after being used, no warning is
@@ -377,6 +405,7 @@ def test_doubleAssignmentWithUse():
     y = x * 2
     x = 20
     ''')
+
 
 def test_comparison():
     """
@@ -394,6 +423,7 @@ def test_comparison():
     x > y
     ''')
 
+
 def test_identity():
     """
     If a defined name is used on either side of an identity test, no
@@ -406,6 +436,7 @@ def test_identity():
     x is not y
     ''')
 
+
 def test_containment():
     """
     If a defined name is used on either side of a containment test, no
@@ -417,6 +448,7 @@ def test_containment():
     x in y
     x not in y
     ''')
+
 
 def test_loopControl():
     """
@@ -431,6 +463,7 @@ def test_loopControl():
         continue
     ''')
 
+
 def test_ellipsis():
     """
     Ellipsis in a slice is supported.
@@ -438,6 +471,7 @@ def test_ellipsis():
     flakes('''
     [1, 2][...]
     ''')
+
 
 def test_extendedSlice():
     """
@@ -447,6 +481,7 @@ def test_extendedSlice():
     x = 3
     [1, 2][x,:]
     ''')
+
 
 def test_varAugmentedAssignment():
     """
@@ -458,6 +493,7 @@ def test_varAugmentedAssignment():
     foo += 1
     ''')
 
+
 def test_attrAugmentedAssignment():
     """
     Augmented assignment of attributes is supported.
@@ -468,22 +504,6 @@ def test_attrAugmentedAssignment():
     foo.bar += foo.baz
     ''')
 
-    def flakes(input, *expectedOutputs, **kw):
-        tree = compile(textwrap.dedent(input), "<test>", "exec", PyCF_ONLY_AST)
-        results = checker.Checker(tree, **kw)
-        outputs = [type(message) for message in results.messages]
-        expectedOutputs = list(expectedOutputs)
-        outputs.sort(key=lambda t: t.__name__)
-        expectedOutputs.sort(key=lambda t: t.__name__)
-        assertEqual(outputs, expectedOutputs, ('\n'
-                                                    'for input:\n'
-                                                    '%s\n'
-                                                    'expected outputs:\n'
-                                                    '%r\n'
-                                                    'but got:\n'
-                                                    '%s') % (input, expectedOutputs,
-                                                             '\n'.join([str(o) for o in results.messages])))
-        return results
 
 def test_unusedVariable():
     """
@@ -495,6 +515,7 @@ def test_unusedVariable():
         b = 1
     ''', m.UnusedVariable)
 
+
 def test_unusedVariableAsLocals():
     """
     Using locals() it is perfectly valid to have unused variables
@@ -504,6 +525,7 @@ def test_unusedVariableAsLocals():
         b = 1
         return locals()
     ''')
+
 
 def test_unusedVariableNoLocals():
     """
@@ -517,6 +539,7 @@ def test_unusedVariableNoLocals():
             return
     ''', m.UnusedVariable)
 
+
 def test_assignToGlobal():
     """
     Assigning to a global and then not using that global is perfectly
@@ -529,7 +552,8 @@ def test_assignToGlobal():
         b = 1
     ''')
 
-@skipIf(version_info < (3,), 'new in Python 3')
+
+@pytest.mark.skipif('''version_info < (3,)''')
 def test_assignToNonlocal():
     """
     Assigning to a nonlocal and then not using that binding is perfectly
@@ -541,6 +565,7 @@ def test_assignToNonlocal():
         nonlocal b
         b = b'1'
     ''')
+
 
 def test_assignToMember():
     """
@@ -557,6 +582,7 @@ def test_assignToMember():
         b.foo = 1
     ''')
 
+
 def test_assignInForLoop():
     """
     Don't warn when a variable in a for loop is assigned to but not used.
@@ -566,6 +592,7 @@ def test_assignInForLoop():
         for i in range(10):
             pass
     ''')
+
 
 def test_assignInListComprehension():
     """
@@ -577,6 +604,7 @@ def test_assignInListComprehension():
         [None for i in range(10)]
     ''')
 
+
 def test_generatorExpression():
     """
     Don't warn when a variable in a generator expression is
@@ -586,6 +614,7 @@ def test_generatorExpression():
     def f():
         (None for i in range(10))
     ''')
+
 
 def test_assignmentInsideLoop():
     """
@@ -600,6 +629,7 @@ def test_assignmentInsideLoop():
             x = i * 2
     ''')
 
+
 def test_tupleUnpacking():
     """
     Don't warn when a variable included in tuple unpacking is unused. It's
@@ -611,6 +641,7 @@ def test_tupleUnpacking():
         (x, y) = 1, 2
     ''')
 
+
 def test_listUnpacking():
     """
     Don't warn when a variable included in list unpacking is unused.
@@ -619,6 +650,7 @@ def test_listUnpacking():
     def f():
         [x, y] = [1, 2]
     ''')
+
 
 def test_closedOver():
     """
@@ -631,6 +663,7 @@ def test_closedOver():
             return foo
         return bar
     ''')
+
 
 def test_doubleClosedOver():
     """
@@ -646,6 +679,7 @@ def test_doubleClosedOver():
         return bar
     ''')
 
+
 def test_tracebackhideSpecialVariable():
     """
     Do not warn about unused local variable __tracebackhide__, which is
@@ -656,6 +690,7 @@ def test_tracebackhideSpecialVariable():
             __tracebackhide__ = True
     """)
 
+
 def test_ifexp():
     """
     Test C{foo if bar else baz} statements.
@@ -663,6 +698,7 @@ def test_ifexp():
     flakes("a = 'moo' if True else 'oink'")
     flakes("a = foo if True else 'oink'", m.UndefinedName)
     flakes("a = 'moo' if True else bar", m.UndefinedName)
+
 
 def test_withStatementNoNames():
     """
@@ -677,6 +713,7 @@ def test_withStatementNoNames():
     bar
     ''')
 
+
 def test_withStatementSingleName():
     """
     No warnings are emitted for using a name defined by a C{with} statement
@@ -688,6 +725,7 @@ def test_withStatementSingleName():
         bar
     bar
     ''')
+
 
 def test_withStatementAttributeName():
     """
@@ -701,6 +739,7 @@ def test_withStatementAttributeName():
         pass
     ''')
 
+
 def test_withStatementSubscript():
     """
     No warnings are emitted for using a subscript as the target of a
@@ -712,6 +751,7 @@ def test_withStatementSubscript():
     with open('foo') as foo[0]:
         pass
     ''')
+
 
 def test_withStatementSubscriptUndefined():
     """
@@ -725,6 +765,7 @@ def test_withStatementSubscriptUndefined():
         pass
     ''', m.UndefinedName)
 
+
 def test_withStatementTupleNames():
     """
     No warnings are emitted for using any of the tuple of names defined by
@@ -737,6 +778,7 @@ def test_withStatementTupleNames():
     bar, baz
     ''')
 
+
 def test_withStatementListNames():
     """
     No warnings are emitted for using any of the list of names defined by a
@@ -748,6 +790,7 @@ def test_withStatementListNames():
         bar, baz
     bar, baz
     ''')
+
 
 def test_withStatementComplicatedTarget():
     """
@@ -765,6 +808,7 @@ def test_withStatementComplicatedTarget():
     a, b, c, d, e, g, h, i
     ''')
 
+
 def test_withStatementSingleNameUndefined():
     """
     An undefined name warning is emitted if the name first defined by a
@@ -776,6 +820,7 @@ def test_withStatementSingleNameUndefined():
     with open('foo') as bar:
         pass
     ''', m.UndefinedName)
+
 
 def test_withStatementTupleNamesUndefined():
     """
@@ -790,6 +835,7 @@ def test_withStatementTupleNamesUndefined():
         pass
     ''', m.UndefinedName)
 
+
 def test_withStatementSingleNameRedefined():
     """
     A redefined name warning is emitted if a name bound by an import is
@@ -801,6 +847,7 @@ def test_withStatementSingleNameRedefined():
     with open('foo') as bar:
         pass
     ''', m.RedefinedWhileUnused)
+
 
 def test_withStatementTupleNamesRedefined():
     """
@@ -815,6 +862,7 @@ def test_withStatementTupleNamesRedefined():
         pass
     ''', m.RedefinedWhileUnused)
 
+
 def test_withStatementUndefinedInside():
     """
     An undefined name warning is emitted if a name is used inside the
@@ -825,6 +873,7 @@ def test_withStatementUndefinedInside():
     with open('foo') as bar:
         baz
     ''', m.UndefinedName)
+
 
 def test_withStatementNameDefinedInBody():
     """
@@ -837,6 +886,7 @@ def test_withStatementNameDefinedInBody():
         baz = 10
     baz
     ''')
+
 
 def test_withStatementUndefinedInExpression():
     """
@@ -855,7 +905,8 @@ def test_withStatementUndefinedInExpression():
         pass
     ''', m.UndefinedName)
 
-@skipIf(version_info < (2, 7), "Python >= 2.7 only")
+
+@pytest.mark.skipif('''version_info < (2, 7)''')
 def test_dictComprehension():
     """
     Dict comprehensions are properly handled.
@@ -864,7 +915,8 @@ def test_dictComprehension():
     a = {1: x for x in range(10)}
     ''')
 
-@skipIf(version_info < (2, 7), "Python >= 2.7 only")
+
+@pytest.mark.skipif('''version_info < (2, 7)''')
 def test_setComprehensionAndLiteral():
     """
     Set comprehensions are properly handled.
@@ -873,6 +925,7 @@ def test_setComprehensionAndLiteral():
     a = {1, 2, 3}
     b = {x for x in range(10)}
     ''')
+
 
 def test_exceptionUsedInExcept():
     as_exc = ', ' if version_info < (2, 6) else ' as '
@@ -887,6 +940,7 @@ def test_exceptionUsedInExcept():
         except Exception%se: e
     ''' % as_exc)
 
+
 def test_exceptWithoutNameInFunction():
     """
     Don't issue false warning when an unnamed exception is used.
@@ -900,6 +954,7 @@ def test_exceptWithoutNameInFunction():
         except tokenize.TokenError: pass
     ''')
 
+
 def test_exceptWithoutNameInFunctionTuple():
     """
     Don't issue false warning when an unnamed exception is used.
@@ -912,6 +967,7 @@ def test_exceptWithoutNameInFunctionTuple():
         except (tokenize.TokenError, IndentationError): pass
     ''')
 
+
 def test_augmentedAssignmentImportedFunctionCall():
     """
     Consider a function that is called on the right part of an
@@ -923,7 +979,8 @@ def test_augmentedAssignmentImportedFunctionCall():
     baz += bar()
     ''')
 
-@skipIf(version_info < (3, 3), 'new in Python 3.3')
+
+@pytest.mark.skipif('''version_info < (3, 3)''')
 def test_yieldFromUndefined():
     """
     Test C{yield from} statement

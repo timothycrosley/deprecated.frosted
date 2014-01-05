@@ -1,13 +1,18 @@
 
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from sys import version_info
+
+import pytest
+from pies.overrides import *
 
 from frosted import messages as m
 from frosted.test.harness import TestCase
-from pies.unittest import skipIf
-from . import flakes
+
+from .utils import flakes
 
 
-@skipIf(version_info >= (3,), 'new in Python 3')
+@pytest.mark.skipif("version_info >= (3,)")
 def test_return():
     flakes('''
     class a:
@@ -19,7 +24,7 @@ def test_return():
     ''', m.ReturnWithArgsInsideGenerator)
 
 
-@skipIf(version_info >= (3,), 'new in Python 3')
+@pytest.mark.skipif("version_info >= (3,)")
 def test_returnNone():
     flakes('''
     def a():
@@ -28,7 +33,7 @@ def test_returnNone():
     ''', m.ReturnWithArgsInsideGenerator)
 
 
-@skipIf(version_info >= (3,), 'new in Python 3')
+@pytest.mark.skipif("version_info >= (3,)")
 def test_returnYieldExpression():
     flakes('''
     def a():

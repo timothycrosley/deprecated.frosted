@@ -25,11 +25,13 @@ import sys
 import tempfile
 from io import StringIO
 
+import pytest
+from pies.overrides import *
+from pies.unittest import skipIf
+
 from frosted.api import check_path, check_recursive
 from frosted.messages import UnusedImport
 from frosted.reporter import Reporter
-from pies.overrides import *
-from pies.unittest import skipIf
 
 from .utils import LoggingReporter, Node
 
@@ -289,7 +291,7 @@ def test_frostedWarning():
     assert errors == [('flake', str(UnusedImport(sourcePath, Node(1), 'foo')))]
 
 
-@skipIf(PY3, "not relevant")
+@pytest.mark.skipif("PY3")
 def test_misencodedFileUTF8():
     """
         If a source file contains bytes which cannot be decoded, this is reported on stderr
