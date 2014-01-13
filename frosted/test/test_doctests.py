@@ -9,7 +9,7 @@ from pies.unittest import skip
 from frosted import messages as m
 from frosted.test.harness import TestCase
 
-from .utils import flakes as flakes_utils
+from .utils import flakes
 
 
 def doctestify(input):
@@ -36,8 +36,8 @@ def doctestify(input):
     return doctestificator % "\n       ".join(lines)
 
 
-def flakes(input, *args, **kwargs):
-    return flakes_utils(doctestify(input), *args, **kwargs)
+#def flakes(input, *args, **kwargs):
+    #return flakes_utils(doctestify(input), *args, **kwargs)
 
 
 def test_doubleNestingReportsClosestName():
@@ -62,12 +62,6 @@ def test_doubleNestingReportsClosestName():
             """
         ''', m.UndefinedLocal).messages[0]
     assert exc.message_args == ('x', 7)
-
-
-def test_futureImport():
-    """
-        XXX This test can't work in a doctest
-    """
 
 
 def test_importBeforeDoctest():
@@ -110,7 +104,7 @@ def test_importInDoctestAndAfter():
 
 
 def test_offsetInDoctests():
-    flakes('''
+    exc = flakes('''
 
             def doctest_stuff():
                 """
@@ -123,7 +117,7 @@ def test_offsetInDoctests():
 
 
 def test_offsetInLambdasInDoctests():
-    flakes('''
+    exc = flakes('''
 
             def doctest_stuff():
                 """
@@ -136,7 +130,7 @@ def test_offsetInLambdasInDoctests():
 
 
 def test_offsetAfterDoctests():
-    flakes('''
+    exc = flakes('''
 
             def doctest_stuff():
                 """
@@ -151,7 +145,7 @@ def test_offsetAfterDoctests():
 
 
 def test_syntax_errorInDoctest():
-    flakes(
+    exceptions = flakes(
             '''
             def doctest_stuff():
                 """
@@ -161,21 +155,17 @@ def test_syntax_errorInDoctest():
                 """
             ''',
             m.DoctestSyntaxError,
-            m.DoctestSyntaxError,
             m.DoctestSyntaxError).messages
     exc = exceptions[0]
     assert exc.lineno == 4
     assert exc.col == 26
     exc = exceptions[1]
-    assert exc.lineno == 5
-    assert exc.col == 16
-    exc = exceptions[2]
     assert exc.lineno == 6
     assert exc.col == 18
 
 
 def test_indentationErrorInDoctest():
-    flakes('''
+    exc = flakes('''
             def doctest_stuff():
                 """
                     >>> if True:
@@ -187,7 +177,7 @@ def test_indentationErrorInDoctest():
 
 
 def test_offsetWithMultiLineArgs():
-    flakes(
+    (exc1, exc2) = flakes(
             '''
             def doctest_stuff(arg1,
                                 arg2,
@@ -228,7 +218,7 @@ def test_doctestCanReferToClass():
 
 
 def test_noOffsetSyntaxErrorInDoctest():
-    flakes('''
+    exceptions = flakes('''
             def buildurl(base, *args, **kwargs):
                 """
                 >>> buildurl('/blah.php', ('a', '&'), ('b', '=')

@@ -14,15 +14,15 @@ from frosted.test.harness import TestCase
 from.utils import flakes
 
 
-def test_undefined(self):
+def test_undefined():
     flakes('bar', m.UndefinedName)
 
 
-def test_definedInListComp(self):
+def test_definedInListComp():
     flakes('[a for a in range(10) if a]')
 
 
-def test_functionsNeedGlobalScope(self):
+def test_functionsNeedGlobalScope():
     flakes('''
     class a:
         def b():
@@ -31,11 +31,11 @@ def test_functionsNeedGlobalScope(self):
     ''')
 
 
-def test_builtins(self):
+def test_builtins():
     flakes('range(10)')
 
 
-def test_builtinWindowsError(self):
+def test_builtinWindowsError():
     """
     C{WindowsError} is sometimes a builtin name, so no warning is emitted
     for using it.
@@ -43,7 +43,7 @@ def test_builtinWindowsError(self):
     flakes('WindowsError')
 
 
-def test_magicGlobalsFile(self):
+def test_magicGlobalsFile():
     """
     Use of the C{__file__} magic global should not emit an undefined name
     warning.
@@ -51,7 +51,7 @@ def test_magicGlobalsFile(self):
     flakes('__file__')
 
 
-def test_magicGlobalsBuiltins(self):
+def test_magicGlobalsBuiltins():
     """
     Use of the C{__builtins__} magic global should not emit an undefined
     name warning.
@@ -59,7 +59,7 @@ def test_magicGlobalsBuiltins(self):
     flakes('__builtins__')
 
 
-def test_magicGlobalsName(self):
+def test_magicGlobalsName():
     """
     Use of the C{__name__} magic global should not emit an undefined name
     warning.
@@ -67,7 +67,7 @@ def test_magicGlobalsName(self):
     flakes('__name__')
 
 
-def test_magicGlobalsPath(self):
+def test_magicGlobalsPath():
     """
     Use of the C{__path__} magic global should not emit an undefined name
     warning, if you refer to it from a file called __init__.py.
@@ -76,12 +76,12 @@ def test_magicGlobalsPath(self):
     flakes('__path__', filename='package/__init__.py')
 
 
-def test_globalImportStar(self):
+def test_globalImportStar():
     """Can't find undefined names with import *."""
     flakes('from fu import *; bar', m.ImportStarUsed)
 
 
-def test_localImportStar(self):
+def test_localImportStar():
     """
     A local import * still allows undefined names to be found
     in upper scopes.
@@ -94,7 +94,7 @@ def test_localImportStar(self):
 
 
 @pytest.mark.skipif("version_info >= (3,)")
-def test_unpackedParameter(self):
+def test_unpackedParameter():
     """Unpacked function parameters create bindings."""
     flakes('''
     def a((bar, baz)):
@@ -103,7 +103,7 @@ def test_unpackedParameter(self):
 
 
 @pytest.mark.skipif("'todo'")
-def test_definedByGlobal(self):
+def test_definedByGlobal():
     """
     "global" can make an otherwise undefined name in another function
     defined.
@@ -114,7 +114,7 @@ def test_definedByGlobal(self):
     ''')
 
 
-def test_globalInGlobalScope(self):
+def test_globalInGlobalScope():
     """
     A global statement in the global scope is ignored.
     """
@@ -125,12 +125,12 @@ def test_globalInGlobalScope(self):
     ''', m.UndefinedName)
 
 
-def test_del(self):
+def test_del():
     """Del deletes bindings."""
     flakes('a = 1; del a; a', m.UndefinedName)
 
 
-def test_delGlobal(self):
+def test_delGlobal():
     """Del a global binding from a function."""
     flakes('''
     a = 1
@@ -141,12 +141,12 @@ def test_delGlobal(self):
     ''')
 
 
-def test_delUndefined(self):
+def test_delUndefined():
     """Del an undefined name."""
     flakes('del a', m.UndefinedName)
 
 
-def test_globalFromNestedScope(self):
+def test_globalFromNestedScope():
     """Global names are available from nested scopes."""
     flakes('''
     a = 1
@@ -156,7 +156,7 @@ def test_globalFromNestedScope(self):
     ''')
 
 
-def test_laterRedefinedGlobalFromNestedScope(self):
+def test_laterRedefinedGlobalFromNestedScope():
     """
     Test that referencing a local name that shadows a global, before it is
     defined, generates a warning.
@@ -170,7 +170,7 @@ def test_laterRedefinedGlobalFromNestedScope(self):
     ''', m.UndefinedLocal)
 
 
-def test_laterRedefinedGlobalFromNestedScope2(self):
+def test_laterRedefinedGlobalFromNestedScope2():
     """
     Test that referencing a local name in a nested scope that shadows a
     global declared in an enclosing scope, before it is defined, generates
@@ -187,7 +187,7 @@ def test_laterRedefinedGlobalFromNestedScope2(self):
     ''', m.UndefinedLocal)
 
 
-def test_intermediateClassScopeIgnored(self):
+def test_intermediateClassScopeIgnored():
     """
     If a name defined in an enclosing scope is shadowed by a local variable
     and the name is used locally before it is bound, an unbound local
@@ -198,7 +198,7 @@ def test_intermediateClassScopeIgnored(self):
     def f():
         x = 1
         class g:
-            def h(self):
+            def h():
                 a = x
                 x = None
                 print(x, a)
@@ -206,7 +206,7 @@ def test_intermediateClassScopeIgnored(self):
     ''', m.UndefinedLocal)
 
 
-def test_doubleNestingReportsClosestName(self):
+def test_doubleNestingReportsClosestName():
     """
     Test that referencing a local name in a nested scope that shadows a
     variable declared in two different outer scopes before it is defined
@@ -225,10 +225,10 @@ def test_doubleNestingReportsClosestName(self):
                 return x
             return x
     ''', m.UndefinedLocal).messages[0]
-    self.assertEqual(exc.message_args, ('x', 5))
+    assert exc.message_args == ('x', 5)
 
 
-def test_laterRedefinedGlobalFromNestedScope3(self):
+def test_laterRedefinedGlobalFromNestedScope3():
     """
     Test that referencing a local name in a nested scope that shadows a
     global, before it is defined, generates a warning.
@@ -244,7 +244,7 @@ def test_laterRedefinedGlobalFromNestedScope3(self):
     ''', m.UndefinedLocal)
 
 
-def test_undefinedAugmentedAssignment(self):
+def test_undefinedAugmentedAssignment():
     flakes(
         '''
         def f(seq):
@@ -263,13 +263,13 @@ def test_undefinedAugmentedAssignment(self):
     )
 
 
-def test_nestedClass(self):
+def test_nestedClass():
     """Nested classes can access enclosing scope."""
     flakes('''
     def f(foo):
         class C:
             bar = foo
-            def f(self):
+            def f():
                 return foo
         return C()
 
@@ -277,7 +277,7 @@ def test_nestedClass(self):
     ''')
 
 
-def test_badNestedClass(self):
+def test_badNestedClass():
     """Free variables in nested classes must bind at class creation."""
     flakes('''
     def f():
@@ -289,7 +289,7 @@ def test_badNestedClass(self):
     ''', m.UndefinedName)
 
 
-def test_definedAsStarArgs(self):
+def test_definedAsStarArgs():
     """Star and double-star arg names are defined."""
     flakes('''
     def f(a, *b, **c):
@@ -298,7 +298,7 @@ def test_definedAsStarArgs(self):
 
 
 @pytest.mark.skipif("version_info < (3,)")
-def test_definedAsStarUnpack(self):
+def test_definedAsStarUnpack():
     """Star names in unpack are defined."""
     flakes('''
     a, *b = range(10)
@@ -315,7 +315,7 @@ def test_definedAsStarUnpack(self):
 
 
 @pytest.mark.skipif("version_info < (3,)")
-def test_keywordOnlyArgs(self):
+def test_keywordOnlyArgs():
     """Keyword-only arg names are defined."""
     flakes('''
     def f(*, a, b=None):
@@ -330,7 +330,7 @@ def test_keywordOnlyArgs(self):
 
 
 @pytest.mark.skipif("version_info < (3,)")
-def test_keywordOnlyArgsUndefined(self):
+def test_keywordOnlyArgsUndefined():
     """Typo in kwonly name."""
     flakes('''
     def f(*, a, b=default_c):
@@ -339,7 +339,7 @@ def test_keywordOnlyArgsUndefined(self):
 
 
 @pytest.mark.skipif("version_info < (3,)")
-def test_annotationUndefined(self):
+def test_annotationUndefined():
     """Undefined annotations."""
     flakes('''
     from abc import note1, note2, note3, note4, note5
@@ -355,14 +355,14 @@ def test_annotationUndefined(self):
 
 
 @pytest.mark.skipif("version_info < (3,)")
-def test_metaClassUndefined(self):
+def test_metaClassUndefined():
     flakes('''
     from abc import ABCMeta
     class A(metaclass=ABCMeta): pass
     ''')
 
 
-def test_definedInGenExp(self):
+def test_definedInGenExp():
     """
     Using the loop variable of a generator expression results in no
     warnings.
@@ -371,7 +371,7 @@ def test_definedInGenExp(self):
                 ('x' if version_info < (3,) else ''))
 
 
-def test_undefinedWithErrorHandler(self):
+def test_undefinedWithErrorHandler():
     """
     Some compatibility code checks explicitly for NameError.
     It should not trigger warnings.
@@ -403,7 +403,7 @@ def test_undefinedWithErrorHandler(self):
     ''', m.UndefinedName)
 
 
-def test_definedInClass(self):
+def test_definedInClass():
     """
     Defined name for generator expressions and dict/set comprehension.
     """
@@ -426,7 +426,7 @@ def test_definedInClass(self):
         ''')
 
 
-def test_impossibleContext(self):
+def test_impossibleContext():
     """
     A Name node with an unrecognized context results in a RuntimeError being
     raised.
@@ -434,4 +434,5 @@ def test_impossibleContext(self):
     tree = compile("x = 10", "<test>", "exec", PyCF_ONLY_AST)
     # Make it into something unrecognizable.
     tree.body[0].targets[0].ctx = object()
-    self.assertRaises(RuntimeError, checker.Checker, tree)
+    with pytest.raises(RuntimeError):
+        checker.Checker(tree)

@@ -170,5 +170,4 @@ def test_readFromStdin():
     """
     d = run_frosted([], stdin='import contraband'.encode('ascii'))
     expected = UnusedImport('<stdin>', Node(1), 'contraband')
-    import pdb;pdb.set_trace()
     assert d == (str(expected) + "\n", '', 1)
