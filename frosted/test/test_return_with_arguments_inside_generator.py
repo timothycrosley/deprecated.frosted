@@ -60,3 +60,14 @@ def test_return_with_args_inside_generator_not_duplicated():
                 yield None
                 return None
     ''', m.ReturnWithArgsInsideGenerator)
+
+
+@pytest.mark.skipif("version_info >= (3,)")
+def test_no_false_positives_for_return_inside_generator():
+    # doubly nested - should still only complain once
+    flakes('''
+    def f():
+        def g():
+            yield None
+        return g
+    ''')
