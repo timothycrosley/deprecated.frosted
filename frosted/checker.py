@@ -597,7 +597,7 @@ class Checker(object):
                 self.offset = node_offset
         self.pop_scope()
 
-    def find_return_with_argument(self, node):
+    def find_return_with_argument(self, node, direct_only=False):
         """
             Finds and returns a return statment that has an argument.
 
@@ -607,7 +607,7 @@ class Checker(object):
         for item in node.body:
             if isinstance(item, ast.Return) and item.value:
                 return item
-            if hasattr(item, 'body'):
+            elif not direct_only and hasattr(item, 'body'):
                 found = self.find_return_with_argument(item)
                 if found is not None:
                     return found
@@ -817,14 +817,13 @@ class Checker(object):
             if PY2:
                 def checkReturnWithArgumentInsideGenerator():
                     """
-                    Check to see if there are any return statements with
-                    arguments but the function is a generator.
+                        Check to see if there are any return statements with
+                        arguments but the function is a generator.
                     """
                     if self.is_generator(node):
-                        stmt = self.find_return_with_argument(node)
+                        stmt = self.find_return_with_argument(node, direct_only=True)
                         if stmt is not None:
-                            self.report(messages.ReturnWithArgsInsideGenerator,
-                                stmt)
+                            self.report(messages.ReturnWithArgsInsideGenerator, stmt)
                 self.defer_assignment(checkReturnWithArgumentInsideGenerator)
             self.pop_scope()
 
