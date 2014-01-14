@@ -597,7 +597,7 @@ class Checker(object):
                 self.offset = node_offset
         self.pop_scope()
 
-    def find_return_with_argument(self, node, direct_only=False):
+    def find_return_with_argument(self, node):
         """
             Finds and returns a return statment that has an argument.
 
@@ -607,10 +607,10 @@ class Checker(object):
         for item in node.body:
             if isinstance(item, ast.Return) and item.value:
                 return item
-            elif not direct_only and hasattr(item, 'body'):
-                found = self.find_return_with_argument(item)
-                if found is not None:
-                    return found
+            elif not isinstance(item, ast.FunctionDef) and hasattr(item, 'body'):
+                return_with_argument = self.find_return_with_argument(item)
+                if return_with_argument:
+                    return return_with_argument
 
     def is_generator(self, node):
         """
@@ -624,7 +624,7 @@ class Checker(object):
             if isinstance(item, (ast.Assign, ast.Expr)):
                 if isinstance(item.value, ast.Yield):
                     return True
-            if hasattr(item, 'body'):
+            elif not isinstance(item, ast.FunctionDef) and hasattr(item, 'body'):
                 if self.is_generator(item):
                     return True
         return False
@@ -821,7 +821,7 @@ class Checker(object):
                         arguments but the function is a generator.
                     """
                     if self.is_generator(node):
-                        stmt = self.find_return_with_argument(node, direct_only=True)
+                        stmt = self.find_return_with_argument(node)
                         if stmt is not None:
                             self.report(messages.ReturnWithArgsInsideGenerator, stmt)
                 self.defer_assignment(checkReturnWithArgumentInsideGenerator)
