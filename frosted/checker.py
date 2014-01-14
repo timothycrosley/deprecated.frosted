@@ -608,7 +608,9 @@ class Checker(object):
             if isinstance(item, ast.Return) and item.value:
                 return item
             elif not isinstance(item, ast.FunctionDef) and hasattr(item, 'body'):
-                return find_return_with_argument(item)
+                return_with_argument = self.find_return_with_argument(item)
+                if return_with_argument:
+                    return return_with_argument
 
     def is_generator(self, node):
         """
