@@ -20,6 +20,7 @@
     OTHER DEALINGS IN THE SOFTWARE.
 """
 
+import os
 import subprocess
 import sys
 
@@ -32,11 +33,12 @@ try:
 
         def finalize_options(self):
             TestCommand.finalize_options(self)
-            self.test_args = []
+            self.test_args = ['frosted/test']
             self.test_suite = True
 
         def run_tests(self):
             import pytest
+            os.chdir
             sys.exit(pytest.main(self.test_args))
 
 except ImportError:
@@ -53,7 +55,7 @@ except ImportError:
             pass
 
         def run(self):
-            raise SystemExit(subprocess.call([sys.executable, 'runtests.py']))
+            raise SystemExit(subprocess.call([sys.executable, 'runtests.py', 'frosted/test']))
 
 try:
    import pypandoc
