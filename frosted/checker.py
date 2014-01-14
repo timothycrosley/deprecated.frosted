@@ -831,9 +831,9 @@ class Checker(object):
 
     def CLASSDEF(self, node):
         """
-        Check names used in a class definition, including its decorators, base
-        classes, and the body of its definition.  Additionally, add its name to
-        the current scope.
+            Check names used in a class definition, including its decorators, base
+            classes, and the body of its definition.  Additionally, add its name to
+            the current scope.
         """
         for deco in node.decorator_list:
             self.handleNode(deco, node)
