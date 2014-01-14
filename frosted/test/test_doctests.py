@@ -36,10 +36,6 @@ def doctestify(input):
     return doctestificator % "\n       ".join(lines)
 
 
-#def flakes(input, *args, **kwargs):
-    #return flakes_utils(doctestify(input), *args, **kwargs)
-
-
 def test_doubleNestingReportsClosestName():
     """
         Lines in doctest are a bit different so we can't use the test
