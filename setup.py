@@ -20,43 +20,73 @@
     OTHER DEALINGS IN THE SOFTWARE.
 """
 
+import subprocess
+import sys
+
 try:
     from setuptools import setup
-    extra = {
-        'test_suite': 'frosted.test',
-        'entry_points': {
-            'console_scripts': ['frosted = frosted.api:main'],
-        },
-    }
-except ImportError:
-    from distutils.core import setup
-    extra = {'scripts': ["bin/frosted"]}
+    from setuptools.command.test import test as TestCommand
 
-setup(
-    name="frosted",
-    license="MIT",
-    version="1.0.0",
-    description="A passive Python syntax checker",
-    author="Timothy Crosley",
-    author_email="timothy.crosley@gmail.com",
-    maintainer="Timothy Crosley",
-    maintainer_email="timothy.crosley@gmail.com",
-    url="https://github.com/timothycrosley/frosted",
-    packages=["frosted", "frosted.scripts", "frosted.test"],
-    classifiers=['Development Status :: 5 - Production/Stable',
-                 'Environment :: Console',
-                 'Intended Audience :: Developers',
-                 'Natural Language :: English',
-                 'License :: OSI Approved :: MIT License',
-                 'Programming Language :: Python',
-                 'Programming Language :: Python :: 2',
-                 'Programming Language :: Python :: 2.6',
-                 'Programming Language :: Python :: 2.7',
-                 'Programming Language :: Python :: 3',
-                 'Programming Language :: Python :: 3.0',
-                 'Programming Language :: Python :: 3.1',
-                 'Programming Language :: Python :: 3.2',
-                 'Programming Language :: Python :: 3.3',
-                 'Topic :: Software Development',
-                 'Topic :: Utilities'],
-    **extra)
+    class PyTest(TestCommand):
+        extra_kwargs = {'tests_require': ['pytest', 'mock']}
+
+        def finalize_options(self):
+            TestCommand.finalize_options(self)
+            self.test_args = []
+            self.test_suite = True
+
+        def run_tests(self):
+            import pytest
+            sys.exit(pytest.main(self.test_args))
+
+except ImportError:
+    from distutils.core import setup, Command
+
+    class PyTest(Command):
+        extra_kwargs = {}
+        user_options = []
+
+        def initialize_options(self):
+            pass
+
+        def finalize_options(self):
+            pass
+
+        def run(self):
+            raise SystemExit(subprocess.call([sys.executable, 'runtests.py']))
+
+try:
+   import pypandoc
+   readme = pypandoc.convert('README.md', 'rst')
+except (IOError, ImportError, OSError, RuntimeError):
+   readme = ''
+
+setup(name="frosted",
+      license="MIT",
+      version="1.0.0",
+      description="A passive Python syntax checker",
+      long_description=readme,
+      author="Timothy Crosley",
+      author_email="timothy.crosley@gmail.com",
+      maintainer="Timothy Crosley",
+      maintainer_email="timothy.crosley@gmail.com",
+      url="https://github.com/timothycrosley/frosted",
+      packages=["frosted", "frosted.scripts", "frosted.test"],
+      cmdclass={'test': PyTest},
+      classifiers=['Development Status :: 5 - Production/Stable',
+                   'Environment :: Console',
+                   'Intended Audience :: Developers',
+                   'Natural Language :: English',
+                   'License :: OSI Approved :: MIT License',
+                   'Programming Language :: Python',
+                   'Programming Language :: Python :: 2',
+                   'Programming Language :: Python :: 2.6',
+                   'Programming Language :: Python :: 2.7',
+                   'Programming Language :: Python :: 3',
+                   'Programming Language :: Python :: 3.0',
+                   'Programming Language :: Python :: 3.1',
+                   'Programming Language :: Python :: 3.2',
+                   'Programming Language :: Python :: 3.3',
+                   'Topic :: Software Development',
+                   'Topic :: Utilities'],
+      **PyTest.extra_kwargs)
