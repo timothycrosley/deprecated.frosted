@@ -126,7 +126,7 @@ def assert_contains_errors(path, errorList):
         sys.stderr = outer
 
     error_string = error.getvalue()
-    assert (errorList) >= count
+    assert len(errorList) >= count
     for error in errorList:
         assert error in error_string
 
