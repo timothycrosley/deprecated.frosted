@@ -36,41 +36,31 @@ def test_builtins():
 
 
 def test_builtinWindowsError():
-    """
-    C{WindowsError} is sometimes a builtin name, so no warning is emitted
-    for using it.
-    """
+    """WindowsError is sometimes a builtin name, so no warning is emitted for using it."""
     flakes('WindowsError')
 
 
 def test_magicGlobalsFile():
-    """
-    Use of the C{__file__} magic global should not emit an undefined name
-    warning.
-    """
+    """Use of the __file magic global should not emit an undefined name
+    warning."""
     flakes('__file__')
 
 
 def test_magicGlobalsBuiltins():
-    """
-    Use of the C{__builtins__} magic global should not emit an undefined
-    name warning.
-    """
+    """Use of the __builtins magic global should not emit an undefined name warning."""
     flakes('__builtins__')
 
 
 def test_magicGlobalsName():
-    """
-    Use of the C{__name__} magic global should not emit an undefined name
-    warning.
-    """
+    """Use of the __name magic global should not emit an undefined name warning."""
     flakes('__name__')
 
 
 def test_magicGlobalsPath():
-    """
-    Use of the C{__path__} magic global should not emit an undefined name
-    warning, if you refer to it from a file called __init__.py.
+    """Use of the __path magic global should not emit an undefined name warning,
+
+    if you refer to it from a file called __init__.py.
+
     """
     flakes('__path__', m.UndefinedName)
     flakes('__path__', filename='package/__init__.py')
@@ -82,10 +72,7 @@ def test_globalImportStar():
 
 
 def test_localImportStar():
-    """
-    A local import * still allows undefined names to be found
-    in upper scopes.
-    """
+    """A local import * still allows undefined names to be found in upper scopes."""
     flakes('''
     def a():
         from fu import *
@@ -104,10 +91,7 @@ def test_unpackedParameter():
 
 @pytest.mark.skipif("'todo'")
 def test_definedByGlobal():
-    """
-    "global" can make an otherwise undefined name in another function
-    defined.
-    """
+    """"global" can make an otherwise undefined name in another function defined."""
     flakes('''
     def a(): global fu; fu = 1
     def b(): fu
@@ -115,9 +99,7 @@ def test_definedByGlobal():
 
 
 def test_globalInGlobalScope():
-    """
-    A global statement in the global scope is ignored.
-    """
+    """A global statement in the global scope is ignored."""
     flakes('''
     global x
     def foo():
@@ -157,10 +139,8 @@ def test_globalFromNestedScope():
 
 
 def test_laterRedefinedGlobalFromNestedScope():
-    """
-    Test that referencing a local name that shadows a global, before it is
-    defined, generates a warning.
-    """
+    """Test that referencing a local name that shadows a global, before it is
+    defined, generates a warning."""
     flakes('''
     a = 1
     def fun():
@@ -171,11 +151,9 @@ def test_laterRedefinedGlobalFromNestedScope():
 
 
 def test_laterRedefinedGlobalFromNestedScope2():
-    """
-    Test that referencing a local name in a nested scope that shadows a
-    global declared in an enclosing scope, before it is defined, generates
-    a warning.
-    """
+    """Test that referencing a local name in a nested scope that shadows a
+    global declared in an enclosing scope, before it is defined, generates a
+    warning."""
     flakes('''
         a = 1
         def fun():
@@ -188,12 +166,10 @@ def test_laterRedefinedGlobalFromNestedScope2():
 
 
 def test_intermediateClassScopeIgnored():
-    """
-    If a name defined in an enclosing scope is shadowed by a local variable
-    and the name is used locally before it is bound, an unbound local
-    warning is emitted, even if there is a class scope between the enclosing
-    scope and the local scope.
-    """
+    """If a name defined in an enclosing scope is shadowed by a local variable
+    and the name is used locally before it is bound, an unbound local warning
+    is emitted, even if there is a class scope between the enclosing scope and
+    the local scope."""
     flakes('''
     def f():
         x = 1
@@ -207,12 +183,10 @@ def test_intermediateClassScopeIgnored():
 
 
 def test_doubleNestingReportsClosestName():
-    """
-    Test that referencing a local name in a nested scope that shadows a
-    variable declared in two different outer scopes before it is defined
-    in the innermost scope generates an UnboundLocal warning which
-    refers to the nearest shadowed name.
-    """
+    """Test that referencing a local name in a nested scope that shadows a
+    variable declared in two different outer scopes before it is defined in the
+    innermost scope generates an UnboundLocal warning which refers to the
+    nearest shadowed name."""
     exc = flakes('''
         def a():
             x = 1
@@ -229,10 +203,8 @@ def test_doubleNestingReportsClosestName():
 
 
 def test_laterRedefinedGlobalFromNestedScope3():
-    """
-    Test that referencing a local name in a nested scope that shadows a
-    global, before it is defined, generates a warning.
-    """
+    """Test that referencing a local name in a nested scope that shadows a
+    global, before it is defined, generates a warning."""
     flakes('''
         def fun():
             a = 1
@@ -363,18 +335,17 @@ def test_metaClassUndefined():
 
 
 def test_definedInGenExp():
-    """
-    Using the loop variable of a generator expression results in no
-    warnings.
-    """
+    """Using the loop variable of a generator expression results in no
+    warnings."""
     flakes('(a for a in %srange(10) if a)' %
                 ('x' if version_info < (3,) else ''))
 
 
 def test_undefinedWithErrorHandler():
-    """
-    Some compatibility code checks explicitly for NameError.
+    """Some compatibility code checks explicitly for NameError.
+
     It should not trigger warnings.
+
     """
     flakes('''
     try:
@@ -404,9 +375,7 @@ def test_undefinedWithErrorHandler():
 
 
 def test_definedInClass():
-    """
-    Defined name for generator expressions and dict/set comprehension.
-    """
+    """Defined name for generator expressions and dict/set comprehension."""
     flakes('''
     class A:
         T = range(10)
@@ -427,10 +396,7 @@ def test_definedInClass():
 
 
 def test_impossibleContext():
-    """
-    A Name node with an unrecognized context results in a RuntimeError being
-    raised.
-    """
+    """A Name node with an unrecognized context results in a RuntimeError being raised."""
     tree = compile("x = 10", "<test>", "exec", PyCF_ONLY_AST)
     # Make it into something unrecognizable.
     tree.body[0].targets[0].ctx = object()

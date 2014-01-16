@@ -1,20 +1,20 @@
-"""
-    frosted/api.py
+"""frosted/api.py.
 
-    Defines the api for the command-line frosted utility
+Defines the api for the command-line frosted utility
 
-    Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
-    documentation files (the "Software"), to deal in the Software without restriction, including without limitation
-    the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
-    to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
+to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
-    The above copyright notice and this permission notice shall be included in all copies or
-    substantial portions of the Software.
+The above copyright notice and this permission notice shall be included in all copies or
+substantial portions of the Software.
 
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
-    TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-    THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
-    CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 
@@ -32,9 +32,7 @@ __all__ = ['check', 'check_path', 'check_recursive', 'iter_source_code', 'main']
 
 
 def check(codeString, filename, reporter=None):
-    """
-        Check the Python source given by codeString for unfrosted flakes.
-    """
+    """Check the Python source given by codeString for unfrosted flakes."""
     if reporter is None:
         reporter = modReporter._make_default_reporter()
     # First, compile into an AST and handle syntax errors.
@@ -67,9 +65,7 @@ def check(codeString, filename, reporter=None):
 
 
 def check_path(filename, reporter=None):
-    """
-        Check the given path, printing out any warnings detected.
-    """
+    """Check the given path, printing out any warnings detected."""
     if reporter is None:
         reporter = modReporter._make_default_reporter()
     try:
@@ -86,9 +82,7 @@ def check_path(filename, reporter=None):
 
 
 def iter_source_code(paths):
-    """
-        Iterate over all Python source files defined in paths
-    """
+    """Iterate over all Python source files defined in paths."""
     for path in paths:
         if os.path.isdir(path):
             for dirpath, dirnames, filenames in os.walk(path):
@@ -100,9 +94,7 @@ def iter_source_code(paths):
 
 
 def check_recursive(paths, reporter):
-    """
-        Recursively check all source files defined in paths
-    """
+    """Recursively check all source files defined in paths."""
     warnings = 0
     for sourcePath in iter_source_code(paths):
         warnings += check_path(sourcePath, reporter)

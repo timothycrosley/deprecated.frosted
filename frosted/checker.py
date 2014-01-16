@@ -1,21 +1,21 @@
-"""
-    frosted/checker.py
+"""frosted/checker.py.
 
-    The core functionality of frosted lives here. Implements the core checking capability models Bindings and Scopes
+The core functionality of frosted lives here. Implements the core checking capability models Bindings and Scopes
 
-    Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
-    documentation files (the "Software"), to deal in the Software without restriction, including without limitation
-    the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
-    to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
+to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
-    The above copyright notice and this permission notice shall be included in all copies or
-    substantial portions of the Software.
+The above copyright notice and this permission notice shall be included in all copies or
+substantial portions of the Software.
 
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
-    TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-    THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
-    CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-    OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 
@@ -42,12 +42,11 @@ def node_name(node):
 
 
 class Binding(object):
-    """
-        Represents the binding of a value to a name
+    """Represents the binding of a value to a name.
 
-        The checker uses this to keep track of which names have been bound and
-        which names have not. See Assignment for a special type of binding that
-        is checked with stricter rules.
+    The checker uses this to keep track of which names have been bound and which names have not. See Assignment for a
+    special type of binding that is checked with stricter rules.
+
     """
     __slots__ = ('name', 'source', 'used')
 
@@ -67,9 +66,7 @@ class Binding(object):
 
 
 class Importation(Binding):
-    """
-        A binding created by an import statement
-    """
+    """A binding created by an import statement."""
     __slots__ = ('fullName', )
 
     def __init__(self, name, source):
@@ -79,26 +76,21 @@ class Importation(Binding):
 
 
 class Argument(Binding):
-    """
-        Represents binding a name as an argument
-    """
+    """Represents binding a name as an argument."""
     __slots__ = ()
 
 
 class Definition(Binding):
-    """
-        A binding that defines a function or a class
-    """
+    """A binding that defines a function or a class."""
     __slots__ = ()
 
 
 class Assignment(Binding):
-    """
-        Represents binding a name with an explicit assignment
+    """Represents binding a name with an explicit assignment.
 
-        The checker will raise warnings for any Assignment that isn't used. Also,
-        the checker does not consider assignments in tuple/list unpacking to be
-        Assignments, rather it treats them as simple Bindings.
+    The checker will raise warnings for any Assignment that isn't used. Also, the checker does not consider assignments
+    in tuple/list unpacking to be Assignments, rather it treats them as simple Bindings.
+
     """
     __slots__ = ()
 
@@ -116,25 +108,23 @@ class ClassDefinition(Definition):
 
 
 class ExportBinding(Binding):
-    """
-        A binding created by an __all__ assignment.  If the names in the list
-        can be determined statically, they will be treated as names for export and
-        additional checking applied to them
+    """A binding created by an __all__ assignment.  If the names in the list
+    can be determined statically, they will be treated as names for export and
+    additional checking applied to them.
 
-        The only __all__ assignment that can be recognized is one which takes
-        the value of a literal list containing literal strings.  For example:
+    The only __all__ assignment that can be recognized is one which takes
+    the value of a literal list containing literal strings.  For example:
 
-            __all__ = ["foo", "bar"]
+        __all__ = ["foo", "bar"]
 
-        Names which are imported and not otherwise used but appear in the value of
-        __all__ will not have an unused import warning reported for them.
+    Names which are imported and not otherwise used but appear in the value of
+    __all__ will not have an unused import warning reported for them.
+
     """
     __slots__ = ()
 
     def names(self):
-        """
-            Return a list of the names referenced by this binding.
-        """
+        """Return a list of the names referenced by this binding."""
         names = []
         if isinstance(self.source, ast.List):
             for node in self.source.elts:
@@ -156,9 +146,7 @@ class ClassScope(Scope):
 
 
 class FunctionScope(Scope):
-    """
-        Represents the name scope for a function
-    """
+    """Represents the name scope for a function."""
     uses_locals = False
     always_used = set(['__tracebackhide__', '__traceback_info__', '__traceback_supplement__'])
 
@@ -167,9 +155,7 @@ class FunctionScope(Scope):
         self.globals = self.always_used.copy()
 
     def unusedAssignments(self):
-        """
-            Return a generator for the assignments which have not been used
-        """
+        """Return a generator for the assignments which have not been used."""
         for name, binding in self.items():
             if (not binding.used and name not in self.globals
                     and not self.uses_locals
@@ -248,9 +234,8 @@ class FunctionSignature(object):
 
 
 class Checker(object):
-    """
-        The core of frosted, checks the cleanliness and sanity of Python code
-    """
+    """The core of frosted, checks the cleanliness and sanity of Python
+    code."""
 
     node_depth = 0
     offset = None
@@ -281,26 +266,22 @@ class Checker(object):
         self.check_dead_scopes()
 
     def defer_function(self, callable):
-        """
-            Schedule a function handler to be called just before completion
+        """Schedule a function handler to be called just before completion.
 
-            This is used for handling function bodies, which must be deferred
-            because code later in the file might modify the global scope. When
-            'callable' is called, the scope at the time this is called will be
-            restored, however it will contain any new bindings added to it.
+        This is used for handling function bodies, which must be deferred because code later in the file might modify
+        the global scope. When 'callable' is called, the scope at the time this is called will be restored, however it
+        will contain any new bindings added to it.
+
         """
         self._deferred_functions.append((callable, self.scope_stack[:], self.offset))
 
     def defer_assignment(self, callable):
-        """
-            Schedule an assignment handler to be called just after deferred function handlers
-        """
+        """Schedule an assignment handler to be called just after deferred
+        function handlers."""
         self._deferred_assignments.append((callable, self.scope_stack[:], self.offset))
 
     def run_deferred(self, deferred):
-        """
-            Run the callables in deferred using their associated scope stack
-        """
+        """Run the callables in deferred using their associated scope stack."""
         for handler, scope, offset in deferred:
             self.scope_stack = scope
             self.offset = offset
@@ -314,10 +295,8 @@ class Checker(object):
         self.dead_scopes.append(self.scope_stack.pop())
 
     def check_dead_scopes(self):
-        """
-            Look at scopes which have been fully examined and report names in them
-            which were imported but unused.
-        """
+        """Look at scopes which have been fully examined and report names in
+        them which were imported but unused."""
         for scope in self.dead_scopes:
             export = isinstance(scope.get('__all__'), ExportBinding)
             if export:
@@ -379,9 +358,8 @@ class Checker(object):
         return (self.descendant_of(lnode, items, parent) ^ self.descendant_of(rnode, items, parent))
 
     def different_forks(self, lnode, rnode):
-        """
-            True, if lnode and rnode are located on different forks of IF/TRY
-        """
+        """True, if lnode and rnode are located on different forks of
+        IF/TRY."""
         ancestor = self.get_common_ancestor(lnode, rnode)
         if isinstance(ancestor, ast.If):
             for fork in (ancestor.body, ancestor.orelse):
@@ -398,14 +376,14 @@ class Checker(object):
         return False
 
     def add_binding(self, node, value, report_redef=True):
-        """
-            Called when a binding is altered.
+        """Called when a binding is altered.
 
-            - `node` is the statement responsible for the change
-            - `value` is the optional new value, a Binding instance, associated
-            with the binding; if None, the binding is deleted if it exists.
-            - if `report_redef` is True (default), rebinding while unused will be
-            reported.
+        - `node` is the statement responsible for the change
+        - `value` is the optional new value, a Binding instance, associated
+        with the binding; if None, the binding is deleted if it exists.
+        - if `report_redef` is True (default), rebinding while unused will be
+        reported.
+
         """
         redefinedWhileUnused = False
         if not isinstance(self.scope, ClassScope):
@@ -530,10 +508,8 @@ class Checker(object):
             self.handleNode(node, tree)
 
     def is_docstring(self, node):
-        """
-            Determine if the given node is a docstring, as long as it is at the
-            correct place in the node tree.
-        """
+        """Determine if the given node is a docstring, as long as it is at the
+        correct place in the node tree."""
         return isinstance(node, ast.Str) or (isinstance(node, ast.Expr) and
                                              isinstance(node.value, ast.Str))
 
@@ -598,11 +574,11 @@ class Checker(object):
         self.pop_scope()
 
     def find_return_with_argument(self, node):
-        """
-            Finds and returns a return statment that has an argument.
+        """Finds and returns a return statment that has an argument.
 
-            Note that we should use node.returns in Python 3, but this method is
-            never called in Python 3 so we don't bother checking.
+        Note that we should use node.returns in Python 3, but this method is never called in Python 3 so we don't bother
+        checking.
+
         """
         for item in node.body:
             if isinstance(item, ast.Return) and item.value:
@@ -613,10 +589,8 @@ class Checker(object):
                     return return_with_argument
 
     def is_generator(self, node):
-        """
-            Checks whether a function is a generator by looking for a yield
-            statement or expression.
-        """
+        """Checks whether a function is a generator by looking for a yield
+        statement or expression."""
         if not isinstance(node.body, list):
             # lambdas can not be generators
             return False
@@ -657,9 +631,7 @@ class Checker(object):
     COMPREHENSION = KEYWORD = handle_children
 
     def GLOBAL(self, node):
-        """
-            Keep track of globals declarations.
-        """
+        """Keep track of globals declarations."""
         if isinstance(self.scope, FunctionScope):
             self.scope.globals.update(node.names)
 
@@ -690,9 +662,7 @@ class Checker(object):
         self.pop_scope()
 
     def FOR(self, node):
-        """
-            Process bindings for loop variables.
-        """
+        """Process bindings for loop variables."""
         vars = []
 
         def collectLoopVars(n):
@@ -715,9 +685,8 @@ class Checker(object):
         self.handle_children(node)
 
     def NAME(self, node):
-        """
-            Handle occurrence of Name (which can be a load/store/delete access.)
-        """
+        """Handle occurrence of Name (which can be a load/store/delete
+        access.)"""
         # Locate the name in locals / function / globals scopes.
         if isinstance(node.ctx, (ast.Load, ast.AugLoad)):
             self.handle_node_load(node)
@@ -807,19 +776,15 @@ class Checker(object):
                 self.handleNode(node.body, node)
 
             def checkUnusedAssignments():
-                """
-                Check to see if any assignments have not been used.
-                """
+                """Check to see if any assignments have not been used."""
                 for name, binding in self.scope.unusedAssignments():
                     self.report(messages.UnusedVariable, binding.source, name)
             self.defer_assignment(checkUnusedAssignments)
 
             if PY2:
                 def checkReturnWithArgumentInsideGenerator():
-                    """
-                        Check to see if there are any return statements with
-                        arguments but the function is a generator.
-                    """
+                    """Check to see if there are any return statements with
+                    arguments but the function is a generator."""
                     if self.is_generator(node):
                         stmt = self.find_return_with_argument(node)
                         if stmt is not None:
@@ -830,10 +795,11 @@ class Checker(object):
         self.defer_function(runFunction)
 
     def CLASSDEF(self, node):
-        """
-            Check names used in a class definition, including its decorators, base
-            classes, and the body of its definition.  Additionally, add its name to
-            the current scope.
+        """Check names used in a class definition, including its decorators,
+        base classes, and the body of its definition.
+
+        Additionally, add its name to the current scope.
+
         """
         for deco in node.decorator_list:
             self.handleNode(deco, node)

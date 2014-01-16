@@ -1,21 +1,21 @@
-"""
-    frosted/test/test_script.py
+"""frosted/test/test_script.py.
 
-    Tests functionality (integration testing) that require starting a full frosted instance against input files
+Tests functionality (integration testing) that require starting a full frosted instance against input files
 
-    Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
-    documentation files (the "Software"), to deal in the Software without restriction, including without limitation
-    the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
-    to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
+to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
-    The above copyright notice and this permission notice shall be included in all copies or
-    substantial portions of the Software.
+The above copyright notice and this permission notice shall be included in all copies or
+substantial portions of the Software.
 
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
-    TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-    THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
-    CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-    OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
 """
 
 from __future__ import absolute_import, division, print_function, unicode_literals
@@ -53,9 +53,7 @@ def make_empty_file(*parts):
 
 
 def test_emptyDirectory():
-    """
-        There are no Python files in an empty directory
-    """
+    """There are no Python files in an empty directory."""
     assert list(iter_source_code([TEMP_DIR])) == []
 
 
@@ -68,17 +66,14 @@ def test_singleFile():
 
 
 def test_onlyPythonSource():
-    """
-        Files that are not Python source files are not included.
-    """
+    """Files that are not Python source files are not included."""
     make_empty_file('foo.pyc')
     assert list(iter_source_code([TEMP_DIR])) == []
 
 
 def test_recurses():
-    """
-        If the Python files are hidden deep down in child directories, we will find them
-    """
+    """If the Python files are hidden deep down in child directories, we will
+    find them."""
     os.mkdir(os.path.join(TEMP_DIR, 'foo'))
     apath = make_empty_file('foo', 'a.py')
     os.mkdir(os.path.join(TEMP_DIR, 'bar'))
@@ -101,18 +96,14 @@ def test_multipleDirectories():
 
 
 def test_explicitFiles():
-    """
-        If one of the paths given to iter_source_code is not a directory but
-        a file, it will include that in its output
-    """
+    """If one of the paths given to iter_source_code is not a directory but a
+    file, it will include that in its output."""
     epath = make_empty_file('e.py')
     assert list(iter_source_code([epath])) == [epath]
 
 
 def run_frosted( paths, stdin=None):
-    """
-        Launch a subprocess running frosted
-    """
+    """Launch a subprocess running frosted."""
     env = native_dict(os.environ)
     env['PYTHONPATH'] = os.pathsep.join(sys.path)
     command = [sys.executable, FROSTED_BINARY]
@@ -132,10 +123,8 @@ def run_frosted( paths, stdin=None):
 
 
 def test_goodFile():
-    """
-        When a Python source file is all good, the return code is zero and no
-        messages are printed to either stdout or stderr
-    """
+    """When a Python source file is all good, the return code is zero and no
+    messages are printed to either stdout or stderr."""
     fd = open(TEMP_FILE_PATH, 'a')
     fd.close()
     d = run_frosted([TEMP_FILE_PATH])
@@ -165,9 +154,7 @@ def test_errors():
 
 
 def test_readFromStdin():
-    """
-        If no arguments are passed to C{frosted} then it reads from stdin.
-    """
+    """If no arguments are passed to C{frosted} then it reads from stdin."""
     d = run_frosted([], stdin='import contraband'.encode('ascii'))
     expected = UnusedImport('<stdin>', Node(1), 'contraband')
     assert d == (str(expected) + "\n", '', 1)

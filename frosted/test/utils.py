@@ -29,18 +29,14 @@ def flakes(input, *expectedOutputs, **kw):
 
 
 class Node(namedtuple('Node', ['lineno', 'col_offset'])):
-    """
-        A mock AST Node
-    """
+    """A mock AST Node."""
 
     def __new__(cls, lineno, col_offset=0):
         return super(Node, cls).__new__(cls, lineno, col_offset)
 
 
 class LoggingReporter(namedtuple('LoggingReporter', ['log'])):
-    """
-        A mock Reporter implementation
-    """
+    """A mock Reporter implementation."""
 
     def flake(self, message):
         self.log.append(('flake', str(message)))

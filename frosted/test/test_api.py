@@ -1,23 +1,22 @@
+"""frosted/test/test_api.py.
+
+Tests all major functionality of the Frosted API
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
+to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or
+substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
+TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
 """
-    frosted/test/test_api.py
-
-    Tests all major functionality of the Frosted API
-
-    Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
-    documentation files (the "Software"), to deal in the Software without restriction, including without limitation
-    the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and
-    to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-    The above copyright notice and this permission notice shall be included in all copies or
-    substantial portions of the Software.
-
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED
-    TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-    THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
-    CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-    OTHER DEALINGS IN THE SOFTWARE.
-"""
-
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import os
@@ -37,11 +36,11 @@ from .utils import LoggingReporter, Node
 
 
 def test_syntax_error():
-    """
-        syntax_error reports that there was a syntax error in the source
-        file.  It reports to the error stream and includes the filename, line
-        number, error message, actual line of source and a caret pointing to
-        where the error is
+    """syntax_error reports that there was a syntax error in the source file.
+
+    It reports to the error stream and includes the filename, line number, error message, actual line of source and a
+    caret pointing to where the error is
+
     """
     err = StringIO()
     reporter = Reporter(None, err)
@@ -52,10 +51,7 @@ def test_syntax_error():
 
 
 def test_syntax_errorNoOffset():
-    """
-        syntax_error doesn't include a caret pointing to the error if
-        offset is passed as None
-    """
+    """syntax_error doesn't include a caret pointing to the error if offset is passed as None."""
     err = StringIO()
     reporter = Reporter(None, err)
     reporter.syntax_error('foo.py', 'a problem', 3, None, 'bad line of source')
@@ -64,10 +60,10 @@ def test_syntax_errorNoOffset():
 
 
 def test_multiLineSyntaxError():
-    """
-        If there's a multi-line syntax error, then we only report the last
-        line.  The offset is adjusted so that it is relative to the start of
-        the last line
+    """ If there's a multi-line syntax error, then we only report the last line.
+
+    The offset is adjusted so that it is relative to the start of the last line
+
     """
     err = StringIO()
     lines = ['bad line of source', 'more bad lines of source']
@@ -80,9 +76,7 @@ def test_multiLineSyntaxError():
 
 
 def test_unexpected_error():
-    """
-        unexpected_error reports an error processing a source file
-    """
+    """unexpected_error reports an error processing a source file."""
     err = StringIO()
     reporter = Reporter(None, err)
     reporter.unexpected_error('source.py', 'error message')
@@ -90,9 +84,10 @@ def test_unexpected_error():
 
 
 def test_flake():
-    """
-        flake reports a code warning from Frosted.
-        It is exactly the str() of a frosted.messages.Message
+    """flake reports a code warning from Frosted.
+
+    It is exactly the str() of a frosted.messages.Message
+
     """
     out = StringIO()
     reporter = Reporter(out, None)
@@ -102,9 +97,7 @@ def test_flake():
 
 
 def make_temp_file(content):
-    """
-        Make a temporary file containing C{content} and return a path to it
-    """
+    """Make a temporary file containing C{content} and return a path to it."""
     _, fpath = tempfile.mkstemp()
     if not hasattr(content, 'decode'):
         content = content.encode('ascii')
@@ -115,9 +108,7 @@ def make_temp_file(content):
 
 
 def assert_contains_errors(path, errorList):
-    """
-        Assert that provided causes at minimal the errors provided in the error list
-    """
+    """Assert that provided causes at minimal the errors provided in the error list."""
     error = StringIO()
     (outer, sys.stderr) = (sys.stderr, error)
     try:
@@ -132,9 +123,7 @@ def assert_contains_errors(path, errorList):
 
 
 def get_errors(path):
-    """
-        Get any warnings or errors reported by frosted for the file at path
-    """
+    """Get any warnings or errors reported by frosted for the file at path."""
     log = []
     reporter = LoggingReporter(log)
     count = check_path(path, reporter)
@@ -147,10 +136,9 @@ def test_legacyScript():
 
 
 def test_missingTrailingNewline():
-    """
-        Source which doesn't end with a newline shouldn't cause any
-        exception to be raised nor an error indicator to be returned by
-        check
+    """Source which doesn't end with a newline shouldn't cause any exception to
+    be raised nor an error indicator to be returned by check.
+
     """
     fName = make_temp_file("def foo():\n\tpass\n\t")
     assert_contains_errors(fName, [])
@@ -166,10 +154,11 @@ def test_check_pathNonExisting():
 
 
 def test_multilineSyntaxError():
-    """
-        Source which includes a syntax error which results in the raised
-        SyntaxError.text containing multiple lines of source are reported
-        with only the last line of that source.
+    """Source which includes a syntax error which results in the raised SyntaxError.
+
+    text containing multiple lines of source are reported with only
+    the last line of that source.
+
     """
     source = """\
 def foo():
@@ -204,9 +193,9 @@ def baz():
 
 
 def test_eofSyntaxError():
-    """
-        The error reported for source files which end prematurely causing a
-        syntax error reflects the cause for the syntax error
+    """The error reported for source files which end prematurely causing a
+    syntax error reflects the cause for the syntax error.
+
     """
     sourcePath = make_temp_file("def foo(")
     assert_contains_errors(sourcePath, ["""\
@@ -217,11 +206,11 @@ def foo(
 
 
 def test_nonDefaultFollowsDefaultSyntaxError():
-    """
-        Source which has a non-default argument following a default argument
-        should include the line number of the syntax error
+    """ Source which has a non-default argument following a default argument
 
-        However these exceptions do not include an offset
+    should include the line number of the syntax error
+    However these exceptions do not include an offset
+
     """
     source = """\
 def foo(bar=baz, bax):
@@ -237,11 +226,10 @@ def foo(bar=baz, bax):
 
 
 def test_nonKeywordAfterKeywordSyntaxError():
-    """
-        Source which has a non-keyword argument after a keyword argument should
-        include the line number of the syntax error
+    """Source which has a non-keyword argument after a keyword argument
 
-        However these exceptions do not include an offset
+    should include the line number of the syntax error
+    However these exceptions do not include an offset
     """
     source = """\
 foo(bar=baz, bax)
@@ -258,9 +246,7 @@ foo(bar=baz, bax)
 
 
 def test_invalidEscape():
-    """
-        The invalid escape syntax raises ValueError in Python 2
-    """
+    """The invalid escape syntax raises ValueError in Python 2."""
     # ValueError: invalid \x escape
     ver = sys.version_info
     sourcePath = make_temp_file(r"foo = '\xyz'")
@@ -271,9 +257,7 @@ def test_invalidEscape():
 
 
 def test_permissionDenied():
-    """
-        If the source file is not readable, this is reported on standard error
-    """
+    """If the source file is not readable, this is reported on standard error."""
     sourcePath = make_temp_file('')
     os.chmod(sourcePath, 0)
     count, errors = get_errors(sourcePath)
@@ -282,9 +266,7 @@ def test_permissionDenied():
 
 
 def test_frostedWarning():
-    """
-        If the source file has a frosted warning, this is reported as a 'flake'
-    """
+    """If the source file has a frosted warning, this is reported as a 'flake'."""
     sourcePath = make_temp_file("import foo")
     count, errors = get_errors(sourcePath)
     assert count == 1
@@ -293,9 +275,7 @@ def test_frostedWarning():
 
 @pytest.mark.skipif("PY3")
 def test_misencodedFileUTF8():
-    """
-        If a source file contains bytes which cannot be decoded, this is reported on stderr
-    """
+    """If a source file contains bytes which cannot be decoded, this is reported on stderr."""
     SNOWMAN = chr(0x2603)
     source = ("""\
 # coding: ascii
@@ -306,9 +286,7 @@ x = "%s"
 
 
 def test_misencodedFileUTF16():
-    """
-        If a source file contains bytes which cannot be decoded, this is reported on stderr
-    """
+    """If a source file contains bytes which cannot be decoded, this is reported on stderr."""
     SNOWMAN = chr(0x2603)
     source = ("""\
 # coding: ascii
@@ -319,9 +297,7 @@ x = "%s"
 
 
 def test_check_recursive():
-    """
-        check_recursive descends into each directory, finding Python files and reporting problems
-    """
+    """check_recursive descends into each directory, finding Python files and reporting problems."""
     tempdir = tempfile.mkdtemp()
     os.mkdir(os.path.join(tempdir, 'foo'))
     file1 = os.path.join(tempdir, 'foo', 'bar.py')

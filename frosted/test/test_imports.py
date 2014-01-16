@@ -38,10 +38,7 @@ def test_redefinedWhileUnused():
 
 
 def test_redefinedIf():
-    """
-    Test that importing a module twice within an if
-    block does raise a warning.
-    """
+    """Test that importing a module twice within an if block does raise a warning."""
     flakes('''
     i = 2
     if i==1:
@@ -51,10 +48,7 @@ def test_redefinedIf():
 
 
 def test_redefinedIfElse():
-    """
-    Test that importing a module twice in if
-    and else blocks does not raise a warning.
-    """
+    """Test that importing a module twice in if and else blocks does not raise a warning."""
     flakes('''
     i = 2
     if i==1:
@@ -65,10 +59,7 @@ def test_redefinedIfElse():
 
 
 def test_redefinedTry():
-    """
-    Test that importing a module twice in an try block
-    does raise a warning.
-    """
+    """Test that importing a module twice in an try block does raise a warning."""
     flakes('''
     try:
         import os
@@ -79,10 +70,7 @@ def test_redefinedTry():
 
 
 def test_redefinedTryExcept():
-    """
-    Test that importing a module twice in an try
-    and except block does not raise a warning.
-    """
+    """Test that importing a module twice in an try and except block does not raise a warning."""
     flakes('''
     try:
         import os
@@ -92,10 +80,7 @@ def test_redefinedTryExcept():
 
 
 def test_redefinedTryNested():
-    """
-    Test that importing a module twice using a nested
-    try/except and if blocks does not issue a warning.
-    """
+    """Test that importing a module twice using a nested try/except and if blocks does not issue a warning."""
     flakes('''
     try:
         if True:
@@ -181,10 +166,7 @@ def test_redefinedByFunction():
 
 
 def test_redefinedInNestedFunction():
-    """
-    Test that shadowing a global name with a nested function definition
-    generates a warning.
-    """
+    """Test that shadowing a global name with a nested function definition generates a warning."""
     flakes('''
     import fu
     def bar():
@@ -203,9 +185,10 @@ def test_redefinedByClass():
 
 
 def test_redefinedBySubclass():
-    """
-    If an imported name is redefined by a class statement which also uses
-    that name in the bases list, no warning is emitted.
+    """If an imported name is redefined by a class statement
+
+    which also uses that name in the bases list, no warning is emitted.
+
     """
     flakes('''
     from fu import bar
@@ -215,10 +198,7 @@ def test_redefinedBySubclass():
 
 
 def test_redefinedInClass():
-    """
-    Test that shadowing a global with a class attribute does not produce a
-    warning.
-    """
+    """Test that shadowing a global with a class attribute does not produce a warning."""
     flakes('''
     import fu
     class bar:
@@ -349,10 +329,7 @@ def test_redefinedByFor():
 
 
 def test_shadowedByFor():
-    """
-    Test that shadowing a global name with a for loop variable generates a
-    warning.
-    """
+    """Test that shadowing a global name with a for loop variable generates a warning."""
     flakes('''
     import fu
     fu.bar()
@@ -362,10 +339,7 @@ def test_shadowedByFor():
 
 
 def test_shadowedByForDeep():
-    """
-    Test that shadowing a global name with a for loop variable nested in a
-    tuple unpack generates a warning.
-    """
+    """Test that shadowing a global name with a for loop variable nested in a tuple unpack generates a warning."""
     flakes('''
     import fu
     fu.bar()
@@ -597,9 +571,7 @@ def test_importStar():
 
 
 def test_packageImport():
-    """
-    If a dotted name is imported and used, no warning is reported.
-    """
+    """If a dotted name is imported and used, no warning is reported."""
     flakes('''
     import fu.bar
     fu.bar
@@ -607,17 +579,15 @@ def test_packageImport():
 
 
 def test_unusedPackageImport():
-    """
-    If a dotted name is imported and not used, an unused import warning is
-    reported.
-    """
+    """If a dotted name is imported and not used, an unused import warning is reported."""
     flakes('import fu.bar', m.UnusedImport)
 
 
 def test_duplicateSubmoduleImport():
-    """
-    If a submodule of a package is imported twice, an unused import warning
-    and a redefined while unused warning are reported.
+    """If a submodule of a package is imported twice, an unused
+
+    import warning and a redefined while unused warning are reported.
+
     """
     flakes('''
     import fu.bar, fu.bar
@@ -631,9 +601,10 @@ def test_duplicateSubmoduleImport():
 
 
 def test_differentSubmoduleImport():
-    """
-    If two different submodules of a package are imported, no duplicate
-    import warning is reported for the package.
+    """If two different submodules of a package are imported,
+
+    no duplicate import warning is reported for the package.
+
     """
     flakes('''
     import fu.bar, fu.baz
@@ -706,7 +677,7 @@ def test_importingForImportError():
 
 @pytest.mark.skipif("'todo: requires evaluating attribute access'")
 def test_importedInClass():
-    """Imports in class scope can be used through """
+    """Imports in class scope can be used through."""
     flakes('''
     class c:
         import i
@@ -725,9 +696,7 @@ def test_futureImport():
 
 
 def test_futureImportFirst():
-    """
-    __future__ imports must come before anything else.
-    """
+    """__future__ imports must come before anything else."""
     flakes('''
     x = 5
     from __future__ import division
@@ -740,10 +709,7 @@ def test_futureImportFirst():
 
 
 def test_ignoredInFunction():
-    """
-    An C{__all__} definition does not suppress unused import warnings in a
-    function scope.
-    """
+    """An C{__all__} definition does not suppress unused import warnings in a function scope."""
     flakes('''
     def foo():
         import bar
@@ -752,10 +718,7 @@ def test_ignoredInFunction():
 
 
 def test_ignoredInClass():
-    """
-    An C{__all__} definition does not suppress unused import warnings in a
-    class scope.
-    """
+    """An C{__all__} definition does not suppress unused import warnings in a class scope."""
     flakes('''
     class foo:
         import bar
@@ -764,10 +727,7 @@ def test_ignoredInClass():
 
 
 def test_warningSuppressed():
-    """
-    If a name is imported and unused but is named in C{__all__}, no warning
-    is reported.
-    """
+    """If a name is imported and unused but is named in C{__all__}, no warning is reported."""
     flakes('''
     import foo
     __all__ = ["foo"]
@@ -775,10 +735,7 @@ def test_warningSuppressed():
 
 
 def test_unrecognizable():
-    """
-    If C{__all__} is defined in a way that can't be recognized statically,
-    it is ignored.
-    """
+    """If C{__all__} is defined in a way that can't be recognized statically, it is ignored."""
     flakes('''
     import foo
     __all__ = ["f" + "oo"]
@@ -790,9 +747,7 @@ def test_unrecognizable():
 
 
 def test_unboundExported():
-    """
-    If C{__all__} includes a name which is not bound, a warning is emitted.
-    """
+    """If C{__all__} includes a name which is not bound, a warning is emitted."""
     flakes('''
     __all__ = ["foo"]
     ''', m.UndefinedExport)
@@ -806,9 +761,7 @@ def test_unboundExported():
 
 
 def test_importStarExported():
-    """
-    Do not report undefined if import * is used
-    """
+    """Do not report undefined if import * is used"""
     flakes('''
     from foolib import *
     __all__ = ["foo"]
@@ -816,26 +769,26 @@ def test_importStarExported():
 
 
 def test_usedInGenExp():
-    """
-    Using a global in a generator expression results in no warnings.
-    """
+    """Using a global in a generator expression results in no warnings."""
     flakes('import fu; (fu for _ in range(1))')
     flakes('import fu; (1 for _ in range(1) if fu)')
 
 
 def test_redefinedByGenExp():
-    """
-    Re-using a global name as the loop variable for a generator
+    """ Re-using a global name as the loop variable for a generator
+
     expression results in a redefinition warning.
+
     """
     flakes('import fu; (1 for fu in range(1))', m.RedefinedWhileUnused, m.UnusedImport)
 
 
 def test_usedAsDecorator():
-    """
-    Using a global name in a decorator statement results in no warnings,
-    but using an undefined name in a decorator statement results in an
-    undefined name warning.
+    """Using a global name in a decorator statement results in no warnings, but
+
+    using an undefined name in a decorator statement results in an undefined
+    name warning.
+
     """
     flakes('''
     from interior import decorate
@@ -859,10 +812,10 @@ def test_usedAsDecorator():
 
 
 def test_usedAsClassDecorator():
-    """
-    Using an imported name as a class decorator results in no warnings,
-    but using an undefined name as a class decorator results in an
-    undefined name warning.
+    """Using an imported name as a class decorator results in no warnings
+
+    but using an undefined name as a class decorator results in an undefined name warning.
+
     """
     flakes('''
     from interior import decorate

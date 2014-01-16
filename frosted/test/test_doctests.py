@@ -37,10 +37,7 @@ def doctestify(input):
 
 
 def test_doubleNestingReportsClosestName():
-    """
-        Lines in doctest are a bit different so we can't use the test
-        from TestUndefinedNames
-    """
+    """Lines in doctest are a bit different so we can't use the test from TestUndefinedNames."""
     exc = flakes('''
         def doctest_stuff():
             """
