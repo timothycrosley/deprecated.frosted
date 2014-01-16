@@ -26,6 +26,7 @@ from pies.overrides import *
 
 class Reporter(object):
     """Formats the results of frosted checks and then presents them to the user."""
+    __slots__ = ('_stdout', '_stderr')
     def __init__(self, warning_stream, error_stream):
         """Construct a Reporter."""
         self._stdout = warning_stream
