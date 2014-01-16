@@ -23,14 +23,14 @@ from pies.overrides import *
 
 
 class Message(object):
-    __slots__ = ('filename', 'lineno', 'col', 'message', 'message_args')
+    __slots__ = ('filename', 'lineno', 'col', 'message_args')
+    message = ''
 
     def __init__(self, filename, loc):
         self.filename = filename
         self.lineno = loc.lineno
         self.col = getattr(loc, 'col_offset', 0)
         self.message_args = ()
-        self.message = ''
 
     def __str__(self):
         return '%s:%s: %s' % (self.filename, self.lineno, self.message % self.message_args)
