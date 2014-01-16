@@ -23,7 +23,7 @@ from pies.overrides import *
 
 
 class Message(object):
-    __slots__ = ('message', 'message_args')
+    __slots__ = ('filename', 'lineno', 'col')
     message = ''
     message_args = ()
 
