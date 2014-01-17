@@ -54,7 +54,8 @@ def test_doubleNestingReportsClosestName():
 
             """
         ''', m.UndefinedLocal).messages[0]
-    assert exc.message_args == ('x', 7)
+
+    assert "local variable 'x'" in exc.message and 'line 7' in exc.message
 
 
 def test_importBeforeDoctest():

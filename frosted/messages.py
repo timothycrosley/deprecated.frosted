@@ -30,7 +30,7 @@ AbstractMessageType = namedtuple('AbstractMessageType', ('error_code', 'name', '
 
 class MessageType(AbstractMessageType):
 
-    class Message(namedtuple('Message', ('message', 'type', 'lineno'))):
+    class Message(namedtuple('Message', ('message', 'type', 'lineno', 'col'))):
 
         def __str__(self):
             return self.message
@@ -41,10 +41,17 @@ class MessageType(AbstractMessageType):
         return new_instance
 
     def __call__(self, filename, loc=None, *kargs, **kwargs):
-        lineno = loc.lineno
-        kwargs.update({'filename': filename, 'lineno':lineno, 'col': getattr(loc, 'col_offset', 0)})
-        return self.Message('{0}:{1}: {2}'.format(filename, lineno, self.template.format(*kargs, **kwargs)), self,
-                            lineno)
+        values = {'filename': filename, 'lineno':loc.lineno, 'col': getattr(loc, 'col_offset', 0)}
+        values.update(kwargs)
+        return self.Message('{0}:{1}: {2}'.format(filename, values['lineno'], self.template.format(*kargs, **values)),
+                            self, values['lineno'], values['col'])
+
+
+class OffsetMessageType(MessageType):
+    def __call__(self, filename, loc, position=None, *kargs, **kwargs):
+        if position:
+            kwargs.update({'lineno': position[0], 'col': position[1]})
+        return MessageType.__call__(self, filename, loc, *kargs, **kwargs)
 
 Message = MessageType(100, 'Generic', '{0}')
 UnusedImport = MessageType(101, 'UnusedImport', '{0} imported but unused')
@@ -56,7 +63,7 @@ ImportShadowedByLoopVar = MessageType(104, 'ImportShadowedByLoopVar',
                                       'import {0!r} from line {1.lineno!r} shadowed by loop variable')
 ImportStarUsed = MessageType(105, 'ImportStarUsed', "'from {0!s} import *' used; unable to detect undefined names")
 UndefinedName = MessageType(106, 'UndefinedName', "undefined name {0!r}")
-DoctestSyntaxError = MessageType(107, 'DoctestSyntaxError', "syntax error in doctest")
+DoctestSyntaxError = OffsetMessageType(107, 'DoctestSyntaxError', "syntax error in doctest")
 UndefinedExport = MessageType(108, 'UndefinedExport', "undefined name {0!r} in __all__")
 UndefinedLocal = MessageType(109, 'UndefinedLocal',
                          'local variable {0!r} (defined in enclosing scope on line {1.lineno!r}) referenced before assignment')
