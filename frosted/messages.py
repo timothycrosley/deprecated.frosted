@@ -19,185 +19,63 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from collections import namedtuple
+
 from pies.overrides import *
 
+BY_CODE = {}
 
-class Message(object):
-    __slots__ = ('filename', 'lineno', 'col', 'message_args')
-    message = ''
-
-    def __init__(self, filename, loc):
-        self.filename = filename
-        self.lineno = loc.lineno
-        self.col = getattr(loc, 'col_offset', 0)
-        self.message_args = ()
-
-    def __str__(self):
-        return '%s:%s: %s' % (self.filename, self.lineno, self.message % self.message_args)
+AbstractMessageType = namedtuple('AbstractMessageType', ('error_code', 'name', 'template'))
 
 
-class UnusedImport(Message):
-    __slots__ = ()
-    message = '%r imported but unused'
+class MessageType(AbstractMessageType):
 
-    def __init__(self, filename, loc, name):
-        Message.__init__(self, filename, loc)
-        self.message_args = (name,)
+    class Message(namedtuple('Message', ('message', 'type', 'lineno', 'col'))):
 
+        def __str__(self):
+            return self.message
 
-class RedefinedWhileUnused(Message):
-    __slots__ = ()
-    message = 'redefinition of unused %r from line %r'
+    def __new__(cls, error_code, name, template):
+        new_instance = AbstractMessageType.__new__(cls, error_code, name, template)
+        BY_CODE[error_code] = new_instance
+        return new_instance
 
-    def __init__(self, filename, loc, name, orig_loc):
-        Message.__init__(self, filename, loc)
-        self.message_args = (name, orig_loc.lineno)
-
-
-class RedefinedInListComp(Message):
-    __slots__ = ()
-    message = 'list comprehension redefines %r from line %r'
-
-    def __init__(self, filename, loc, name, orig_loc):
-        Message.__init__(self, filename, loc)
-        self.message_args = (name, orig_loc.lineno)
+    def __call__(self, filename, loc=None, *kargs, **kwargs):
+        values = {'filename': filename, 'lineno':loc.lineno, 'col': getattr(loc, 'col_offset', 0)}
+        values.update(kwargs)
+        return self.Message('{0}:{1}: {2}'.format(filename, values['lineno'], self.template.format(*kargs, **values)),
+                            self, values['lineno'], values['col'])
 
 
-class ImportShadowedByLoopVar(Message):
-    __slots__ = ()
-    message = 'import %r from line %r shadowed by loop variable'
-
-    def __init__(self, filename, loc, name, orig_loc):
-        Message.__init__(self, filename, loc)
-        self.message_args = (name, orig_loc.lineno)
-
-
-class ImportStarUsed(Message):
-    __slots__ = ()
-    message = "'from %s import *' used; unable to detect undefined names"
-
-    def __init__(self, filename, loc, modname):
-        Message.__init__(self, filename, loc)
-        self.message_args = (modname,)
-
-
-class UndefinedName(Message):
-    __slots__ = ()
-    message = 'undefined name %r'
-
-    def __init__(self, filename, loc, name):
-        Message.__init__(self, filename, loc)
-        self.message_args = (name,)
-
-
-class DoctestSyntaxError(Message):
-    __slots__ = ()
-    message = 'syntax error in doctest'
-
-    def __init__(self, filename, loc, position=None):
-        Message.__init__(self, filename, loc)
+class OffsetMessageType(MessageType):
+    def __call__(self, filename, loc, position=None, *kargs, **kwargs):
         if position:
-            (self.lineno, self.col) = position
-        self.message_args = ()
+            kwargs.update({'lineno': position[0], 'col': position[1]})
+        return MessageType.__call__(self, filename, loc, *kargs, **kwargs)
 
-
-class UndefinedExport(Message):
-    __slots__ = ()
-    message = 'undefined name %r in __all__'
-
-    def __init__(self, filename, loc, name):
-        Message.__init__(self, filename, loc)
-        self.message_args = (name,)
-
-
-class UndefinedLocal(Message):
-    __slots__ = ()
-    message = ('local variable %r (defined in enclosing scope on line %r) '
-               'referenced before assignment')
-
-    def __init__(self, filename, loc, name, orig_loc):
-        Message.__init__(self, filename, loc)
-        self.message_args = (name, orig_loc.lineno)
-
-
-class DuplicateArgument(Message):
-    __slots__ = ()
-    message = 'duplicate argument %r in function definition'
-
-    def __init__(self, filename, loc, name):
-        Message.__init__(self, filename, loc)
-        self.message_args = (name,)
-
-
-class Redefined(Message):
-    __slots__ = ()
-    message = 'redefinition of %r from line %r'
-
-    def __init__(self, filename, loc, name, orig_loc):
-        Message.__init__(self, filename, loc)
-        self.message_args = (name, orig_loc.lineno)
-
-
-class LateFutureImport(Message):
-    __slots__ = ()
-    message = 'future import(s) %r after other statements'
-
-    def __init__(self, filename, loc, names):
-        Message.__init__(self, filename, loc)
-        self.message_args = (names,)
-
-
-class UnusedVariable(Message):
-    """Indicates that a variable has been explicity assigned to but not actually used."""
-    __slots__ = ()
-    message = 'local variable %r is assigned to but never used'
-
-    def __init__(self, filename, loc, names):
-        Message.__init__(self, filename, loc)
-        self.message_args = (names,)
-
-
-class MultipleValuesForArgument(Message):
-    __slots__ = ()
-    message = '%s() got multiple values for argument %r'
-    def __init__(self, filename, loc, functionname, argname):
-        Message.__init__(self, filename, loc)
-        self.message_args = (functionname, argname)
-
-
-class TooFewArguments(Message):
-    __slots__ = ()
-    message = '%s() takes at least %d argument(s)'
-    def __init__(self, filename, loc, functionname, minargs):
-        Message.__init__(self, filename, loc)
-        self.message_args = (functionname, minargs)
-
-
-class TooManyArguments(Message):
-    __slots__ = ()
-    message = '%s() takes at most %d argument(s)'
-    def __init__(self, filename, loc, functionname, maxargs):
-        Message.__init__(self, filename, loc)
-        self.message_args = (functionname, maxargs)
-
-
-class UnexpectedArgument(Message):
-    __slots__ = ()
-    message = '%s() got unexpected keyword argument: %r'
-    def __init__(self, filename, loc, functionname, argname):
-        Message.__init__(self, filename, loc)
-        self.message_args = (functionname, argname)
-
-
-class NeedKwOnlyArgument(Message):
-    __slots__ = ()
-    message = '%s() needs kw-only argument(s): %s'
-    def __init__(self, filename, loc, functionname, missing_arguments):
-        Message.__init__(self, filename, loc)
-        self.message_args = (functionname, missing_arguments)
-
-
-class ReturnWithArgsInsideGenerator(Message):
-    """Indicates a return statement with arguments inside a generator."""
-    __slots__ = ()
-    message = '\'return\' with argument inside generator'
+Message = MessageType(100, 'Generic', '{0}')
+UnusedImport = MessageType(101, 'UnusedImport', '{0} imported but unused')
+RedefinedWhileUnused = MessageType(102, 'RedefinedWhileUnused',
+                                   'redefinition of {0!r} from line {1.lineno!r}')
+RedefinedInListComp = MessageType(103, 'RedefinedInListComp',
+                                  'list comprehension redefines {0!r} from line {1.lineno!r}')
+ImportShadowedByLoopVar = MessageType(104, 'ImportShadowedByLoopVar',
+                                      'import {0!r} from line {1.lineno!r} shadowed by loop variable')
+ImportStarUsed = MessageType(105, 'ImportStarUsed', "'from {0!s} import *' used; unable to detect undefined names")
+UndefinedName = MessageType(106, 'UndefinedName', "undefined name {0!r}")
+DoctestSyntaxError = OffsetMessageType(107, 'DoctestSyntaxError', "syntax error in doctest")
+UndefinedExport = MessageType(108, 'UndefinedExport', "undefined name {0!r} in __all__")
+UndefinedLocal = MessageType(109, 'UndefinedLocal',
+                         'local variable {0!r} (defined in enclosing scope on line {1.lineno!r}) referenced before assignment')
+DuplicateArgument = MessageType(110, 'DuplicateArgument', "duplicate argument {0!r} in function definition")
+Redefined = MessageType(111, 'Redefined', "redefinition of {0!r} from line {1.lineno!r}")
+LateFutureImport = MessageType(112, 'LateFutureImport', "future import(s) {0!r} after other statements")
+UnusedVariable = MessageType(113, 'UnusedVariable', "local variable {0!r} is assigned to but never used")
+MultipleValuesForArgument = MessageType(114, 'MultipleValuesForArgument',
+                                        "{0!s}() got multiple values for argument {1!r}")
+TooFewArguments = MessageType(115, 'TooFewArguments', "{0!s}() takes at least {1:d} argument(s)")
+TooManyArguments = MessageType(116, 'TooManyArguments', "{0!s}() takes at most {1:d} argument(s)")
+UnexpectedArgument = MessageType(117, 'UnexpectedArgument', "{0!s}() got unexpected keyword argument: {1!r}")
+NeedKwOnlyArgument = MessageType(118, 'NeedKwOnlyArgument', "{0!s}() needs kw-only argument(s): {1!s}")
+ReturnWithArgsInsideGenerator = MessageType(119, 'ReturnWithArgsInsideGenerator',
+                                            "'return' with argument inside generator")

@@ -199,7 +199,8 @@ def test_doubleNestingReportsClosestName():
                 return x
             return x
     ''', m.UndefinedLocal).messages[0]
-    assert exc.message_args == ('x', 5)
+    assert 'x' in exc.message
+    assert str(5) in exc.message
 
 
 def test_laterRedefinedGlobalFromNestedScope3():

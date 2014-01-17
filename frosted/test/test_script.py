@@ -140,7 +140,7 @@ def test_fileWithFlakes():
     fd.close()
     d = run_frosted([TEMP_FILE_PATH])
     expected = UnusedImport(TEMP_FILE_PATH, Node(1), 'contraband')
-    assert d == ("%s\n" % expected, '', 1)
+    assert d[0].strip() == expected.message.strip()
 
 
 def test_errors():
@@ -156,5 +156,6 @@ def test_errors():
 def test_readFromStdin():
     """If no arguments are passed to C{frosted} then it reads from stdin."""
     d = run_frosted([], stdin='import contraband'.encode('ascii'))
+
     expected = UnusedImport('<stdin>', Node(1), 'contraband')
-    assert d == (str(expected) + "\n", '', 1)
+    assert d[0].strip() == expected.message.strip()
