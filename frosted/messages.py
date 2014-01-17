@@ -30,7 +30,7 @@ AbstractMessageType = namedtuple('AbstractMessageType', ('error_code', 'name', '
 
 class MessageType(AbstractMessageType):
 
-    class Message(namedtuple('Message', ('message', 'type'))):
+    class Message(namedtuple('Message', ('message', 'type', 'lineno'))):
 
         def __str__(self):
             return self.message
@@ -43,7 +43,8 @@ class MessageType(AbstractMessageType):
     def __call__(self, filename, loc=None, *kargs, **kwargs):
         lineno = loc.lineno
         kwargs.update({'filename': filename, 'lineno':lineno, 'col': getattr(loc, 'col_offset', 0)})
-        return self.Message('{0}:{1}: {2}'.format(filename, lineno, self.template.format(*kargs, **kwargs)), self)
+        return self.Message('{0}:{1}: {2}'.format(filename, lineno, self.template.format(*kargs, **kwargs)), self,
+                            lineno)
 
 Message = MessageType(100, 'Generic', '{0}')
 UnusedImport = MessageType(101, 'UnusedImport', '{0} imported but unused')
@@ -65,8 +66,8 @@ LateFutureImport = MessageType(112, 'LateFutureImport', "future import(s) {0!r} 
 UnusedVariable = MessageType(113, 'UnusedVariable', "local variable {0!r} is assigned to but never used")
 MultipleValuesForArgument = MessageType(114, 'MultipleValuesForArgument',
                                         "{0!s}() got multiple values for argument {1!r}")
-TooFewArguments = MessageType(115, 'TooFewArguments', "{0!s}() takes at least {1!d} argument(s)")
-TooManyArguments = MessageType(116, 'TooManyArguments', "{0!s}() takes at most {1!d} argument(s)")
+TooFewArguments = MessageType(115, 'TooFewArguments', "{0!s}() takes at least {1:d} argument(s)")
+TooManyArguments = MessageType(116, 'TooManyArguments', "{0!s}() takes at most {1:d} argument(s)")
 UnexpectedArgument = MessageType(117, 'UnexpectedArgument', "{0!s}() got unexpected keyword argument: {1!r}")
 NeedKwOnlyArgument = MessageType(118, 'NeedKwOnlyArgument', "{0!s}() needs kw-only argument(s): {1!s}")
 ReturnWithArgsInsideGenerator = MessageType(119, 'ReturnWithArgsInsideGenerator',
