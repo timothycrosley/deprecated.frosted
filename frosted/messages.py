@@ -21,7 +21,26 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from pies.overrides import *
 
+BY_CODE = {}
+BY_NAME = {}
 
+class MessageType(NamedTuple('MessageType', ['error_code', 'template', 'name'])):
+
+    class Message(NamedTuple('Message', ['message', 'type'])):
+
+        def __str__(self):
+            return self.message
+
+    def __new__(self, error_code, name, template):
+        
+
+    def __call__(self, filename, loc, **template_values):
+        template_values.update({'filename': filename, 'loc': loc})
+        return self.Message('{0}:{1}: {2}'.format(filename, loc, template.format(template_values)), self)
+
+
+
+MESSAGE_BASE = '%s:%s: %s'
 class Message(object):
     __slots__ = ('filename', 'lineno', 'col', 'message_args')
     message = ''
