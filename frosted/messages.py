@@ -45,12 +45,7 @@ class MessageType(AbstractMessageType):
         kwargs.update({'filename': filename, 'lineno':lineno, 'col': getattr(loc, 'col_offset', 0)})
         return self.Message('{0}:{1}: {2}'.format(filename, lineno, self.template.format(*kargs, **kwargs)), self)
 
-    @property
-    def __name__(self):
-        return self.name
-
-
-Generic = MessageType(100, 'Generic', '{0}')
+Message = MessageType(100, 'Generic', '{0}')
 UnusedImport = MessageType(101, 'UnusedImport', '{0} imported but unused')
 RedefinedWhileUnused = MessageType(102, 'RedefinedWhileUnused',
                                    'redefinition of {0!r} from line {1.lineno!r}')

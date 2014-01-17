@@ -13,10 +13,10 @@ __all__ = ['flakes', 'Node', 'LoggingReporter']
 def flakes(input, *expectedOutputs, **kw):
     tree = compile(textwrap.dedent(input), "<test>", "exec", PyCF_ONLY_AST)
     results = checker.Checker(tree, **kw)
-    outputs = [type(message) for message in results.messages]
+    outputs = [message.type for message in results.messages]
     expectedOutputs = list(expectedOutputs)
-    outputs.sort(key=lambda t: t.__name__)
-    expectedOutputs.sort(key=lambda t: t.__name__)
+    outputs.sort(key=lambda t: t.name)
+    expectedOutputs.sort(key=lambda t: t.name)
     assert outputs == expectedOutputs, ('\n'
                                         'for input:\n'
                                         '%s\n'
