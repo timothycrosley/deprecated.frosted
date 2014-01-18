@@ -19,7 +19,7 @@ or if you prefer
 
     easy_install frosted
 
-using Frosted
+Using Frosted
 ===================
 
 from the command line:
