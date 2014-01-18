@@ -30,6 +30,7 @@ The following improvements have already been implemented into Frosted
 - Frosted adds the ability to configure which files you want to check, and which errors you don't care about. A must have feature IMO.
 - Frosted implements the .editorconfig standard for configuration. This means you only need one configuration file for isort, frosted, and all the code editors anybody working with your project may be using.
 - Frosted uses more logical, self-documenting, and standard terminal interface. With pyflakes the default action without any arguments is to do nothing (waiting for stdin) with Frosted you get an error and help.
+- Frosted switched from Java style unittests to the more Pythonic py.test (I admit this is highly subjective).
 - The number one reason frosted is better is because of you! Or rather, the Python community at large. I will quickly respond to any pull requests, recommendations, or bug reports that come my way.
 - Frosting. Duh.
 
@@ -94,9 +95,9 @@ Frosted exposes a simple API for checking Python code from withing other Python 
 
 - frosted.api.check (codeString, filename, reporter=modReporter.Default, **setting_overrides)
   Check the Python source given by codeString for unfrosted flakes.
-- frosted.api.check_path(filename, reporter=modReporter.Default, **setting_overrides)
+- frosted.api.check_path (filename, reporter=modReporter.Default, **setting_overrides)
   Check the given path, printing out any warnings detected.
-- frosted.check_recursive(paths, reporter=modReporter.Default, **setting_overrides)
+- frosted.check_recursive (paths, reporter=modReporter.Default, **setting_overrides)
   Recursively check all source files defined in paths.
 
 Additionally, you can use the command line tool in an API fashion, by passing '-' in as the filename and then sending
