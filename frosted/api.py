@@ -16,17 +16,18 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABI
 CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function, unicode_literals\
 
+import argparse
 import os
 import sys
 from optparse import OptionParser
 
+from frosted import reporter as modReporter
+from frosted import __version__, checker
 from pies.overrides import *
 
 import _ast
-from frosted import reporter as modReporter
-from frosted import __version__, checker
 
 __all__ = ['check', 'check_path', 'check_recursive', 'iter_source_code', 'main']
 
@@ -92,16 +93,29 @@ def iter_source_code(paths):
 def check_recursive(paths, reporter=modReporter.Default):
     """Recursively check all source files defined in paths."""
     warnings = 0
-    for sourcePath in iter_source_code(paths):
-        warnings += check_path(sourcePath, reporter)
+    for source_path in iter_source_code(paths):
+        warnings += check_path(source_path, reporter)
     return warnings
 
 
 def main(prog=None):
-    parser = OptionParser(prog=prog, version=__version__)
-    __, args = parser.parse_args()
-    if args:
-        warnings = check_recursive(args)
+    parser = argparse.ArgumentParser(description='Quickly check the correctness of your Python scripts.')
+    parser.add_argument('files', nargs='+', help='One or more Python source files that need their imports sorted.')
+    parser.add_argument('-r', '--recursive', dest='recursive', action='store_true',
+                        help='Recursively look for Python files to check')
+    parser.add_argument('-v', '--version', action='version', version='frosted {0}'.format(__version__))
+    arguments = dict((key, value) for (key, value) in itemsview(vars(parser.parse_args())) if value)
+    file_names = arguments.pop('files', [])
+    if file_names == ['-']:
+        check(sys.stdin.read(), '<stdin>')
+    elif arguments.get('recursive'):
+        warnings = check_recursive(file_names)
     else:
-        warnings = check(sys.stdin.read(), '<stdin>')
+        warnings = 0
+        for file_path in file_names:
+            try:
+                warnings += check_path(file_path)
+            except IOError as e:
+                print("WARNING: Unable to parse file {0} due to {1}".format(file_name, e))
+
     raise SystemExit(warnings > 0)
