@@ -20,9 +20,9 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import os
 import sys
-
+11
 from frosted import reporter as modReporter
-from frosted import checker
+from frosted import checker, settings
 from pies.overrides import *
 
 import _ast
@@ -30,8 +30,15 @@ import _ast
 __all__ = ['check', 'check_path', 'check_recursive', 'iter_source_code', 'main']
 
 
-def check(codeString, filename, reporter=modReporter.Default):
+def check(codeString, filename, reporter=modReporter.Default, **setting_overrides):
     """Check the Python source given by codeString for unfrosted flakes."""
+    active_settings = settings.default.copy()
+    active_settings.update(setting_overrides)
+
+    if filename in active_settings.get('skip', []):
+        print("WARNING: {0} was skipped as it's listed in 'skip' setting".format(file_path), file=stderr)
+        return 0
+
     # First, compile into an AST and handle syntax errors.
     try:
         tree = compile(codeString, filename, "exec", _ast.PyCF_ONLY_AST)
@@ -54,14 +61,14 @@ def check(codeString, filename, reporter=modReporter.Default):
         reporter.unexpected_error(filename, 'problem decoding source')
         return 1
     # Okay, it's syntactically valid.  Now check it.
-    w = checker.Checker(tree, filename)
+    w = checker.Checker(tree, filename, None, **active_settings)
     w.messages.sort(key=lambda m: m.lineno)
     for warning in w.messages:
         reporter.flake(warning)
     return len(w.messages)
 
 
-def check_path(filename, reporter=modReporter.Default):
+def check_path(filename, reporter=modReporter.Default, **setting_overrides):
     """Check the given path, printing out any warnings detected."""
     try:
         with open(filename, 'U') as f:
@@ -73,7 +80,7 @@ def check_path(filename, reporter=modReporter.Default):
         msg = sys.exc_info()[1]
         reporter.unexpected_error(filename, msg.args[1])
         return 1
-    return check(codestr, filename, reporter)
+    return check(codestr, filename, reporter, **setting_overrides)
 
 
 def iter_source_code(paths):
@@ -88,9 +95,9 @@ def iter_source_code(paths):
             yield path
 
 
-def check_recursive(paths, reporter=modReporter.Default):
+def check_recursive(paths, reporter=modReporter.Default, **setting_overrides):
     """Recursively check all source files defined in paths."""
     warnings = 0
     for source_path in iter_source_code(paths):
-        warnings += check_path(source_path, reporter)
+        warnings += check_path(source_path, reporter, **setting_overrides)
     return warnings

@@ -53,6 +53,7 @@ class OffsetMessageType(MessageType):
             kwargs.update({'lineno': position[0], 'col': position[1]})
         return MessageType.__call__(self, filename, loc, *kargs, **kwargs)
 
+
 Message = MessageType(100, 'Generic', '{0}')
 UnusedImport = MessageType(101, 'UnusedImport', '{0} imported but unused')
 RedefinedWhileUnused = MessageType(102, 'RedefinedWhileUnused',
@@ -66,7 +67,7 @@ UndefinedName = MessageType(106, 'UndefinedName', "undefined name {0!r}")
 DoctestSyntaxError = OffsetMessageType(107, 'DoctestSyntaxError', "syntax error in doctest")
 UndefinedExport = MessageType(108, 'UndefinedExport', "undefined name {0!r} in __all__")
 UndefinedLocal = MessageType(109, 'UndefinedLocal',
-                         'local variable {0!r} (defined in enclosing scope on line {1.lineno!r}) referenced before assignment')
+                  'local variable {0!r} (defined in enclosing scope on line {1.lineno!r}) referenced before assignment')
 DuplicateArgument = MessageType(110, 'DuplicateArgument', "duplicate argument {0!r} in function definition")
 Redefined = MessageType(111, 'Redefined', "redefinition of {0!r} from line {1.lineno!r}")
 LateFutureImport = MessageType(112, 'LateFutureImport', "future import(s) {0!r} after other statements")

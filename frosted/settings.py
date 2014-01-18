@@ -25,18 +25,14 @@ OTHER DEALINGS IN THE SOFTWARE.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import os
-from collections import namedtuple
 
 from pies.overrides import *
 
 MAX_CONFIG_SEARCH_DEPTH = 25 # The number of parent directories frosted will look for a config file within
 
-WrapModes = ('GRID', 'VERTICAL', 'HANGING_INDENT', 'VERTICAL_HANGING_INDENT', 'VERTICAL_GRID', 'VERTICAL_GRID_GROUPED')
-WrapModes = namedtuple('WrapModes', WrapModes)(*range(len(WrapModes)))
-
 # Note that none of these lists must be complete as they are simply fallbacks for when included auto-detection fails.
 default = {'skip': ['__init__.py', ],
-           'ignore_errors': [],}
+           'ignore_frosted_errors': [],}
 
 try:
     import configparser
