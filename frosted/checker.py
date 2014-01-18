@@ -24,7 +24,6 @@ import doctest
 import itertools
 import os
 import sys
-from collections import namedtuple
 
 from frosted import messages
 from pies import ast

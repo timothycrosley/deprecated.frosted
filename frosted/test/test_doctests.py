@@ -4,9 +4,7 @@ import textwrap
 
 import pytest
 from frosted import messages as m
-from frosted.test.harness import TestCase
 from pies.overrides import *
-from pies.unittest import skip
 
 from .utils import flakes
 

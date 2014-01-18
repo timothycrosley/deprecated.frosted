@@ -29,7 +29,6 @@ from frosted.api import check_path, check_recursive
 from frosted.messages import UnusedImport
 from frosted.reporter import Reporter
 from pies.overrides import *
-from pies.unittest import skipIf
 
 from .utils import LoggingReporter, Node
 
@@ -235,12 +234,7 @@ foo(bar=baz, bax)
 
 def test_invalidEscape():
     """The invalid escape syntax raises ValueError in Python 2."""
-    # ValueError: invalid \x escape
-    ver = sys.version_info
     sourcePath = make_temp_file(r"foo = '\xyz'")
-    last_line = '       ^\n' if ver >= (3, 2) else ''
-    # Column has been "fixed" since 3.2.4 and 3.3.1
-    col = 1 if ver >= (3, 3, 1) or ((3, 2, 4) <= ver < (3, 3)) else 2
     assert_contains_errors(sourcePath, ("(unicode error) 'unicodeescape' codec can't decode bytes",))
 
 

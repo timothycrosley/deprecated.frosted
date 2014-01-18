@@ -4,7 +4,6 @@ from sys import version_info
 
 import pytest
 from frosted import messages as m
-from frosted.test.harness import TestCase
 from pies.overrides import *
 
 from .utils import flakes
