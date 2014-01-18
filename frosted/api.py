@@ -35,8 +35,8 @@ def check(codeString, filename, reporter=modReporter.Default, **setting_override
     active_settings = settings.default.copy()
     active_settings.update(setting_overrides)
 
-    if filename in active_settings.get('skip', []):
-        print("WARNING: {0} was skipped as it's listed in 'skip' setting".format(file_path), file=stderr)
+    if filename in active_settings.get('skip', []) or filename.split('/')[-1] in active_settings.get('skip', []):
+        print("WARNING: {0} was skipped as it's listed in 'skip' setting".format(filename), file=sys.stderr)
         return 0
 
     # First, compile into an AST and handle syntax errors.
