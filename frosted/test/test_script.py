@@ -58,9 +58,7 @@ def test_emptyDirectory():
 
 
 def test_singleFile():
-    """
-        If the directory contains one Python file - iter_source_code will find it
-    """
+    """If the directory contains one Python file - iter_source_code will find it"""
     childpath = make_empty_file('foo.py')
     assert list(iter_source_code([TEMP_DIR])) == [childpath]
 
@@ -72,8 +70,7 @@ def test_onlyPythonSource():
 
 
 def test_recurses():
-    """If the Python files are hidden deep down in child directories, we will
-    find them."""
+    """If the Python files are hidden deep down in child directories, we will find them."""
     os.mkdir(os.path.join(TEMP_DIR, 'foo'))
     apath = make_empty_file('foo', 'a.py')
     os.mkdir(os.path.join(TEMP_DIR, 'bar'))
@@ -83,9 +80,7 @@ def test_recurses():
 
 
 def test_multipleDirectories():
-    """
-        iter_source_code can be given multiple directories - it will recurse into each of them
-    """
+    """iter_source_code can be given multiple directories - it will recurse into each of them"""
     foopath = os.path.join(TEMP_DIR, 'foo')
     barpath = os.path.join(TEMP_DIR, 'bar')
     os.mkdir(foopath)
@@ -124,7 +119,10 @@ def run_frosted(paths, stdin=None):
 
 def test_goodFile():
     """When a Python source file is all good, the return code is zero and no
-    messages are printed to either stdout or stderr."""
+
+    messages are printed to either stdout or stderr.
+
+    """
     fd = open(TEMP_FILE_PATH, 'a')
     fd.close()
     d = run_frosted([TEMP_FILE_PATH])
@@ -132,8 +130,10 @@ def test_goodFile():
 
 
 def test_fileWithFlakes():
-    """
-        When a Python source file has warnings, the return code is non-zero and the warnings are printed to stdout
+    """ When a Python source file has warnings,
+
+    the return code is non-zero and the warnings are printed to stdout
+
     """
     fd = open(TEMP_FILE_PATH, 'wb')
     fd.write("import contraband\n".encode('ascii'))
@@ -144,9 +144,10 @@ def test_fileWithFlakes():
 
 
 def test_errors():
-    """
-        When frosted finds errors with the files it's given, (if they don't exist, say),
-        then the return code is non-zero and the errors are printed to stderr
+    """ When frosted finds errors with the files it's given, (if they don't exist, say),
+
+    then the return code is non-zero and the errors are printed to stderr
+
     """
     d = run_frosted([TEMP_FILE_PATH, '-r'])
     error_msg = '%s: No such file or directory\n' % (TEMP_FILE_PATH,)
