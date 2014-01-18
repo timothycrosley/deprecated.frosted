@@ -102,7 +102,7 @@ def test_explicitFiles():
     assert list(iter_source_code([epath])) == [epath]
 
 
-def run_frosted( paths, stdin=None):
+def run_frosted(paths, stdin=None):
     """Launch a subprocess running frosted."""
     env = native_dict(os.environ)
     env['PYTHONPATH'] = os.pathsep.join(sys.path)
@@ -148,14 +148,14 @@ def test_errors():
         When frosted finds errors with the files it's given, (if they don't exist, say),
         then the return code is non-zero and the errors are printed to stderr
     """
-    d = run_frosted([TEMP_FILE_PATH])
+    d = run_frosted([TEMP_FILE_PATH, '-r'])
     error_msg = '%s: No such file or directory\n' % (TEMP_FILE_PATH,)
     assert d == ('', error_msg, 1)
 
 
 def test_readFromStdin():
     """If no arguments are passed to C{frosted} then it reads from stdin."""
-    d = run_frosted([], stdin='import contraband'.encode('ascii'))
+    d = run_frosted(['-'], stdin='import contraband'.encode('ascii'))
 
     expected = UnusedImport('<stdin>', Node(1), 'contraband')
     assert d[0].strip() == expected.message.strip()
