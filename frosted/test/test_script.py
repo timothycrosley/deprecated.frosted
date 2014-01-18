@@ -21,9 +21,9 @@ OTHER DEALINGS IN THE SOFTWARE.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import os
-import sys
 import shutil
 import subprocess
+import sys
 import tempfile
 
 import frosted
