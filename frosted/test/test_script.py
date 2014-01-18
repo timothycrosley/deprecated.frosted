@@ -32,7 +32,7 @@ from frosted.messages import UnusedImport
 from pies.overrides import *
 from .utils import Node, LoggingReporter
 
-FROSTED_BINARY = os.path.join(os.path.dirname(frosted.__file__), '..', 'bin', 'frosted')
+FROSTED_BINARY = os.path.join(os.path.dirname(frosted.__file__), '..', 'scripts', 'frosted')
 
 
 def setup_function(function):

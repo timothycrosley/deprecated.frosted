@@ -125,13 +125,9 @@ def get_errors(path):
     return count, log
 
 
-def test_legacyScript():
-    from frosted.scripts import frosted as script_frosted
-    assert script_frosted.check_path is check_path
-
-
 def test_missingTrailingNewline():
     """Source which doesn't end with a newline shouldn't cause any exception to
+
     be raised nor an error indicator to be returned by check.
 
     """
@@ -140,9 +136,7 @@ def test_missingTrailingNewline():
 
 
 def test_check_pathNonExisting():
-    """
-        check_path handles non-existing files
-    """
+    """check_path handles non-existing files"""
     count, errors = get_errors('extremo')
     assert count == 1
     assert errors == [('unexpected_error', 'extremo', 'No such file or directory')]
