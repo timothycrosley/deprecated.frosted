@@ -66,26 +66,26 @@ Frosted Error-codes
 Frosted recognizes the following errors when present withing your code. You can use the 'ignore_frosted_errors' to
 specify any errors you want frosted to ignore.
 
-- 100: Generic Message
-- 101: UnusedImport
-- 102: RedefinedWhileUnused
-- 103: RedefinedInListComp',
-- 104: ImportShadowedByLoopVar',
-- 105: ImportStarUsed', "'from {0!s} import *' used; unable to detect undefined names")
-- 106: UndefinedName', "undefined name {0!r}")
-- 107: DoctestSyntaxError', "syntax error in doctest")
-- 108: UndefinedExport', "undefined name {0!r} in __all__")
-- 109: UndefinedLocal',
-- 110: DuplicateArgument', "duplicate argument {0!r} in function definition")
-- 111: Redefined', "redefinition of {0!r} from line {1.lineno!r}")
-- 112: LateFutureImport', "future import(s) {0!r} after other statements")
-- 113: UnusedVariable', "local variable {0!r} is assigned to but never used")
-- 114: MultipleValuesForArgument',
-- 115: TooFewArguments', "{0!s}() takes at least {1:d} argument(s)")
-- 116: TooManyArguments', "{0!s}() takes at most {1:d} argument(s)")
-- 117: UnexpectedArgument', "{0!s}() got unexpected keyword argument: {1!r}")
-- 118: NeedKwOnlyArgument', "{0!s}() needs kw-only argument(s): {1!s}")
-- 119: ReturnWithArgsInsideGenerator',
+- *100*: Generic Message
+- *101*: UnusedImport
+- *102*: RedefinedWhileUnused
+- *103*: RedefinedInListComp',
+- *104*: ImportShadowedByLoopVar',
+- *105*: ImportStarUsed', "'from {0!s} import *' used; unable to detect undefined names")
+- *106*: UndefinedName', "undefined name {0!r}")
+- *107*: DoctestSyntaxError', "syntax error in doctest")
+- *108*: UndefinedExport', "undefined name {0!r} in __all__")
+- *109*: UndefinedLocal',
+- *110*: DuplicateArgument', "duplicate argument {0!r} in function definition")
+- *111*: Redefined', "redefinition of {0!r} from line {1.lineno!r}")
+- *112*: LateFutureImport', "future import(s) {0!r} after other statements")
+- *113*: UnusedVariable', "local variable {0!r} is assigned to but never used")
+- *114*: MultipleValuesForArgument',
+- *115*: TooFewArguments', "{0!s}() takes at least {1:d} argument(s)")
+- *116*: TooManyArguments', "{0!s}() takes at most {1:d} argument(s)")
+- *117*: UnexpectedArgument', "{0!s}() got unexpected keyword argument: {1!r}")
+- *118*: NeedKwOnlyArgument', "{0!s}() needs kw-only argument(s): {1!s}")
+- *119*: ReturnWithArgsInsideGenerator',
 
 Frosted Code API
 ===================
