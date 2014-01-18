@@ -16,45 +16,37 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABI
 CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
 """
-
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import sys
+from collections import namedtuple
 
 from pies.overrides import *
 
 
-class Reporter(object):
+class Reporter(namedtuple('Reporter', ('stdout', 'stderr'))):
     """Formats the results of frosted checks and then presents them to the user."""
-    __slots__ = ('_stdout', '_stderr')
-    def __init__(self, warning_stream, error_stream):
-        """Construct a Reporter."""
-        self._stdout = warning_stream
-        self._stderr = error_stream
 
     def unexpected_error(self, filename, msg):
         """Output an unexpected_error specific to the provided filename."""
-        self._stderr.write("%s: %s\n" % (filename, msg))
+        self.stderr.write("%s: %s\n" % (filename, msg))
 
     def syntax_error(self, filename, msg, lineno, offset, text):
         """Output a syntax_error specific to the provided filename."""
         line = text.splitlines()[-1]
         if offset is not None:
             offset = offset - (len(text) - len(line))
-            self._stderr.write('%s:%d:%d: %s\n' % (filename, lineno, offset, msg))
+            self.stderr.write('%s:%d:%d: %s\n' % (filename, lineno, offset, msg))
         else:
-            self._stderr.write('%s:%d: %s\n' % (filename, lineno, msg))
-        self._stderr.write(str(line))
-        self._stderr.write('\n')
+            self.stderr.write('%s:%d: %s\n' % (filename, lineno, msg))
+        self.stderr.write(str(line))
+        self.stderr.write('\n')
         if offset is not None:
-            self._stderr.write(" " * offset + "^\n")
+            self.stderr.write(" " * offset + "^\n")
 
     def flake(self, message):
         """Print an error message to stdout."""
-        self._stdout.write(str(message))
-        self._stdout.write('\n')
+        self.stdout.write(str(message))
+        self.stdout.write('\n')
 
-
-def _make_default_reporter():
-    """Make a reporter that can be used when no reporter is specified."""
-    return Reporter(sys.stdout, sys.stderr)
+Default = Reporter(sys.stdout, sys.stderr)

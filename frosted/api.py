@@ -31,10 +31,8 @@ from frosted import __version__, checker
 __all__ = ['check', 'check_path', 'check_recursive', 'iter_source_code', 'main']
 
 
-def check(codeString, filename, reporter=None):
+def check(codeString, filename, reporter=modReporter.Default):
     """Check the Python source given by codeString for unfrosted flakes."""
-    if reporter is None:
-        reporter = modReporter._make_default_reporter()
     # First, compile into an AST and handle syntax errors.
     try:
         tree = compile(codeString, filename, "exec", _ast.PyCF_ONLY_AST)
@@ -64,10 +62,8 @@ def check(codeString, filename, reporter=None):
     return len(w.messages)
 
 
-def check_path(filename, reporter=None):
+def check_path(filename, reporter=modReporter.Default):
     """Check the given path, printing out any warnings detected."""
-    if reporter is None:
-        reporter = modReporter._make_default_reporter()
     try:
         with open(filename, 'U') as f:
             codestr = f.read() + '\n'
@@ -93,7 +89,7 @@ def iter_source_code(paths):
             yield path
 
 
-def check_recursive(paths, reporter):
+def check_recursive(paths, reporter=modReporter.Default):
     """Recursively check all source files defined in paths."""
     warnings = 0
     for sourcePath in iter_source_code(paths):
@@ -104,9 +100,8 @@ def check_recursive(paths, reporter):
 def main(prog=None):
     parser = OptionParser(prog=prog, version=__version__)
     __, args = parser.parse_args()
-    reporter = modReporter._make_default_reporter()
     if args:
-        warnings = check_recursive(args, reporter)
+        warnings = check_recursive(args)
     else:
-        warnings = check(sys.stdin.read(), '<stdin>', reporter)
+        warnings = check(sys.stdin.read(), '<stdin>')
     raise SystemExit(warnings > 0)
