@@ -131,7 +131,7 @@ Why did you fork pyflakes?
 ===================
 
 Pyflakes was a great project, and introduced a great approach for quickly checking for Python syntax errors. I am very grateful to the original creators.
-However, I feel over the last year it has greatly stagnated, without a clear vision and someone willing to take true ownership of the project.
+However, I feel over the last year it has become stagnate, without a clear vision and someone willing to take true ownership of the project.
 While I know it is in no way intentional, critical failures have stayed open, despite perfectly complete and valid pull-requests open, without so much as an acknowledgement from the maintainer.
 As I genuinely believe open source projects need constant improvement (releasing early and often), I decided to start this project and look for as much
 input as possible from the Python community. I'm hoping together we can build an even more awesome syntax checker!
