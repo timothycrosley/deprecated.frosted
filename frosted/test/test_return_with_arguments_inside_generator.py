@@ -3,10 +3,9 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from sys import version_info
 
 import pytest
-from pies.overrides import *
-
 from frosted import messages as m
 from frosted.test.harness import TestCase
+from pies.overrides import *
 
 from .utils import flakes
 

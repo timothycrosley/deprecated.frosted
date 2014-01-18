@@ -30,7 +30,8 @@ import frosted
 from frosted.api import iter_source_code
 from frosted.messages import UnusedImport
 from pies.overrides import *
-from .utils import Node, LoggingReporter
+
+from .utils import LoggingReporter, Node
 
 FROSTED_BINARY = os.path.join(os.path.dirname(frosted.__file__), '..', 'scripts', 'frosted')
 

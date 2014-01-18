@@ -1,0 +1,9 @@
+root = true
+
+[*.py]
+max_line_length = 120
+indent_style = space
+indent_size = 4
+known_first_party = frosted
+balanced_wrapping = true
+ignore_frosted_errors = 105
