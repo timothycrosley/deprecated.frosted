@@ -66,26 +66,26 @@ Frosted Error-codes
 Frosted recognizes the following errors when present withing your code. You can use the 'ignore_frosted_errors' to
 specify any errors you want frosted to ignore.
 
-- *100*: Generic Message
-- *101*: UnusedImport
-- *102*: RedefinedWhileUnused
-- *103*: RedefinedInListComp
-- *104*: ImportShadowedByLoopVar
-- *105*: ImportStarUsed
-- *106*: UndefinedName
-- *107*: DoctestSyntaxError
-- *108*: UndefinedExport
-- *109*: UndefinedLocal
-- *110*: DuplicateArgument
-- *111*: Redefined
-- *112*: LateFutureImport
-- *113*: UnusedVariable
-- *114*: MultipleValuesForArgument
-- *115*: TooFewArguments
-- *116*: TooManyArguments
-- *117*: UnexpectedArgument
-- *118*: NeedKwOnlyArgument
-- *119*: ReturnWithArgsInsideGenerator
+- **100**: Generic Message
+- **101**: UnusedImport
+- **102**: RedefinedWhileUnused
+- **103**: RedefinedInListComp
+- **104**: ImportShadowedByLoopVar
+- **105**: ImportStarUsed
+- **106**: UndefinedName
+- **107**: DoctestSyntaxError
+- **108**: UndefinedExport
+- **109**: UndefinedLocal
+- **110**: DuplicateArgument
+- **111**: Redefined
+- **112**: LateFutureImport
+- **113**: UnusedVariable
+- **114**: MultipleValuesForArgument
+- **115**: TooFewArguments
+- **116**: TooManyArguments
+- **117**: UnexpectedArgument
+- **118**: NeedKwOnlyArgument
+- **119**: ReturnWithArgsInsideGenerator
 
 Frosted Code API
 ===================
