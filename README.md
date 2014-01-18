@@ -30,7 +30,7 @@ or recursively:
 
     frosted -r .
 
-is equivalent to
+ *which is equivalent to*
 
     frosted **/*.py
 
