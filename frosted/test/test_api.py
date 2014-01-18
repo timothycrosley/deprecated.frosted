@@ -110,12 +110,7 @@ def make_temp_file(content):
 def assert_contains_errors(path, errorList):
     """Assert that provided causes at minimal the errors provided in the error list."""
     error = StringIO()
-    (outer, sys.stderr) = (sys.stderr, error)
-    try:
-        count = check_path(path)
-    finally:
-        sys.stderr = outer
-
+    count = check_path(path, Reporter(sys.stdout, error))
     error_string = error.getvalue()
     assert len(errorList) >= count
     for error in errorList:
