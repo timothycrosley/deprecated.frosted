@@ -2632,10 +2632,11 @@ anGV8s5acGZEfgV/54u+QWvqPINl2qbAMv0xFxZ5n5ujCk5NCidCGOH995ZvORyLPPUgNz+8FB2+
 P/+6xX94b+yP
 """
 
-import sys
 import base64
-import zlib
 import imp
+import sys
+import zlib
+
 
 class DictImporter(object):
     def __init__(self, sources):

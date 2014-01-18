@@ -3,13 +3,13 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from sys import version_info
 
 import pytest
+from frosted import messages as m
+from frosted import checker
+from frosted.test.harness import TestCase
 from pies.overrides import *
 from pies.unittest import skip, skipIf
 
 from _ast import PyCF_ONLY_AST
-from frosted import messages as m
-from frosted import checker
-from frosted.test.harness import TestCase
 
 from.utils import flakes
 
