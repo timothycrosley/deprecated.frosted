@@ -19,6 +19,30 @@ or if you prefer
 
     easy_install frosted
 
+using Frosted
+===================
+
+from the command line:
+
+    frosted mypythonfile.py mypythonfile2.py
+
+or recursively:
+
+    frosted -r .
+
+is equivalent to
+
+    frosted **/*.py
+
+or to read from stdin:
+
+    frosted -
+
+from within Python:
+
+    import frosted
+
+    frosted.api.check_path("pythonfile.py")
 
 What makes Frosted better then pyflakes?
 ===================
