@@ -244,7 +244,7 @@ class Checker(object):
 
     def __init__(self, tree, filename='(none)', builtins=None, **settings):
         self.settings = settings
-        self.ignore_errors = [int(error_code) for error_code in settings.get('ignore_frosted_errors', [])]
+        self.ignore_errors = settings.get('ignore_frosted_errors', [])
         self._node_handlers = {}
         self._deferred_functions = []
         self._deferred_assignments = []
@@ -326,8 +326,12 @@ class Checker(object):
         self.push_scope(ClassScope)
 
     def report(self, message_class, *args, **kwargs):
-        if not message_class.error_code in self.ignore_errors:
+        error_code = message_class.error_code
+
+        if(not error_code[:2] + "00" in self.ignore_errors and not error_code in self.ignore_errors and not
+           str(message_class.error_number) in self.ignore_errors):
             self.messages.append(message_class(self.filename, *args, **kwargs))
+
 
     def has_parent(self, node, kind):
         while hasattr(node, 'parent'):
