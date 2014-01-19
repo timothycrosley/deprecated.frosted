@@ -27,6 +27,7 @@ import sys
 import tempfile
 
 import frosted
+import pytest
 from frosted.api import iter_source_code
 from frosted.messages import UnusedImport
 from pies.overrides import *
@@ -161,3 +162,9 @@ def test_readFromStdin():
 
     expected = UnusedImport('<stdin>', Node(1), 'contraband')
     assert d[0].strip() == expected.message.strip()
+
+
+@pytest.mark.skipif("version_info >= (3,)")
+def test_print_statement_python2():
+    d = run_frosted(['-'], stdin='print "Hello, Frosted"'.encode('ascii'))
+    assert d == ('', '', 0)
