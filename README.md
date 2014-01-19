@@ -83,7 +83,7 @@ exposed api checking methods.
 Finally, frosted supports editorconfig files using the standard syntax defined here:
 http://editorconfig.org/
 
-Meaning You can place any standard isort configuration parameters within a .editorconfig file under the *.py section
+Meaning You can place any standard frosted configuration parameters within a .editorconfig file under the *.py section
 and they will be honored.
 
 Frosted Error-codes
