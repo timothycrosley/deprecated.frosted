@@ -80,7 +80,7 @@ To configure frosted for a single user create a ~/.frosted.cfg file:
 
     [settings]
     skip=file3.py,file4.py
-    ignore_frosted_errors=101,105,110
+    ignore_frosted_errors=E101,E205,E300
 
 
 Additionally, you can specify project level configuration simply by placing a .frosted.cfg file at the root of your
@@ -95,32 +95,42 @@ http://editorconfig.org/
 Meaning You can place any standard frosted configuration parameters within a .editorconfig file under the *.py section
 and they will be honored.
 
-Frosted Error-codes
+Frosted Error Codes
 ======================
 
 Frosted recognizes the following errors when present within your code. You can use the 'ignore_frosted_errors' setting to
-specify any errors you want Frosted to ignore.
+specify any errors you want Frosted to ignore. If you specify the series error code (ex: E100) all errors in that series will be
+ignored.
 
-- **100**: Generic Message
-- **101**: UnusedImport
-- **102**: RedefinedWhileUnused
-- **103**: RedefinedInListComp
-- **104**: ImportShadowedByLoopVar
-- **105**: ImportStarUsed
-- **106**: UndefinedName
-- **107**: DoctestSyntaxError
-- **108**: UndefinedExport
-- **109**: UndefinedLocal
-- **110**: DuplicateArgument
-- **111**: Redefined
-- **112**: LateFutureImport
-- **113**: UnusedVariable
-- **114**: MultipleValuesForArgument
-- **115**: TooFewArguments
-- **116**: TooManyArguments
-- **117**: UnexpectedArgument
-- **118**: NeedKwOnlyArgument
-- **119**: ReturnWithArgsInsideGenerator
+**I100 Series** - *General Information*
+- **I101**: Generic
+
+**E100 Series** - *Import Errors*
+- **E101**: UnusedImport
+- **E102**: ImportShadowedByLoopVar
+- **E103**: ImportStarUsed
+
+**E200 Series** - *Function / Method Definition and Calling Errors*
+- **E201**: MultipleValuesForArgument
+- **E202**: TooFewArguments
+- **E203**: TooManyArguments
+- **E204**: UnexpectedArgument
+- **E205**: NeedKwOnlyArgument
+- **E206**: DuplicateArgument
+- **E207**: LateFutureImport
+- **E208**: ReturnWithArgsInsideGenerator
+
+**E300 Series** - *Variable / Definition Usage Errors*
+- **E301**: RedefinedWhileUnused
+- **E302**: RedefinedInListComp
+- **E303**: UndefinedName
+- **E304**: UndefinedExport
+- **E305**: UndefinedLocal
+- **E306**: Redefined
+- **E307**: UnusedVariable
+
+**E400 Series** - *Syntax Errors*
+- **E401**: DoctestSyntaxError
 
 Frosted Code API
 ===================
