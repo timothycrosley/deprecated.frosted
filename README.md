@@ -45,6 +45,15 @@ from within Python:
 
     frosted.api.check_path("pythonfile.py")
 
+Discussing improvements and getting help
+===================
+
+Using any of the following methods will result in a quick resolution to any issue you may have with Frosted
+or a quick response to any implementation detail you wish to discuss.
+  - [Mailing List](https://mail.python.org/mailman/listinfo/code-quality) - best place to discuss large architectural changes or changes that effect that may effect Python code-quality projects beyond Frosted.
+  - [Github issues](https://github.com/timothycrosley/frosted/issues) - best place to report bugs, ask for concretely defined features, and even ask for general help.
+  - <timothy.crosley@gmail.com> - feel free to email me any questions or concerns you have that you don't think would benefit from community wide involvement.
+
 What makes Frosted better then pyflakes?
 ===================
 
