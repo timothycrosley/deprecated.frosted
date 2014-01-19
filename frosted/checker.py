@@ -880,6 +880,8 @@ class Checker(object):
     def EXCEPTHANDLER(self, node):
         # 3.x: in addition to handling children, we must handle the name of
         # the exception, which is not a Name node, but a simple string.
+        if node.type is None:
+            self.report(messages.BareExcept, node)
         if isinstance(node.name, str):
             self.handle_node_store(node)
         self.handle_children(node)
