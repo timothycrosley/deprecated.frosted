@@ -95,12 +95,15 @@ http://editorconfig.org/
 Meaning You can place any standard frosted configuration parameters within a .editorconfig file under the *.py section
 and they will be honored.
 
-Frosted Error-codes
+Frosted Error Codes
 ======================
 
 Frosted recognizes the following errors when present within your code. You can use the 'ignore_frosted_errors' setting to
 specify any errors you want Frosted to ignore. If you specify the series error code (ex: E100) all errors in that series will be
 ignored.
+
+**I100 Series** - *General Information*
+- **I101**: Generic
 
 **E100 Series** - *Import Errors*
 - **E101**: UnusedImport
