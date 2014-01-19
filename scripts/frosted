@@ -11,6 +11,8 @@ from frosted import __version__, settings
 from frosted.api import check, check_path, check_recursive, iter_source_code
 from pies.overrides import *
 
+warnings = 0
+
 parser = argparse.ArgumentParser(description='Quickly check the correctness of your Python scripts.')
 parser.add_argument('files', nargs='+', help='One or more Python source files that need their imports sorted.')
 parser.add_argument('-r', '--recursive', dest='recursive', action='store_true',
