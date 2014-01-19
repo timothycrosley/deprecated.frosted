@@ -16,7 +16,7 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABI
 CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import unicode_literals
 
 import os
 import sys
@@ -36,7 +36,7 @@ def check(codeString, filename, reporter=modReporter.Default, **setting_override
     active_settings.update(setting_overrides)
 
     if filename in active_settings.get('skip', []) or filename.split('/')[-1] in active_settings.get('skip', []):
-        print("WARNING: {0} was skipped as it's listed in 'skip' setting".format(filename), file=sys.stderr)
+        sys.stderr.write("WARNING: {0} was skipped as it's listed in 'skip' setting\n".format(filename))
         return 0
 
     # First, compile into an AST and handle syntax errors.
