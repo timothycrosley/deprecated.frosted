@@ -47,9 +47,9 @@ class MessageType(AbstractMessageType):
         values = {'filename': filename, 'lineno':loc.lineno, 'col': getattr(loc, 'col_offset', 0)}
         values.update(kwargs)
         if kwargs.get('verbose', False):
-            return self.Message('{0}:{1}:{2}:{3}:{4}'.format(filename, values['lineno'], values['col'],
-                                                             (kargs and kargs[0] or ''),
-                                                             self.template.format(*kargs, **values)),
+            return self.Message('{0}:{1}:{2}:{3}:{4}:{5}'.format(self.error_code, filename, values['lineno'],
+                                                                 values['col'], (kargs and kargs[0] or ''),
+                                                                 self.template.format(*kargs, **values)),
                                 self, values['lineno'], values['col'])
         return self.Message('{0}:{1}: {2}'.format(filename, values['lineno'], self.template.format(*kargs, **values)),
                             self, values['lineno'], values['col'])
