@@ -332,7 +332,6 @@ class Checker(object):
            str(message_class.error_number) in self.ignore_errors):
             self.messages.append(message_class(self.filename, *args, **kwargs))
 
-
     def has_parent(self, node, kind):
         while hasattr(node, 'parent'):
             node = node.parent
