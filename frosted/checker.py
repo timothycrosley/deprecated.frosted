@@ -330,6 +330,7 @@ class Checker(object):
 
         if(not error_code[:2] + "00" in self.ignore_errors and not error_code in self.ignore_errors and not
            str(message_class.error_number) in self.ignore_errors):
+            kwargs['verbose'] = self.settings.get('verbose')
             self.messages.append(message_class(self.filename, *args, **kwargs))
 
     def has_parent(self, node, kind):
