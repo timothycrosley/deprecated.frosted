@@ -136,6 +136,8 @@ While I know it is in no way intentional, critical failures have stayed open, de
 As I genuinely believe open source projects need constant improvement (releasing early and often), I decided to start this project and look for as much
 input as possible from the Python community. I'm hoping together we can build an even more awesome syntax checker!
 
+Note: the maintainer of pyflakes has been added as a contributer to frosted.
+
 --------------------------------------------
 
 Thanks and I hope you enjoy the new Frosted pyflakes!
