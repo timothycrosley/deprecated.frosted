@@ -26,7 +26,7 @@ parser.add_argument('-v', '--version', action='version', version='frosted {0}'.f
 arguments = dict((key, value) for (key, value) in itemsview(vars(parser.parse_args())) if value)
 file_names = arguments.pop('files', [])
 if file_names == ['-']:
-    check(sys.stdin.read(), '<stdin>')
+    check(sys.stdin.read(), '<stdin>', **arguments)
 elif arguments.get('recursive'):
     warnings = check_recursive(file_names, **arguments)
 else:
