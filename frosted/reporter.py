@@ -18,6 +18,7 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import re
 import sys
 from collections import namedtuple
 
@@ -42,7 +43,7 @@ class Reporter(namedtuple('Reporter', ('stdout', 'stderr'))):
         self.stderr.write(str(line))
         self.stderr.write('\n')
         if offset is not None:
-            self.stderr.write(" " * offset + "^\n")
+            self.stderr.write(re.sub(r'\S', ' ', line[:offset]) + "^\n")
 
     def flake(self, message):
         """Print an error message to stdout."""

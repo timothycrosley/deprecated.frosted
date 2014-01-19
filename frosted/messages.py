@@ -24,8 +24,9 @@ from collections import namedtuple
 from pies.overrides import *
 
 BY_CODE = {}
+_ERROR_INDEX = 100
 
-AbstractMessageType = namedtuple('AbstractMessageType', ('error_code', 'name', 'template'))
+AbstractMessageType = namedtuple('AbstractMessageType', ('error_code', 'name', 'template', 'error_number'))
 
 
 class MessageType(AbstractMessageType):
@@ -36,15 +37,23 @@ class MessageType(AbstractMessageType):
             return self.message
 
     def __new__(cls, error_code, name, template):
-        new_instance = AbstractMessageType.__new__(cls, error_code, name, template)
+        global _ERROR_INDEX
+        new_instance = AbstractMessageType.__new__(cls, error_code, name, template, _ERROR_INDEX)
+        _ERROR_INDEX += 1
         BY_CODE[error_code] = new_instance
         return new_instance
 
     def __call__(self, filename, loc=None, *kargs, **kwargs):
         values = {'filename': filename, 'lineno':loc.lineno, 'col': getattr(loc, 'col_offset', 0)}
         values.update(kwargs)
+        if kwargs.get('verbose', False):
+            return self.Message('{0}:{1}:{2}:{3}:{4}'.format(filename, values['lineno'], values['col'],
+                                                             (kargs and kargs[0] or ''),
+                                                             self.template.format(*kargs, **values)),
+                                self, values['lineno'], values['col'])
         return self.Message('{0}:{1}: {2}'.format(filename, values['lineno'], self.template.format(*kargs, **values)),
                             self, values['lineno'], values['col'])
+
 
 
 class OffsetMessageType(MessageType):
@@ -54,29 +63,30 @@ class OffsetMessageType(MessageType):
         return MessageType.__call__(self, filename, loc, *kargs, **kwargs)
 
 
-Message = MessageType(100, 'Generic', '{0}')
-UnusedImport = MessageType(101, 'UnusedImport', '{0} imported but unused')
-RedefinedWhileUnused = MessageType(102, 'RedefinedWhileUnused',
+Message = MessageType('I101', 'Generic', '{0}')
+UnusedImport = MessageType('E101', 'UnusedImport', '{0} imported but unused')
+RedefinedWhileUnused = MessageType('E301', 'RedefinedWhileUnused',
                                    'redefinition of {0!r} from line {1.lineno!r}')
-RedefinedInListComp = MessageType(103, 'RedefinedInListComp',
+RedefinedInListComp = MessageType('E302', 'RedefinedInListComp',
                                   'list comprehension redefines {0!r} from line {1.lineno!r}')
-ImportShadowedByLoopVar = MessageType(104, 'ImportShadowedByLoopVar',
+ImportShadowedByLoopVar = MessageType('E102', 'ImportShadowedByLoopVar',
                                       'import {0!r} from line {1.lineno!r} shadowed by loop variable')
-ImportStarUsed = MessageType(105, 'ImportStarUsed', "'from {0!s} import *' used; unable to detect undefined names")
-UndefinedName = MessageType(106, 'UndefinedName', "undefined name {0!r}")
-DoctestSyntaxError = OffsetMessageType(107, 'DoctestSyntaxError', "syntax error in doctest")
-UndefinedExport = MessageType(108, 'UndefinedExport', "undefined name {0!r} in __all__")
-UndefinedLocal = MessageType(109, 'UndefinedLocal',
+ImportStarUsed = MessageType('E103', 'ImportStarUsed', "'from {0!s} import *' used; unable to detect undefined names")
+UndefinedName = MessageType('E303', 'UndefinedName', "undefined name {0!r}")
+DoctestSyntaxError = OffsetMessageType('E401', 'DoctestSyntaxError', "syntax error in doctest")
+UndefinedExport = MessageType('E304', 'UndefinedExport', "undefined name {0!r} in __all__")
+UndefinedLocal = MessageType('E305', 'UndefinedLocal',
                   'local variable {0!r} (defined in enclosing scope on line {1.lineno!r}) referenced before assignment')
-DuplicateArgument = MessageType(110, 'DuplicateArgument', "duplicate argument {0!r} in function definition")
-Redefined = MessageType(111, 'Redefined', "redefinition of {0!r} from line {1.lineno!r}")
-LateFutureImport = MessageType(112, 'LateFutureImport', "future import(s) {0!r} after other statements")
-UnusedVariable = MessageType(113, 'UnusedVariable', "local variable {0!r} is assigned to but never used")
-MultipleValuesForArgument = MessageType(114, 'MultipleValuesForArgument',
+DuplicateArgument = MessageType('E206', 'DuplicateArgument', "duplicate argument {0!r} in function definition")
+Redefined = MessageType('E306', 'Redefined', "redefinition of {0!r} from line {1.lineno!r}")
+LateFutureImport = MessageType('E207', 'LateFutureImport', "future import(s) {0!r} after other statements")
+UnusedVariable = MessageType('E307', 'UnusedVariable', "local variable {0!r} is assigned to but never used")
+MultipleValuesForArgument = MessageType('E201', 'MultipleValuesForArgument',
                                         "{0!s}() got multiple values for argument {1!r}")
-TooFewArguments = MessageType(115, 'TooFewArguments', "{0!s}() takes at least {1:d} argument(s)")
-TooManyArguments = MessageType(116, 'TooManyArguments', "{0!s}() takes at most {1:d} argument(s)")
-UnexpectedArgument = MessageType(117, 'UnexpectedArgument', "{0!s}() got unexpected keyword argument: {1!r}")
-NeedKwOnlyArgument = MessageType(118, 'NeedKwOnlyArgument', "{0!s}() needs kw-only argument(s): {1!s}")
-ReturnWithArgsInsideGenerator = MessageType(119, 'ReturnWithArgsInsideGenerator',
+TooFewArguments = MessageType('E202', 'TooFewArguments', "{0!s}() takes at least {1:d} argument(s)")
+TooManyArguments = MessageType('E203', 'TooManyArguments', "{0!s}() takes at most {1:d} argument(s)")
+UnexpectedArgument = MessageType('E204', 'UnexpectedArgument', "{0!s}() got unexpected keyword argument: {1!r}")
+NeedKwOnlyArgument = MessageType('E205', 'NeedKwOnlyArgument', "{0!s}() needs kw-only argument(s): {1!s}")
+ReturnWithArgsInsideGenerator = MessageType('E208', 'ReturnWithArgsInsideGenerator',
                                             "'return' with argument inside generator")
+BareExcept = MessageType('W101', 'BareExcept', "bare except used: this is dangerous and should be avoided")

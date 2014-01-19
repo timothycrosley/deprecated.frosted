@@ -7,6 +7,7 @@
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/timothycrosley/frosted/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
 Frosted is a fork of pyflakes that aims at more open contribution from the outside public, a smaller more maintainable code base, and a better Python checker for all.
+It currently cleanly supports Python 2.6 - 3.4 using pies (https://github.com/timothycrosley/pies) to achieve this without ugly hacks and/or py2to3.
 
 Installing Frosted
 ===================
@@ -44,6 +45,15 @@ from within Python:
 
     frosted.api.check_path("pythonfile.py")
 
+Discussing improvements and getting help
+===================
+
+Using any of the following methods will result in a quick resolution to any issue you may have with Frosted
+or a quick response to any implementation detail you wish to discuss.
+  - [Mailing List](https://mail.python.org/mailman/listinfo/code-quality) - best place to discuss large architectural changes or changes that effect that may effect Python code-quality projects beyond Frosted.
+  - [Github issues](https://github.com/timothycrosley/frosted/issues) - best place to report bugs, ask for concretely defined features, and even ask for general help.
+  - <timothy.crosley@gmail.com> - feel free to email me any questions or concerns you have that you don't think would benefit from community wide involvement.
+
 What makes Frosted better then pyflakes?
 ===================
 
@@ -70,7 +80,7 @@ To configure frosted for a single user create a ~/.frosted.cfg file:
 
     [settings]
     skip=file3.py,file4.py
-    ignore_frosted_errors=101,105,110
+    ignore_frosted_errors=E101,E205,E300
 
 
 Additionally, you can specify project level configuration simply by placing a .frosted.cfg file at the root of your
@@ -82,35 +92,48 @@ exposed api checking methods.
 Finally, frosted supports editorconfig files using the standard syntax defined here:
 http://editorconfig.org/
 
-Meaning You can place any standard isort configuration parameters within a .editorconfig file under the *.py section
+Meaning You can place any standard frosted configuration parameters within a .editorconfig file under the *.py section
 and they will be honored.
 
-Frosted Error-codes
+Frosted Error Codes
 ======================
 
 Frosted recognizes the following errors when present within your code. You can use the 'ignore_frosted_errors' setting to
-specify any errors you want Frosted to ignore.
+specify any errors you want Frosted to ignore. If you specify the series error code (ex: E100) all errors in that series will be
+ignored.
 
-- **100**: Generic Message
-- **101**: UnusedImport
-- **102**: RedefinedWhileUnused
-- **103**: RedefinedInListComp
-- **104**: ImportShadowedByLoopVar
-- **105**: ImportStarUsed
-- **106**: UndefinedName
-- **107**: DoctestSyntaxError
-- **108**: UndefinedExport
-- **109**: UndefinedLocal
-- **110**: DuplicateArgument
-- **111**: Redefined
-- **112**: LateFutureImport
-- **113**: UnusedVariable
-- **114**: MultipleValuesForArgument
-- **115**: TooFewArguments
-- **116**: TooManyArguments
-- **117**: UnexpectedArgument
-- **118**: NeedKwOnlyArgument
-- **119**: ReturnWithArgsInsideGenerator
+**I100 Series** - *General Information*
+- **I101**: Generic
+
+**E100 Series** - *Import Errors*
+- **E101**: UnusedImport
+- **E102**: ImportShadowedByLoopVar
+- **E103**: ImportStarUsed
+
+**E200 Series** - *Function / Method Definition and Calling Errors*
+- **E201**: MultipleValuesForArgument
+- **E202**: TooFewArguments
+- **E203**: TooManyArguments
+- **E204**: UnexpectedArgument
+- **E205**: NeedKwOnlyArgument
+- **E206**: DuplicateArgument
+- **E207**: LateFutureImport
+- **E208**: ReturnWithArgsInsideGenerator
+
+**E300 Series** - *Variable / Definition Usage Errors*
+- **E301**: RedefinedWhileUnused
+- **E302**: RedefinedInListComp
+- **E303**: UndefinedName
+- **E304**: UndefinedExport
+- **E305**: UndefinedLocal
+- **E306**: Redefined
+- **E307**: UnusedVariable
+
+**E400 Series** - *Syntax Errors*
+- **E401**: DoctestSyntaxError
+
+**W100 Series** - *Exception Warning*
+- **W101**: BareExcept
 
 Frosted Code API
 ===================
@@ -130,11 +153,11 @@ file content to stdin.
 Why did you fork pyflakes?
 ===================
 
-Pyflakes was a great project, and introduced a great approach for quickly checking for Python syntax errors. I am very grateful to the original creators.
+Pyflakes was a great project, and introduced a great approach for quickly checking for Python coding errors. I am very grateful to the original creators.
 However, I feel over the last year it has become stagnate, without a clear vision and someone willing to take true ownership of the project.
 While I know it is in no way intentional, critical failures have stayed open, despite perfectly complete and valid pull-requests open, without so much as an acknowledgement from the maintainer.
 As I genuinely believe open source projects need constant improvement (releasing early and often), I decided to start this project and look for as much
-input as possible from the Python community. I'm hoping together we can build an even more awesome syntax checker!
+input as possible from the Python community. I'm hoping together we can build an even more awesome code checker!
 
 Note: the maintainer of pyflakes has been added as a contributer to frosted.
 
