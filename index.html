@@ -1,0 +1,211 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Frosted by timothycrosley</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Frosted</h1>
+        <p>A simple program which checks Python source files for errors.</p>
+
+        <p class="view"><a href="https://github.com/timothycrosley/frosted">View the Project on GitHub <small>timothycrosley/frosted</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/timothycrosley/frosted/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/timothycrosley/frosted/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/timothycrosley/frosted">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a name="" class="anchor" href="#"><span class="octicon octicon-link"></span></a><img src="https://raw.github.com/timothycrosley/frosted/master/logo.png" alt="frosted">
+</h1>
+
+<p><a href="http://badge.fury.io/py/frosted"><img src="https://badge.fury.io/py/frosted.png" alt="PyPI version"></a>
+<a href="https://crate.io/packages/frosted/"><img src="https://pypip.in/d/frosted/badge.png" alt="PyPi downloads"></a>
+<a href="https://travis-ci.org/timothycrosley/frosted"><img src="https://travis-ci.org/timothycrosley/frosted.png?branch=master" alt="Build Status"></a>
+<a href="https://bitdeli.com/free" title="Bitdeli Badge"><img src="https://d2weczhvl823v0.cloudfront.net/timothycrosley/frosted/trend.png" alt="Bitdeli Badge"></a></p>
+
+<p>Frosted is a fork of pyflakes that aims at more open contribution from the outside public, a smaller more maintainable code base, and a better Python checker for all.</p>
+
+<h1>
+<a name="installing-frosted" class="anchor" href="#installing-frosted"><span class="octicon octicon-link"></span></a>Installing Frosted</h1>
+
+<p>Installing Frosted is as simple as:</p>
+
+<pre><code>pip install frosted --upgrade
+</code></pre>
+
+<p>or if you prefer</p>
+
+<pre><code>easy_install frosted
+</code></pre>
+
+<h1>
+<a name="using-frosted" class="anchor" href="#using-frosted"><span class="octicon octicon-link"></span></a>Using Frosted</h1>
+
+<p>from the command line:</p>
+
+<pre><code>frosted mypythonfile.py mypythonfile2.py
+</code></pre>
+
+<p>or recursively:</p>
+
+<pre><code>frosted -r .
+</code></pre>
+
+<p><em>which is equivalent to</em></p>
+
+<pre><code>frosted **/*.py
+</code></pre>
+
+<p>or to read from stdin:</p>
+
+<pre><code>frosted -
+</code></pre>
+
+<p>from within Python:</p>
+
+<pre><code>import frosted
+
+frosted.api.check_path("pythonfile.py")
+</code></pre>
+
+<h1>
+<a name="what-makes-frosted-better-then-pyflakes" class="anchor" href="#what-makes-frosted-better-then-pyflakes"><span class="octicon octicon-link"></span></a>What makes Frosted better then pyflakes?</h1>
+
+<p>The following improvements have already been implemented into Frosted</p>
+
+<ul>
+<li>Several improvements and fixes that have stayed open (and ignored) on mainline pyflakes have been integrated.</li>
+<li>Lots of code has been re-factored and simplified, Frosted aims to be faster and leaner then pyflakes ever was.</li>
+<li>Frosted adds the ability to configure which files you want to check, and which errors you don't care about. Which, in my opinion, is a must have feature.</li>
+<li>Frosted implements the .editorconfig standard for configuration. This means you only need one configuration file for isort, frosted, and all the code editors anybody working with your project may be using.</li>
+<li>Frosted uses a more logical, self-documenting, and standard terminal interface. With pyflakes the default action without any arguments is to do nothing (waiting for stdin) with Frosted you get an error and help.</li>
+<li>Frosted switched from Java style unittests to the more Pythonic py.test (I admit this is highly subjective).</li>
+<li>The number one reason frosted is better is because of you! Or rather, the Python community at large. I will quickly respond to any pull requests, recommendations, or bug reports that come my way.</li>
+<li>Frosting. Duh.</li>
+</ul><p>And it will only get better from here on out!</p>
+
+<h1>
+<a name="configuring-frosted" class="anchor" href="#configuring-frosted"><span class="octicon octicon-link"></span></a>Configuring Frosted</h1>
+
+<p>If you find the default frosted settings do not work well for your project, frosted provides several ways to adjust
+the behavior.</p>
+
+<p>To configure frosted for a single user create a ~/.frosted.cfg file:</p>
+
+<pre><code>[settings]
+skip=file3.py,file4.py
+ignore_frosted_errors=101,105,110
+</code></pre>
+
+<p>Additionally, you can specify project level configuration simply by placing a .frosted.cfg file at the root of your
+project. frosted will look up to 25 directories up, from the one it is ran, to find a project specific configuration.</p>
+
+<p>You can then override any of these settings by using command line arguments, or by passing in kwargs into any of the
+exposed api checking methods.</p>
+
+<p>Finally, frosted supports editorconfig files using the standard syntax defined here:
+<a href="http://editorconfig.org/">http://editorconfig.org/</a></p>
+
+<p>Meaning You can place any standard isort configuration parameters within a .editorconfig file under the *.py section
+and they will be honored.</p>
+
+<h1>
+<a name="frosted-error-codes" class="anchor" href="#frosted-error-codes"><span class="octicon octicon-link"></span></a>Frosted Error-codes</h1>
+
+<p>Frosted recognizes the following errors when present within your code. You can use the 'ignore_frosted_errors' setting to
+specify any errors you want Frosted to ignore.</p>
+
+<ul>
+<li>
+<strong>100</strong>: Generic Message</li>
+<li>
+<strong>101</strong>: UnusedImport</li>
+<li>
+<strong>102</strong>: RedefinedWhileUnused</li>
+<li>
+<strong>103</strong>: RedefinedInListComp</li>
+<li>
+<strong>104</strong>: ImportShadowedByLoopVar</li>
+<li>
+<strong>105</strong>: ImportStarUsed</li>
+<li>
+<strong>106</strong>: UndefinedName</li>
+<li>
+<strong>107</strong>: DoctestSyntaxError</li>
+<li>
+<strong>108</strong>: UndefinedExport</li>
+<li>
+<strong>109</strong>: UndefinedLocal</li>
+<li>
+<strong>110</strong>: DuplicateArgument</li>
+<li>
+<strong>111</strong>: Redefined</li>
+<li>
+<strong>112</strong>: LateFutureImport</li>
+<li>
+<strong>113</strong>: UnusedVariable</li>
+<li>
+<strong>114</strong>: MultipleValuesForArgument</li>
+<li>
+<strong>115</strong>: TooFewArguments</li>
+<li>
+<strong>116</strong>: TooManyArguments</li>
+<li>
+<strong>117</strong>: UnexpectedArgument</li>
+<li>
+<strong>118</strong>: NeedKwOnlyArgument</li>
+<li>
+<strong>119</strong>: ReturnWithArgsInsideGenerator</li>
+</ul><h1>
+<a name="frosted-code-api" class="anchor" href="#frosted-code-api"><span class="octicon octicon-link"></span></a>Frosted Code API</h1>
+
+<p>Frosted exposes a simple API for checking Python code from withing other Python applications or plugins.</p>
+
+<ul>
+<li>frosted.api.check (codeString, filename, reporter=modReporter.Default, **setting_overrides)
+Check the Python source given by codeString for unfrosted flakes.</li>
+<li>frosted.api.check_path (filename, reporter=modReporter.Default, **setting_overrides)
+Check the given path, printing out any warnings detected.</li>
+<li>frosted.check_recursive (paths, reporter=modReporter.Default, **setting_overrides)
+Recursively check all source files defined in paths.</li>
+</ul><p>Additionally, you can use the command line tool in an API fashion, by passing '-' in as the filename and then sending
+file content to stdin.</p>
+
+<h1>
+<a name="why-did-you-fork-pyflakes" class="anchor" href="#why-did-you-fork-pyflakes"><span class="octicon octicon-link"></span></a>Why did you fork pyflakes?</h1>
+
+<p>Pyflakes was a great project, and introduced a great approach for quickly checking for Python syntax errors. I am very grateful to the original creators.
+However, I feel over the last year it has become stagnate, without a clear vision and someone willing to take true ownership of the project.
+While I know it is in no way intentional, critical failures have stayed open, despite perfectly complete and valid pull-requests open, without so much as an acknowledgement from the maintainer.
+As I genuinely believe open source projects need constant improvement (releasing early and often), I decided to start this project and look for as much
+input as possible from the Python community. I'm hoping together we can build an even more awesome syntax checker!</p>
+
+<p>Note: the maintainer of pyflakes has been added as a contributer to frosted.</p>
+
+<hr><p>Thanks and I hope you enjoy the new Frosted pyflakes!</p>
+
+<p>~Timothy Crosley</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/timothycrosley">timothycrosley</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
