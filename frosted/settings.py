@@ -32,7 +32,8 @@ MAX_CONFIG_SEARCH_DEPTH = 25 # The number of parent directories frosted will loo
 
 # Note that none of these lists must be complete as they are simply fallbacks for when included auto-detection fails.
 default = {'skip': ['__init__.py', ],
-           'ignore_frosted_errors': [],}
+           'ignore_frosted_errors': [],
+           'verbose': False}
 
 try:
     import configparser
