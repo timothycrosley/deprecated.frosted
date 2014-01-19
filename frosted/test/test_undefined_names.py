@@ -362,7 +362,7 @@ def test_undefinedWithErrorHandler():
     flakes('''
     try:
         socket_map
-    except:
+    except Exception:
         socket_map = {}
     ''', m.UndefinedName)
     flakes('''

@@ -132,6 +132,9 @@ ignored.
 **E400 Series** - *Syntax Errors*
 - **E401**: DoctestSyntaxError
 
+**W100 Series** - *Exception Warning*
+- **W101**: BareExcept
+
 Frosted Code API
 ===================
 

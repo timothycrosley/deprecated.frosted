@@ -83,3 +83,4 @@ UnexpectedArgument = MessageType('E204', 'UnexpectedArgument', "{0!s}() got unex
 NeedKwOnlyArgument = MessageType('E205', 'NeedKwOnlyArgument', "{0!s}() needs kw-only argument(s): {1!s}")
 ReturnWithArgsInsideGenerator = MessageType('E208', 'ReturnWithArgsInsideGenerator',
                                             "'return' with argument inside generator")
+BareExcept = MessageType('W101', 'BareExcept', "bare except used: this is dangerous and should be avoided.")

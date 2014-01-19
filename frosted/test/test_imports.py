@@ -61,7 +61,7 @@ def test_redefinedTry():
     try:
         import os
         import os
-    except:
+    except Exception:
         pass
     os.path''', m.RedefinedWhileUnused)
 
@@ -71,7 +71,7 @@ def test_redefinedTryExcept():
     flakes('''
     try:
         import os
-    except:
+    except Exception:
         import os
     os.path''')
 
@@ -83,7 +83,7 @@ def test_redefinedTryNested():
         if True:
             if True:
                 import os
-    except:
+    except Exception:
         import os
     os.path''')
 
@@ -96,7 +96,7 @@ def test_redefinedTryExceptMulti():
         from bb import mixer
     except RuntimeError:
         from cc import mixer
-    except:
+    except Exception:
         from dd import mixer
     mixer(123)
     """)
@@ -397,7 +397,7 @@ def test_usedInTry():
     flakes('''
     import fu
     try: fu
-    except: pass
+    except Exception: pass
     ''')
 
 
@@ -405,7 +405,7 @@ def test_usedInExcept():
     flakes('''
     import fu
     try: fu
-    except: pass
+    except Exception: pass
     ''')
 
 

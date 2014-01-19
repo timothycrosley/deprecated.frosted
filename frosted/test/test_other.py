@@ -176,7 +176,7 @@ def test_redefinedTryExceptFunction():
     flakes('''
     try:
         def a(): pass
-    except:
+    except Exception:
         def a(): pass
     ''')
 
@@ -187,7 +187,7 @@ def test_redefinedTryFunction():
     try:
         def a(): pass
         def a(): pass
-    except:
+    except Exception:
         pass
     ''', m.RedefinedWhileUnused)
 
@@ -862,3 +862,15 @@ def test_yieldFromUndefined():
     def bar():
         yield from foo()
     ''', m.UndefinedName)
+
+
+def test_bareExcept():
+    """
+        Issue a warning when using bare except:.
+    """
+    flakes('''
+        try:
+            pass
+        except:
+            pass
+        ''', m.BareExcept)
