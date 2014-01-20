@@ -44,7 +44,7 @@ editor_config_file = os.path.expanduser('~/.editorconfig')
 tries = 0
 current_directory = os.getcwd()
 while current_directory and tries < MAX_CONFIG_SEARCH_DEPTH:
-    potential_path = os.path.join(current_directory, ".editorconfig")
+    potential_path = os.path.join(current_directory, native_str(".editorconfig"))
     if os.path.exists(potential_path):
         editor_config_file = potential_path
         break
@@ -84,7 +84,7 @@ frosted_config_file = os.path.expanduser('~/.frosted.cfg')
 tries = 0
 current_directory = os.getcwd()
 while current_directory and tries < MAX_CONFIG_SEARCH_DEPTH:
-    potential_path = os.path.join(current_directory, ".frosted.cfg")
+    potential_path = os.path.join(current_directory, native_str(".frosted.cfg"))
     if os.path.exists(potential_path):
         frosted_config_file = potential_path
         break
