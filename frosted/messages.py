@@ -26,7 +26,8 @@ from pies.overrides import *
 BY_CODE = {}
 _ERROR_INDEX = 100
 
-AbstractMessageType = namedtuple('AbstractMessageType', ('error_code', 'name', 'template', 'error_number'))
+AbstractMessageType = namedtuple('AbstractMessageType', ('error_code', 'name', 'template',
+                                                         'keyword', 'error_number'))
 
 
 class MessageType(AbstractMessageType):
@@ -36,22 +37,25 @@ class MessageType(AbstractMessageType):
         def __str__(self):
             return self.message
 
-    def __new__(cls, error_code, name, template):
+    def __new__(cls, error_code, name, template, keyword='{0!s}'):
         global _ERROR_INDEX
-        new_instance = AbstractMessageType.__new__(cls, error_code, name, template, _ERROR_INDEX)
+        new_instance = AbstractMessageType.__new__(cls, error_code, name, template,
+                                                   keyword, _ERROR_INDEX)
         _ERROR_INDEX += 1
         BY_CODE[error_code] = new_instance
         return new_instance
 
     def __call__(self, filename, loc=None, *kargs, **kwargs):
-        values = {'filename': filename, 'lineno':loc.lineno, 'col': getattr(loc, 'col_offset', 0)}
+        values = {'filename': filename, 'lineno': loc.lineno, 'col': getattr(loc, 'col_offset', 0)}
         values.update(kwargs)
+
+        message = self.template.format(*kargs, **values)
         if kwargs.get('verbose', False):
-            return self.Message('{0}:{1}:{2}:{3}:{4}:{5}'.format(self.error_code, filename, values['lineno'],
-                                                                 values['col'], (kargs and kargs[0] or ''),
-                                                                 self.template.format(*kargs, **values)),
+            keyword = self.keyword.format(*kargs, **values)
+            return self.Message('{0}:{1}:{2}:{3}:{4}:{5}'.format(filename, values['lineno'], values['col'],
+                                                                 self.error_code, keyword, message),
                                 self, values['lineno'], values['col'])
-        return self.Message('{0}:{1}: {2}'.format(filename, values['lineno'], self.template.format(*kargs, **values)),
+        return self.Message('{0}:{1}: {2}'.format(filename, values['lineno'], message),
                             self, values['lineno'], values['col'])
 
 
@@ -63,7 +67,7 @@ class OffsetMessageType(MessageType):
         return MessageType.__call__(self, filename, loc, *kargs, **kwargs)
 
 
-Message = MessageType('I101', 'Generic', '{0}')
+Message = MessageType('I101', 'Generic', '{0}', '')
 UnusedImport = MessageType('E101', 'UnusedImport', '{0} imported but unused')
 RedefinedWhileUnused = MessageType('E301', 'RedefinedWhileUnused',
                                    'redefinition of {0!r} from line {1.lineno!r}')
@@ -71,7 +75,7 @@ RedefinedInListComp = MessageType('E302', 'RedefinedInListComp',
                                   'list comprehension redefines {0!r} from line {1.lineno!r}')
 ImportShadowedByLoopVar = MessageType('E102', 'ImportShadowedByLoopVar',
                                       'import {0!r} from line {1.lineno!r} shadowed by loop variable')
-ImportStarUsed = MessageType('E103', 'ImportStarUsed', "'from {0!s} import *' used; unable to detect undefined names")
+ImportStarUsed = MessageType('E103', 'ImportStarUsed', "'from {0!s} import *' used; unable to detect undefined names", '*')
 UndefinedName = MessageType('E303', 'UndefinedName', "undefined name {0!r}")
 DoctestSyntaxError = OffsetMessageType('E401', 'DoctestSyntaxError', "syntax error in doctest")
 UndefinedExport = MessageType('E304', 'UndefinedExport', "undefined name {0!r} in __all__")
@@ -88,5 +92,5 @@ TooManyArguments = MessageType('E203', 'TooManyArguments', "{0!s}() takes at mos
 UnexpectedArgument = MessageType('E204', 'UnexpectedArgument', "{0!s}() got unexpected keyword argument: {1!r}")
 NeedKwOnlyArgument = MessageType('E205', 'NeedKwOnlyArgument', "{0!s}() needs kw-only argument(s): {1!s}")
 ReturnWithArgsInsideGenerator = MessageType('E208', 'ReturnWithArgsInsideGenerator',
-                                            "'return' with argument inside generator")
-BareExcept = MessageType('W101', 'BareExcept', "bare except used: this is dangerous and should be avoided")
+                                            "'return' with argument inside generator", 'return')
+BareExcept = MessageType('W101', 'BareExcept', "bare except used: this is dangerous and should be avoided", 'except')
