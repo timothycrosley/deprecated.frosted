@@ -29,6 +29,7 @@ from frosted import messages
 from pies import ast
 from pies.overrides import *
 
+PY34_GTE = sys.version_info >= (3, 4)
 BUILTIN_VARS = set(dir(builtins) + ['__file__', '__builtins__', 'WindowsError'] +
                    os.environ.get('PYFLAKES_BUILTINS', '').split(','))
 
@@ -619,7 +620,7 @@ class Checker(object):
 
     # "expr" type nodes
     BOOLOP = BINOP = UNARYOP = IFEXP = DICT = SET = YIELD = YIELDFROM = COMPARE = REPR = ATTRIBUTE = SUBSCRIPT = \
-             LIST = TUPLE = STARRED = handle_children
+             LIST = TUPLE = STARRED = NAMECONSTANT = handle_children
 
     NUM = STR = BYTES = ELLIPSIS = ignore
 
@@ -732,6 +733,7 @@ class Checker(object):
 
     def LAMBDA(self, node):
         args = []
+        annotations = []
 
         if PY2:
             def addArgs(arglist):
@@ -747,26 +749,36 @@ class Checker(object):
             defaults = node.args.defaults
         else:
             for arg in node.args.args + node.args.kwonlyargs:
-                if arg.arg in args:
-                    self.report(messages.DuplicateArgument,
-                                node, arg.arg)
+                annotations.append(arg.annotation)
                 args.append(arg.arg)
-                self.handleNode(arg.annotation, node)
-            if hasattr(node, 'returns'):    # Only for FunctionDefs
-                for annotation in (node.args.varargannotation,
-                                   node.args.kwargannotation, node.returns):
-                    self.handleNode(annotation, node)
             defaults = node.args.defaults + node.args.kw_defaults
 
-        # vararg/kwarg identifiers are not Name nodes
-        for wildcard in (node.args.vararg, node.args.kwarg):
+        # Only for Python3 FunctionDefs
+        is_py3_func = hasattr(node, 'returns')
+
+        for arg_name in ('vararg', 'kwarg'):
+            wildcard = getattr(node.args, arg_name)
             if not wildcard:
                 continue
-            if wildcard in args:
-                self.report(messages.DuplicateArgument, node, wildcard)
-            args.append(wildcard)
-        for default in defaults:
-            self.handleNode(default, node)
+            args.append(getattr(wildcard, 'arg', wildcard))
+            if is_py3_func:
+                if PY34_GTE:
+                    annotations.append(wildcard.annotation)
+                else:
+                    argannotation = arg_name + 'annotation'
+                    annotations.append(getattr(node.args, argannotation))
+        if is_py3_func:
+            annotations.append(node.returns)
+
+        if PY3:
+            if len(set(args)) < len(args):
+                for (idx, arg) in enumerate(args):
+                    if arg in args[:idx]:
+                        self.report(messages.DuplicateArgument, node, arg)
+
+        for child in annotations + defaults:
+            if child:
+                self.handleNode(child, node)
 
         def runFunction():
 
