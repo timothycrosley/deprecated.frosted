@@ -65,7 +65,7 @@ except (IOError, ImportError, OSError, RuntimeError):
 
 setup(name="frosted",
       license="MIT",
-      version="1.1.2",
+      version="1.2.0",
       description="A passive Python syntax checker",
       long_description=readme,
       author="Timothy Crosley",
