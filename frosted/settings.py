@@ -26,8 +26,13 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import os
 
-from pies.overrides import *
 from pies.functools import lru_cache
+from pies.overrides import *
+
+try:
+    import configparser
+except ImportError:
+    import ConfigParser as configparser
 
 MAX_CONFIG_SEARCH_DEPTH = 25 # The number of parent directories frosted will look for a config file within
 
@@ -36,10 +41,6 @@ default = {'skip': ['__init__.py', ],
            'ignore_frosted_errors': [],
            'verbose': False}
 
-try:
-    import configparser
-except ImportError:
-    import ConfigParser as configparser
 
 @lru_cache()
 def from_path(path):
