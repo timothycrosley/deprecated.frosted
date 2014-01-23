@@ -235,7 +235,11 @@ foo(bar=baz, bax)
 def test_invalidEscape():
     """The invalid escape syntax raises ValueError in Python 2."""
     sourcePath = make_temp_file(r"foo = '\xyz'")
-    assert_contains_errors(sourcePath, ("(unicode error) 'unicodeescape' codec can't decode bytes",))
+    if PY2:
+        decoding_error = "%s: problem decoding source\n" % (sourcePath,)
+    else:
+        decoding_error = "(unicode error) 'unicodeescape' codec can't decode bytes"
+    assert_contains_errors(sourcePath, (decoding_error, ))
 
 
 def test_permissionDenied():
