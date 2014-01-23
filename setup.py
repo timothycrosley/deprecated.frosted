@@ -78,7 +78,7 @@ setup(name="frosted",
       install_requires=['pies>=2.5.5'],
       entry_points={
         'console_scripts': [
-            'cookiecutter = cookiecutter.main:main',
+            'frosted = frosted.main:main',
         ]
       },
       cmdclass={'test': PyTest},
