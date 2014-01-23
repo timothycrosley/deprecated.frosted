@@ -27,6 +27,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import os
 
 from pies.overrides import *
+from pies.functools import lru_cache
 
 MAX_CONFIG_SEARCH_DEPTH = 25 # The number of parent directories frosted will look for a config file within
 
@@ -40,11 +41,12 @@ try:
 except ImportError:
     import ConfigParser as configparser
 
+@lru_cache()
 def from_path(path):
     computed_settings = default.copy()
     editor_config_file = os.path.expanduser('~/.editorconfig')
     tries = 0
-    current_directory = os.getcwd()
+    current_directory = path
     while current_directory and tries < MAX_CONFIG_SEARCH_DEPTH:
         potential_path = os.path.join(current_directory, native_str(".editorconfig"))
         if os.path.exists(potential_path):
@@ -84,7 +86,7 @@ def from_path(path):
 
     frosted_config_file = os.path.expanduser('~/.frosted.cfg')
     tries = 0
-    current_directory = os.getcwd()
+    current_directory = path
     while current_directory and tries < MAX_CONFIG_SEARCH_DEPTH:
         potential_path = os.path.join(current_directory, native_str(".frosted.cfg"))
         if os.path.exists(potential_path):
