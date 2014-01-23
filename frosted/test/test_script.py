@@ -152,7 +152,6 @@ def test_non_unicode_slash_u():
     fd.write('"""Example: C:\\foobar\\unit-tests\\test.py"""'.encode('ascii'))
     fd.close()
     d = run_frosted([TEMP_FILE_PATH])
-    expected = UnusedImport(TEMP_FILE_PATH, Node(1), 'contraband')
     assert d == ('', '', 0)
 
 

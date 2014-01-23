@@ -30,8 +30,7 @@ __all__ = ['check', 'check_path', 'check_recursive', 'iter_source_code', 'main']
 
 def check(codeString, filename, reporter=modReporter.Default, settings_path=None, **setting_overrides):
     """Check the Python source given by codeString for unfrosted flakes."""
-    settings_path or os.path.abspath(filename)
-    active_settings = settings.default.copy()
+    active_settings = settings.from_path(settings_path or os.path.dirname(os.path.abspath(filename)))
     active_settings.update(setting_overrides)
 
     if filename in active_settings.get('skip', []) or filename.split('/')[-1] in active_settings.get('skip', []):
