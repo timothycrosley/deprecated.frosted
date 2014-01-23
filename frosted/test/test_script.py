@@ -18,7 +18,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 """
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function
 
 import os
 import shutil
@@ -148,9 +148,7 @@ def test_fileWithFlakes():
 def test_non_unicode_slash_u():
     """ Ensure \ u doesn't cause a unicode decode error """
     fd = open(TEMP_FILE_PATH, 'wb')
-    fd.write("""
-                Example: C:\foobar\unit-tests\test.py
-             """)
+    fd.write('"""Example: C:\foobar\unit-tests\test.py"""')
     fd.close()
     d = run_frosted([TEMP_FILE_PATH])
     expected = UnusedImport(TEMP_FILE_PATH, Node(1), 'contraband')
