@@ -34,7 +34,7 @@ from pies.overrides import *
 
 from .utils import Node
 
-FROSTED_BINARY = os.path.join(os.path.dirname(frosted.__file__), '..', 'scripts', 'frosted')
+FROSTED_BINARY = os.path.join(os.path.dirname(frosted.__file__), 'main.py')
 
 
 def setup_function(function):
