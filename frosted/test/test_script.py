@@ -145,10 +145,11 @@ def test_fileWithFlakes():
     assert d[0].strip() == expected.message.strip()
 
 
+@pytest.mark.skipif("sys.version_info >= (3,)")
 def test_non_unicode_slash_u():
     """ Ensure \ u doesn't cause a unicode decode error """
     fd = open(TEMP_FILE_PATH, 'wb')
-    fd.write('"""Example: C:\foobar\unit-tests\test.py"""')
+    fd.write('"""Example: C:\\foobar\\unit-tests\\test.py"""'.encode('ascii'))
     fd.close()
     d = run_frosted([TEMP_FILE_PATH])
     expected = UnusedImport(TEMP_FILE_PATH, Node(1), 'contraband')
@@ -174,7 +175,7 @@ def test_readFromStdin():
     assert d[0].strip() == expected.message.strip()
 
 
-@pytest.mark.skipif("version_info >= (3,)")
+@pytest.mark.skipif("sys.version_info >= (3,)")
 def test_print_statement_python2():
     d = run_frosted(['-'], stdin='print "Hello, Frosted"'.encode('ascii'))
     assert d == ('', '', 0)
