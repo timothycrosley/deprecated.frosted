@@ -145,6 +145,18 @@ def test_fileWithFlakes():
     assert d[0].strip() == expected.message.strip()
 
 
+def test_non_unicode_slash_u():
+    """ Ensure \ u doesn't cause a unicode decode error """
+    fd = open(TEMP_FILE_PATH, 'wb')
+    fd.write("""
+                Example: C:\foobar\unit-tests\test.py
+             """)
+    fd.close()
+    d = run_frosted([TEMP_FILE_PATH])
+    expected = UnusedImport(TEMP_FILE_PATH, Node(1), 'contraband')
+    assert d == ('', '', 0)
+
+
 def test_errors():
     """ When frosted finds errors with the files it's given, (if they don't exist, say),
 
