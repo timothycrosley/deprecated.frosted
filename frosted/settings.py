@@ -40,66 +40,70 @@ try:
 except ImportError:
     import ConfigParser as configparser
 
-editor_config_file = os.path.expanduser('~/.editorconfig')
-tries = 0
-current_directory = os.getcwd()
-while current_directory and tries < MAX_CONFIG_SEARCH_DEPTH:
-    potential_path = os.path.join(current_directory, native_str(".editorconfig"))
-    if os.path.exists(potential_path):
-        editor_config_file = potential_path
-        break
+def from_path(path):
+    computed_settings = default.copy()
+    editor_config_file = os.path.expanduser('~/.editorconfig')
+    tries = 0
+    current_directory = os.getcwd()
+    while current_directory and tries < MAX_CONFIG_SEARCH_DEPTH:
+        potential_path = os.path.join(current_directory, native_str(".editorconfig"))
+        if os.path.exists(potential_path):
+            editor_config_file = potential_path
+            break
 
-    current_directory = os.path.split(current_directory)[0]
-    tries += 1
+        current_directory = os.path.split(current_directory)[0]
+        tries += 1
 
-if os.path.exists(editor_config_file):
-    with open(editor_config_file) as config_file:
-        line = "\n"
-        last_position = config_file.tell()
-        while line:
-            line = config_file.readline()
-            if "[" in line:
-                config_file.seek(last_position)
-                break
+    if os.path.exists(editor_config_file):
+        with open(editor_config_file) as config_file:
+            line = "\n"
             last_position = config_file.tell()
+            while line:
+                line = config_file.readline()
+                if "[" in line:
+                    config_file.seek(last_position)
+                    break
+                last_position = config_file.tell()
 
-        config = configparser.SafeConfigParser()
-        config.readfp(config_file)
-        settings = {}
-        if config.has_section('*'):
-            settings.update(dict(config.items('*')))
-        if config.has_section('*.py'):
-            settings.update(dict(config.items('*.py')))
-        if config.has_section('**.py'):
-            settings.update(dict(config.items('**.py')))
+            config = configparser.SafeConfigParser()
+            config.readfp(config_file)
+            settings = {}
+            if config.has_section('*'):
+                settings.update(dict(config.items('*')))
+            if config.has_section('*.py'):
+                settings.update(dict(config.items('*.py')))
+            if config.has_section('**.py'):
+                settings.update(dict(config.items('**.py')))
 
-        for key, value in settings.items():
-            existing_value_type = type(default.get(key, ''))
-            if existing_value_type in (list, tuple):
-                default[key.lower()] = value.split(",")
-            else:
-                default[key.lower()] = existing_value_type(value)
+            for key, value in settings.items():
+                existing_value_type = type(computed_settings.get(key, ''))
+                if existing_value_type in (list, tuple):
+                    computed_settings[key.lower()] = value.split(",")
+                else:
+                    computed_settings[key.lower()] = existing_value_type(value)
 
-frosted_config_file = os.path.expanduser('~/.frosted.cfg')
-tries = 0
-current_directory = os.getcwd()
-while current_directory and tries < MAX_CONFIG_SEARCH_DEPTH:
-    potential_path = os.path.join(current_directory, native_str(".frosted.cfg"))
-    if os.path.exists(potential_path):
-        frosted_config_file = potential_path
-        break
+    frosted_config_file = os.path.expanduser('~/.frosted.cfg')
+    tries = 0
+    current_directory = os.getcwd()
+    while current_directory and tries < MAX_CONFIG_SEARCH_DEPTH:
+        potential_path = os.path.join(current_directory, native_str(".frosted.cfg"))
+        if os.path.exists(potential_path):
+            frosted_config_file = potential_path
+            break
 
-    current_directory = os.path.split(current_directory)[0]
-    tries += 1
+        current_directory = os.path.split(current_directory)[0]
+        tries += 1
 
-if os.path.exists(frosted_config_file):
-    with open(frosted_config_file) as config_file:
-        config = configparser.SafeConfigParser()
-        config.readfp(config_file)
-        settings = dict(config.items('settings'))
-        for key, value in settings.items():
-            existing_value_type = type(default.get(key, ''))
-            if existing_value_type in (list, tuple):
-                default[key.lower()] = value.split(",")
-            else:
-                default[key.lower()] = existing_value_type(value)
+    if os.path.exists(frosted_config_file):
+        with open(frosted_config_file) as config_file:
+            config = configparser.SafeConfigParser()
+            config.readfp(config_file)
+            settings = dict(config.items('settings'))
+            for key, value in settings.items():
+                existing_value_type = type(computed_settings.get(key, ''))
+                if existing_value_type in (list, tuple):
+                    computed_settings[key.lower()] = value.split(",")
+                else:
+                    computed_settings[key.lower()] = existing_value_type(value)
+
+    return computed_settings
