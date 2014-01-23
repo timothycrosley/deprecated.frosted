@@ -750,6 +750,7 @@ class Checker(object):
         else:
             for arg in node.args.args + node.args.kwonlyargs:
                 annotations.append(arg.annotation)
+                args.append(arg.arg)
             defaults = node.args.defaults + node.args.kw_defaults
 
         # Only for Python3 FunctionDefs
