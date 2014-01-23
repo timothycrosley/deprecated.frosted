@@ -65,7 +65,7 @@ except (IOError, ImportError, OSError, RuntimeError):
 
 setup(name="frosted",
       license="MIT",
-      version="1.1.2",
+      version="1.2.0",
       description="A passive Python syntax checker",
       long_description=readme,
       author="Timothy Crosley",
@@ -75,8 +75,12 @@ setup(name="frosted",
       url="https://github.com/timothycrosley/frosted",
       packages=["frosted", "frosted.test"],
       requires=['pies'],
-      scripts=['scripts/frosted'],
       install_requires=['pies>=2.5.5'],
+      entry_points={
+        'console_scripts': [
+            'frosted = frosted.main:main',
+        ]
+      },
       cmdclass={'test': PyTest},
       classifiers=['Development Status :: 5 - Production/Stable',
                    'Environment :: Console',

@@ -77,7 +77,7 @@ ImportShadowedByLoopVar = MessageType('E102', 'ImportShadowedByLoopVar',
                                       'import {0!r} from line {1.lineno!r} shadowed by loop variable')
 ImportStarUsed = MessageType('E103', 'ImportStarUsed', "'from {0!s} import *' used; unable to detect undefined names", '*')
 UndefinedName = MessageType('E303', 'UndefinedName', "undefined name {0!r}")
-DoctestSyntaxError = OffsetMessageType('E401', 'DoctestSyntaxError', "syntax error in doctest")
+DoctestSyntaxError = OffsetMessageType('E401', 'DoctestSyntaxError', "syntax error in doctest", '')
 UndefinedExport = MessageType('E304', 'UndefinedExport', "undefined name {0!r} in __all__")
 UndefinedLocal = MessageType('E305', 'UndefinedLocal',
                   'local variable {0!r} (defined in enclosing scope on line {1.lineno!r}) referenced before assignment')

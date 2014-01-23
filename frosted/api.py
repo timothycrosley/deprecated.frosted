@@ -16,8 +16,6 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABI
 CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 
 """
-from __future__ import unicode_literals
-
 import os
 import sys
 
@@ -30,9 +28,9 @@ import _ast
 __all__ = ['check', 'check_path', 'check_recursive', 'iter_source_code', 'main']
 
 
-def check(codeString, filename, reporter=modReporter.Default, **setting_overrides):
+def check(codeString, filename, reporter=modReporter.Default, settings_path=None, **setting_overrides):
     """Check the Python source given by codeString for unfrosted flakes."""
-    active_settings = settings.default.copy()
+    active_settings = settings.from_path(settings_path or os.path.dirname(os.path.abspath(filename)))
     active_settings.update(setting_overrides)
 
     if filename in active_settings.get('skip', []) or filename.split('/')[-1] in active_settings.get('skip', []):
@@ -68,7 +66,7 @@ def check(codeString, filename, reporter=modReporter.Default, **setting_override
     return len(w.messages)
 
 
-def check_path(filename, reporter=modReporter.Default, **setting_overrides):
+def check_path(filename, reporter=modReporter.Default, settings_path=None, **setting_overrides):
     """Check the given path, printing out any warnings detected."""
     try:
         with open(filename, 'U') as f:
@@ -80,7 +78,7 @@ def check_path(filename, reporter=modReporter.Default, **setting_overrides):
         msg = sys.exc_info()[1]
         reporter.unexpected_error(filename, msg.args[1])
         return 1
-    return check(codestr, filename, reporter, **setting_overrides)
+    return check(codestr, filename, reporter, settings_path, **setting_overrides)
 
 
 def iter_source_code(paths):
@@ -95,9 +93,9 @@ def iter_source_code(paths):
             yield path
 
 
-def check_recursive(paths, reporter=modReporter.Default, **setting_overrides):
+def check_recursive(paths, reporter=modReporter.Default, settings_path=None, **setting_overrides):
     """Recursively check all source files defined in paths."""
     warnings = 0
     for source_path in iter_source_code(paths):
-        warnings += check_path(source_path, reporter, **setting_overrides)
+        warnings += check_path(source_path, reporter, settings_path=None, **setting_overrides)
     return warnings
