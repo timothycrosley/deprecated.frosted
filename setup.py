@@ -75,8 +75,12 @@ setup(name="frosted",
       url="https://github.com/timothycrosley/frosted",
       packages=["frosted", "frosted.test"],
       requires=['pies'],
-      scripts=['scripts/frosted'],
       install_requires=['pies>=2.5.5'],
+      entry_points={
+        'console_scripts': [
+            'cookiecutter = cookiecutter.main:main',
+        ]
+      },
       cmdclass={'test': PyTest},
       classifiers=['Development Status :: 5 - Production/Stable',
                    'Environment :: Console',
