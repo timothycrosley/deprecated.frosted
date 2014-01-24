@@ -24,7 +24,7 @@ or if you prefer
 Using Frosted
 ===================
 
-from the command line:
+**from the command line:**
 
     frosted mypythonfile.py mypythonfile2.py
 
@@ -40,7 +40,7 @@ or to read from stdin:
 
     frosted -
 
-from within Python:
+**from within Python:**
 
     import frosted
 
