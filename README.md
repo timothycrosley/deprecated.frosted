@@ -83,6 +83,8 @@ To configure frosted for a single user create a ~/.frosted.cfg file:
     skip=file3.py,file4.py
     ignore_frosted_errors=E101,E205,E300
 
+- **skip** - A comma delimited list of file or directory names to skip. The name must exactly match the entire path, the name of the file, or one of it's parent directories for it to be skipped.
+- **ignore_frosted_errors** - A comma delimited list of Frosted error codes to ignore. You can see a definition of all error codes in the next section.
 
 Additionally, you can specify project level configuration simply by placing a .frosted.cfg file at the root of your
 project. frosted will look up to 25 directories up, from the one it is ran, to find a project specific configuration.
