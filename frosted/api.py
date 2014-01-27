@@ -28,12 +28,23 @@ import _ast
 __all__ = ['check', 'check_path', 'check_recursive', 'iter_source_code', 'main']
 
 
+def _should_skip(filename, skip):
+    if filename in skip:
+        return True
+
+    position = os.path.split(filename)
+    while position[1]:
+        if position[1] in skip:
+            return True
+        position = os.path.split(position[0])
+
+
 def check(codeString, filename, reporter=modReporter.Default, settings_path=None, **setting_overrides):
     """Check the Python source given by codeString for unfrosted flakes."""
-    active_settings = settings.from_path(settings_path or os.path.dirname(os.path.abspath(filename)))
+    active_settings = settings.from_path(settings_path or os.path.dirname(os.path.abspath(filename))).copy()
     active_settings.update(setting_overrides)
 
-    if filename in active_settings.get('skip', []) or filename.split('/')[-1] in active_settings.get('skip', []):
+    if _should_skip(filename, active_settings.get('skip', [])):
         sys.stderr.write("WARNING: {0} was skipped as it's listed in 'skip' setting\n".format(filename))
         return 0
 
