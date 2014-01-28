@@ -46,7 +46,10 @@ class MessageType(AbstractMessageType):
         return new_instance
 
     def __call__(self, filename, loc=None, *kargs, **kwargs):
-        values = {'filename': filename, 'lineno': loc.lineno, 'col': getattr(loc, 'col_offset', 0)}
+        values = {'filename': filename, 'lineno': 0, 'col': 0}
+        if loc:
+            values['lineno'] = loc.lineno
+            values['col'] = getattr(loc, 'col_offset', 0)
         values.update(kwargs)
 
         message = self.template.format(*kargs, **values)
@@ -95,4 +98,4 @@ NeedKwOnlyArgument = MessageType('E205', 'NeedKwOnlyArgument', "{0!s}() needs kw
 ReturnWithArgsInsideGenerator = MessageType('E208', 'ReturnWithArgsInsideGenerator',
                                             "'return' with argument inside generator", 'return')
 BareExcept = MessageType('W101', 'BareExcept', "bare except used: this is dangerous and should be avoided", 'except')
-FileSkipped = MessageType('W201', 'FileSkipped', "{0!s} skipped because of the current configuration")
+FileSkipped = MessageType('W201', 'FileSkipped', "Skipped because of the current configuration")

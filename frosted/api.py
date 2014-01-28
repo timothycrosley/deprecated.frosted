@@ -53,7 +53,7 @@ def check(codeString, filename, reporter=modReporter.Default, settings_path=None
             ignore = active_settings.get('ignore_frosted_errors', [])
             if(not "W200" in ignore and not "W201" in ignore):
                 reporter.flake(FileSkipped(filename))
-                return 0
+        return 0
 
     # First, compile into an AST and handle syntax errors.
     try:
