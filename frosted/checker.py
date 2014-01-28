@@ -234,8 +234,7 @@ class FunctionSignature(object):
 
 
 class Checker(object):
-    """The core of frosted, checks the cleanliness and sanity of Python
-    code."""
+    """The core of frosted, checks the cleanliness and sanity of Python code."""
 
     node_depth = 0
     offset = None
@@ -246,6 +245,10 @@ class Checker(object):
     def __init__(self, tree, filename='(none)', builtins=None, **settings):
         self.settings = settings
         self.ignore_errors = settings.get('ignore_frosted_errors', [])
+        file_specifc_ignores = settings.get('ignore_frosted_errors_for_' + (os.path.basename(filename) or ""), None)
+        if file_specifc_ignores:
+            self.ignore_errors += file_specifc_ignores
+
         self._node_handlers = {}
         self._deferred_functions = []
         self._deferred_assignments = []
@@ -303,8 +306,8 @@ class Checker(object):
             export = isinstance(scope.get('__all__'), ExportBinding)
             if export:
                 all = scope['__all__'].names()
+                # Look for possible mistakes in the export list
                 if not scope.importStarred and os.path.basename(self.filename) != '__init__.py':
-                    # Look for possible mistakes in the export list
                     undefined = set(all) - set(scope)
                     for name in undefined:
                         self.report(messages.UndefinedExport, scope['__all__'].source, name)
@@ -312,10 +315,9 @@ class Checker(object):
                 all = []
 
             # Look for imported names that aren't used without checking imports in namespace definition
-            if self.filename != '__init__.py':
-                for importation in scope.values():
-                    if isinstance(importation, Importation) and not importation.used and importation.name not in all:
-                        self.report(messages.UnusedImport, importation.source, importation.name)
+            for importation in scope.values():
+                if isinstance(importation, Importation) and not importation.used and importation.name not in all:
+                    self.report(messages.UnusedImport, importation.source, importation.name)
 
     def push_scope(self, scope_class=FunctionScope):
         self.scope_stack.append(scope_class())

@@ -25,7 +25,7 @@ from pies.overrides import *
 
 import _ast
 
-__all__ = ['check', 'check_path', 'check_recursive', 'iter_source_code', 'main']
+__all__ = ['check', 'check_path', 'check_recursive', 'iter_source_code']
 
 
 def _should_skip(filename, skip):
