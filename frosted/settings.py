@@ -37,8 +37,9 @@ except ImportError:
 MAX_CONFIG_SEARCH_DEPTH = 25 # The number of parent directories frosted will look for a config file within
 
 # Note that none of these lists must be complete as they are simply fallbacks for when included auto-detection fails.
-default = {'skip': ['__init__.py', ],
+default = {'skip': [],
            'ignore_frosted_errors': [],
+           'ignore_frosted_errors_for__init__.py': ['E101', 'E103'],
            'verbose': False}
 
 
@@ -79,7 +80,10 @@ def from_path(path):
                 settings.update(dict(config.items('**.py')))
 
             for key, value in settings.items():
-                existing_value_type = type(computed_settings.get(key, ''))
+                if key.startswith('ignore_frosted_errors_for'):
+                    existing_value_type = list
+                else:
+                    existing_value_type = type(computed_settings.get(key, ''))
                 if existing_value_type in (list, tuple):
                     computed_settings[key.lower()] = value.split(",")
                 else:
@@ -103,7 +107,10 @@ def from_path(path):
             config.readfp(config_file)
             settings = dict(config.items('settings'))
             for key, value in settings.items():
-                existing_value_type = type(computed_settings.get(key, ''))
+                if key.startswith('ignore_frosted_errors_for'):
+                    existing_value_type = list
+                else:
+                    existing_value_type = type(computed_settings.get(key, ''))
                 if existing_value_type in (list, tuple):
                     computed_settings[key.lower()] = value.split(",")
                 else:
