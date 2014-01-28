@@ -138,6 +138,9 @@ ignored.
 **W100 Series** - *Exception Warning*
 - **W101**: BareExcept
 
+**W200 Series** - *Handling Warning*
+- **W201**: FileSkipped
+
 Frosted Code API
 ===================
 
