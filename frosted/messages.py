@@ -75,7 +75,8 @@ RedefinedInListComp = MessageType('E302', 'RedefinedInListComp',
                                   'list comprehension redefines {0!r} from line {1.lineno!r}')
 ImportShadowedByLoopVar = MessageType('E102', 'ImportShadowedByLoopVar',
                                       'import {0!r} from line {1.lineno!r} shadowed by loop variable')
-ImportStarUsed = MessageType('E103', 'ImportStarUsed', "'from {0!s} import *' used; unable to detect undefined names", '*')
+ImportStarUsed = MessageType('E103', 'ImportStarUsed',
+                             "'from {0!s} import *' used; unable to detect undefined names", '*')
 UndefinedName = MessageType('E303', 'UndefinedName', "undefined name {0!r}")
 DoctestSyntaxError = OffsetMessageType('E401', 'DoctestSyntaxError', "syntax error in doctest", '')
 UndefinedExport = MessageType('E304', 'UndefinedExport', "undefined name {0!r} in __all__")
@@ -94,3 +95,4 @@ NeedKwOnlyArgument = MessageType('E205', 'NeedKwOnlyArgument', "{0!s}() needs kw
 ReturnWithArgsInsideGenerator = MessageType('E208', 'ReturnWithArgsInsideGenerator',
                                             "'return' with argument inside generator", 'return')
 BareExcept = MessageType('W101', 'BareExcept', "bare except used: this is dangerous and should be avoided", 'except')
+BareExcept = MessageType('W201', 'FileSkipped', "{0!s} skipped because of the current configuration")
