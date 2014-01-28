@@ -37,7 +37,7 @@ except ImportError:
 MAX_CONFIG_SEARCH_DEPTH = 25 # The number of parent directories frosted will look for a config file within
 
 # Note that none of these lists must be complete as they are simply fallbacks for when included auto-detection fails.
-default = {'skip': ['__init__.py', ],
+default = {'skip': [],
            'ignore_frosted_errors': [],
            'verbose': False}
 
