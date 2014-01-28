@@ -21,6 +21,7 @@ import sys
 
 from frosted import reporter as modReporter
 from frosted import checker, settings
+from frosted.messages import FileSkipped
 from pies.overrides import *
 
 import _ast
@@ -45,8 +46,14 @@ def check(codeString, filename, reporter=modReporter.Default, settings_path=None
     active_settings.update(setting_overrides)
 
     if _should_skip(filename, active_settings.get('skip', [])):
-        sys.stderr.write("WARNING: {0} was skipped as it's listed in 'skip' setting\n".format(filename))
-        return 0
+        if active_settings.get('directly_being_checked', None) == 1:
+            reporter.flake(FileSkipped(filename))
+            return 1
+        elif active_settings.get('verbose', False):
+            ignore = active_settings.get('ignore_frosted_errors', [])
+            if(not "W200" in ignore and not "W201" in ignore):
+                reporter.flake(FileSkipped(filename))
+                return 0
 
     # First, compile into an AST and handle syntax errors.
     try:
