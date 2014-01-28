@@ -134,6 +134,7 @@ ignored.
 
 **E400 Series** - *Syntax Errors*
 - **E401**: DoctestSyntaxError
+- **E402**: PythonSyntaxError
 
 **W100 Series** - *Exception Warning*
 - **W101**: BareExcept

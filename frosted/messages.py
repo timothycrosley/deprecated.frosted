@@ -99,3 +99,4 @@ ReturnWithArgsInsideGenerator = MessageType('E208', 'ReturnWithArgsInsideGenerat
                                             "'return' with argument inside generator", 'return')
 BareExcept = MessageType('W101', 'BareExcept', "bare except used: this is dangerous and should be avoided", 'except')
 FileSkipped = MessageType('W201', 'FileSkipped', "Skipped because of the current configuration")
+PythonSyntaxError = MessageType('E402', 'PythonSyntaxError', "{0!s}")
