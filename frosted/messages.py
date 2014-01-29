@@ -19,6 +19,7 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import re
 from collections import namedtuple
 
 from pies.overrides import *
@@ -70,6 +71,19 @@ class OffsetMessageType(MessageType):
         return MessageType.__call__(self, filename, loc, *kargs, **kwargs)
 
 
+class SyntaxErrorType(MessageType):
+    def __call__(self, filename, msg, lineno, offset, text, *kargs, **kwargs):
+        kwargs['lineno'] = lineno
+        line = text.splitlines()[-1]
+        msg += "\n" + str(line)
+        if offset is not None:
+            offset = offset - (len(text) - len(line))
+            kwargs['col'] = offset
+            msg += "\n" + re.sub(r'\S',' ', line[:offset]) + "^"
+
+        return MessageType.__call__(self, filename, None, msg, *kargs, **kwargs)
+
+
 Message = MessageType('I101', 'Generic', '{0}', '')
 UnusedImport = MessageType('E101', 'UnusedImport', '{0} imported but unused')
 RedefinedWhileUnused = MessageType('E301', 'RedefinedWhileUnused',
@@ -99,4 +113,4 @@ ReturnWithArgsInsideGenerator = MessageType('E208', 'ReturnWithArgsInsideGenerat
                                             "'return' with argument inside generator", 'return')
 BareExcept = MessageType('W101', 'BareExcept', "bare except used: this is dangerous and should be avoided", 'except')
 FileSkipped = MessageType('W201', 'FileSkipped', "Skipped because of the current configuration")
-PythonSyntaxError = MessageType('E402', 'PythonSyntaxError', "{0!s}")
+PythonSyntaxError = SyntaxErrorType('E402', 'PythonSyntaxError', "{0!s}", "syntax")

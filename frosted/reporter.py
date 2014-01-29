@@ -32,19 +32,6 @@ class Reporter(namedtuple('Reporter', ('stdout', 'stderr'))):
         """Output an unexpected_error specific to the provided filename."""
         self.stderr.write("%s: %s\n" % (filename, msg))
 
-    def syntax_error(self, filename, msg, lineno, offset, text):
-        """Output a syntax_error specific to the provided filename."""
-        line = text.splitlines()[-1]
-        if offset is not None:
-            offset = offset - (len(text) - len(line))
-            self.stderr.write('%s:%d:%d: %s\n' % (filename, lineno, offset, msg))
-        else:
-            self.stderr.write('%s:%d: %s\n' % (filename, lineno, msg))
-        self.stderr.write(str(line))
-        self.stderr.write('\n')
-        if offset is not None:
-            self.stderr.write(re.sub(r'\S', ' ', line[:offset]) + "^\n")
-
     def flake(self, message):
         """Print an error message to stdout."""
         self.stdout.write(str(message))
