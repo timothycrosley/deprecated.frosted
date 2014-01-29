@@ -21,7 +21,7 @@ import sys
 
 from frosted import reporter as modReporter
 from frosted import checker, settings
-from frosted.messages import FileSkipped
+from frosted.messages import FileSkipped, PythonSyntaxError
 from pies.overrides import *
 
 import _ast
@@ -52,7 +52,7 @@ def check(codeString, filename, reporter=modReporter.Default, settings_path=None
         elif active_settings.get('verbose', False):
             ignore = active_settings.get('ignore_frosted_errors', [])
             if(not "W200" in ignore and not "W201" in ignore):
-                reporter.flake(FileSkipped(filename))
+                reporter.flake(FileSkipped(filename, verbose=active_settings.get('verbose')))
         return 0
 
     # First, compile into an AST and handle syntax errors.
@@ -71,7 +71,8 @@ def check(codeString, filename, reporter=modReporter.Default, settings_path=None
             # unknown.
             reporter.unexpected_error(filename, 'problem decoding source')
         else:
-            reporter.syntax_error(filename, msg, lineno, offset, text)
+            reporter.flake(PythonSyntaxError(filename, msg, lineno, offset, text,
+                                             verbose=active_settings.get('verbose')))
         return 1
     except Exception:
         reporter.unexpected_error(filename, 'problem decoding source')
