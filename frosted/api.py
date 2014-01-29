@@ -42,7 +42,12 @@ def _should_skip(filename, skip):
 
 def check(codeString, filename, reporter=modReporter.Default, settings_path=None, **setting_overrides):
     """Check the Python source given by codeString for unfrosted flakes."""
-    active_settings = settings.from_path(settings_path or os.path.dirname(os.path.abspath(filename))).copy()
+
+    if not settings_path and filename:
+        settings_path = os.path.dirname(os.path.abspath(filename))
+    settings_path = settings_path or os.getcwd()
+
+    active_settings = settings.from_path(settings_path).copy()
     active_settings.update(setting_overrides)
 
     if _should_skip(filename, active_settings.get('skip', [])):
