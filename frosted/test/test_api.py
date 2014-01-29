@@ -43,7 +43,7 @@ def test_syntax_error():
     err = StringIO()
     reporter = Reporter(err, err)
     reporter.flake(PythonSyntaxError('foo.py', 'a problem', 3, 7, 'bad line of source', verbose=True))
-    assert ("foo.py:3:7:E402:syntax:a problem\n"
+    assert ("foo.py:3:7:E402::a problem\n"
             "bad line of source\n"
             "       ^\n") == err.getvalue()
 
@@ -53,7 +53,7 @@ def test_syntax_errorNoOffset():
     err = StringIO()
     reporter = Reporter(err, err)
     reporter.flake(PythonSyntaxError('foo.py', 'a problem', 3, None, 'bad line of source', verbose=True))
-    assert ("foo.py:3:0:E402:syntax:a problem\n"
+    assert ("foo.py:3:0:E402::a problem\n"
             "bad line of source\n") == err.getvalue()
 
 
@@ -67,7 +67,7 @@ def test_multiLineSyntaxError():
     lines = ['bad line of source', 'more bad lines of source']
     reporter = Reporter(err, err)
     reporter.flake(PythonSyntaxError('foo.py', 'a problem', 3, len(lines[0]) + 7, '\n'.join(lines), verbose=True))
-    assert ("foo.py:3:6:E402:syntax:a problem\n" +
+    assert ("foo.py:3:6:E402::a problem\n" +
             lines[-1] + "\n" +
             "      ^\n") == err.getvalue()
 
@@ -172,7 +172,7 @@ def baz():
     assert_contains_output(
         sourcePath,
         ["""\
-%s:8:10:E402:syntax:invalid syntax
+%s:8:10:E402::invalid syntax
     '''quux'''
           ^
 """ % (sourcePath,)])
@@ -185,7 +185,7 @@ def test_eofSyntaxError():
     """
     sourcePath = make_temp_file("def foo(")
     assert_contains_output(sourcePath, ["""\
-%s:1:8:E402:syntax:unexpected EOF while parsing
+%s:1:8:E402::unexpected EOF while parsing
 def foo(
         ^
 """ % (sourcePath,)])
@@ -206,7 +206,7 @@ def foo(bar=baz, bax):
     last_line = '       ^\n' if sys.version_info >= (3, 2) else ''
     column = '7:' if sys.version_info >= (3, 2) else '0:'
     assert_contains_output(sourcePath, ["""\
-%s:1:%sE402:syntax:non-default argument follows default argument
+%s:1:%sE402::non-default argument follows default argument
 def foo(bar=baz, bax):
 %s""" % (sourcePath, column, last_line)])
 
@@ -226,7 +226,7 @@ foo(bar=baz, bax)
     assert_contains_output(
         sourcePath,
         ["""\
-%s:1:%sE402:syntax:non-keyword arg after keyword arg
+%s:1:%sE402::non-keyword arg after keyword arg
 foo(bar=baz, bax)
 %s""" % (sourcePath, column, last_line)])
 
