@@ -21,11 +21,12 @@ import sys
 
 from frosted import reporter as modReporter
 from frosted import checker, settings
+from frosted.messages import FileSkipped, PythonSyntaxError
 from pies.overrides import *
 
 import _ast
 
-__all__ = ['check', 'check_path', 'check_recursive', 'iter_source_code', 'main']
+__all__ = ['check', 'check_path', 'check_recursive', 'iter_source_code']
 
 
 def _should_skip(filename, skip):
@@ -45,7 +46,13 @@ def check(codeString, filename, reporter=modReporter.Default, settings_path=None
     active_settings.update(setting_overrides)
 
     if _should_skip(filename, active_settings.get('skip', [])):
-        sys.stderr.write("WARNING: {0} was skipped as it's listed in 'skip' setting\n".format(filename))
+        if active_settings.get('directly_being_checked', None) == 1:
+            reporter.flake(FileSkipped(filename))
+            return 1
+        elif active_settings.get('verbose', False):
+            ignore = active_settings.get('ignore_frosted_errors', [])
+            if(not "W200" in ignore and not "W201" in ignore):
+                reporter.flake(FileSkipped(filename, None, verbose=active_settings.get('verbose')))
         return 0
 
     # First, compile into an AST and handle syntax errors.
@@ -64,7 +71,8 @@ def check(codeString, filename, reporter=modReporter.Default, settings_path=None
             # unknown.
             reporter.unexpected_error(filename, 'problem decoding source')
         else:
-            reporter.syntax_error(filename, msg, lineno, offset, text)
+            reporter.flake(PythonSyntaxError(filename, msg, lineno, offset, text,
+                                             verbose=active_settings.get('verbose')))
         return 1
     except Exception:
         reporter.unexpected_error(filename, 'problem decoding source')

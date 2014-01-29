@@ -35,7 +35,7 @@ def main():
         warnings = 0
         for file_path in file_names:
             try:
-                warnings += check_path(file_path, **arguments)
+                warnings += check_path(file_path, directly_being_checked=len(file_names), **arguments)
             except IOError as e:
                 print("WARNING: Unable to parse file {0} due to {1}".format(file_name, e))
 

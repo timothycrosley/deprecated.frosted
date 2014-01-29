@@ -19,6 +19,7 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import re
 from collections import namedtuple
 
 from pies.overrides import *
@@ -46,7 +47,10 @@ class MessageType(AbstractMessageType):
         return new_instance
 
     def __call__(self, filename, loc=None, *kargs, **kwargs):
-        values = {'filename': filename, 'lineno': loc.lineno, 'col': getattr(loc, 'col_offset', 0)}
+        values = {'filename': filename, 'lineno': 0, 'col': 0}
+        if loc:
+            values['lineno'] = loc.lineno
+            values['col'] = getattr(loc, 'col_offset', 0)
         values.update(kwargs)
 
         message = self.template.format(*kargs, **values)
@@ -67,6 +71,19 @@ class OffsetMessageType(MessageType):
         return MessageType.__call__(self, filename, loc, *kargs, **kwargs)
 
 
+class SyntaxErrorType(MessageType):
+    def __call__(self, filename, msg, lineno, offset, text, *kargs, **kwargs):
+        kwargs['lineno'] = lineno
+        line = text.splitlines()[-1]
+        msg += "\n" + str(line)
+        if offset is not None:
+            offset = offset - (len(text) - len(line))
+            kwargs['col'] = offset
+            msg += "\n" + re.sub(r'\S',' ', line[:offset]) + "^"
+
+        return MessageType.__call__(self, filename, None, msg, *kargs, **kwargs)
+
+
 Message = MessageType('I101', 'Generic', '{0}', '')
 UnusedImport = MessageType('E101', 'UnusedImport', '{0} imported but unused')
 RedefinedWhileUnused = MessageType('E301', 'RedefinedWhileUnused',
@@ -75,7 +92,8 @@ RedefinedInListComp = MessageType('E302', 'RedefinedInListComp',
                                   'list comprehension redefines {0!r} from line {1.lineno!r}')
 ImportShadowedByLoopVar = MessageType('E102', 'ImportShadowedByLoopVar',
                                       'import {0!r} from line {1.lineno!r} shadowed by loop variable')
-ImportStarUsed = MessageType('E103', 'ImportStarUsed', "'from {0!s} import *' used; unable to detect undefined names", '*')
+ImportStarUsed = MessageType('E103', 'ImportStarUsed',
+                             "'from {0!s} import *' used; unable to detect undefined names", '*')
 UndefinedName = MessageType('E303', 'UndefinedName', "undefined name {0!r}")
 DoctestSyntaxError = OffsetMessageType('E401', 'DoctestSyntaxError', "syntax error in doctest", '')
 UndefinedExport = MessageType('E304', 'UndefinedExport', "undefined name {0!r} in __all__")
@@ -94,3 +112,5 @@ NeedKwOnlyArgument = MessageType('E205', 'NeedKwOnlyArgument', "{0!s}() needs kw
 ReturnWithArgsInsideGenerator = MessageType('E208', 'ReturnWithArgsInsideGenerator',
                                             "'return' with argument inside generator", 'return')
 BareExcept = MessageType('W101', 'BareExcept', "bare except used: this is dangerous and should be avoided", 'except')
+FileSkipped = MessageType('W201', 'FileSkipped', "Skipped because of the current configuration", 'skipped')
+PythonSyntaxError = SyntaxErrorType('E402', 'PythonSyntaxError', "{0!s}", "syntax")

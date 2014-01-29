@@ -564,7 +564,7 @@ def test_nestedClassAndFunctionScope():
 
 
 def test_importStar():
-    flakes('from fu import *', m.ImportStarUsed)
+    flakes('from fu import *', m.ImportStarUsed, ignore_frosted_errors=[])
 
 
 def test_packageImport():
@@ -754,7 +754,7 @@ def test_unboundExported():
     for filename in ["foo/__init__.py", "__init__.py"]:
         flakes('''
         __all__ = ["foo"]
-        ''', filename=filename)
+        ''', filename=filename, **{'ignore_frosted_errors_for___init__.py': ['E101', 'E103']})
 
 
 def test_importStarExported():

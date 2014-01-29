@@ -83,12 +83,17 @@ To configure frosted for a single user create a ~/.frosted.cfg file:
     skip=file3.py,file4.py
     ignore_frosted_errors=E101,E205,E300
 
+- **skip** - A comma delimited list of file or directory names to skip. The name must exactly match the entire path, the name of the file, or one of it's parent directories for it to be skipped.
+- **ignore_frosted_errors** - A comma delimited list of Frosted error codes to ignore. You can see a definition of all error codes in the next section.
 
 Additionally, you can specify project level configuration simply by placing a .frosted.cfg file at the root of your
 project. frosted will look up to 25 directories up, from the one it is ran, to find a project specific configuration.
 
 You can then override any of these settings by using command line arguments, or by passing in kwargs into any of the
 exposed api checking methods.
+
+Beyond that, frosted supports setup.cfg based configuration. All you need to do is add a [frosted] section to your
+project's setup.cfg file with any desired settings.
 
 Finally, frosted supports editorconfig files using the standard syntax defined here:
 http://editorconfig.org/
@@ -132,9 +137,13 @@ ignored.
 
 **E400 Series** - *Syntax Errors*
 - **E401**: DoctestSyntaxError
+- **E402**: PythonSyntaxError
 
 **W100 Series** - *Exception Warning*
 - **W101**: BareExcept
+
+**W200 Series** - *Handling Warning*
+- **W201**: FileSkipped
 
 Frosted Code API
 ===================
@@ -150,6 +159,16 @@ Frosted exposes a simple API for checking Python code from withing other Python 
 
 Additionally, you can use the command line tool in an API fashion, by passing '-' in as the filename and then sending
 file content to stdin.
+
+Text Editor Integration
+===================
+
+Integration with text editors and tools is a priority for the project. As such, any pull request that adds integration support
+or links to a third-party project that does will be enthusiastically accepted.
+
+Current list of known supported text-editors:
+
+- **vim** - Support has been added via syntastic: https://github.com/scrooloose/syntastic
 
 Why did you fork pyflakes?
 ===================
