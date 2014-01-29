@@ -160,7 +160,7 @@ file content to stdin.
 Text Editor Integration
 ===================
 
-Integration with text editors and tools is a priority for the project, and any pull request that adds supports
+Integration with text editors and tools is a priority for the project. As such, any pull request that adds integration support
 or links to a third-party project that does will be enthusiastically accepted.
 
 Current list of known supported text-editors:
