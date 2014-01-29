@@ -85,7 +85,7 @@ def _read_config_file(file_path, sections):
 
         config = configparser.SafeConfigParser()
         config.readfp(config_file)
-        settings = {}
+        settings = dict()
         for section in sections:
             if config.has_section(section):
                 settings.update(dict(config.items(section)))
@@ -93,7 +93,7 @@ def _read_config_file(file_path, sections):
             if key.startswith('ignore_frosted_errors_for'):
                 existing_value_type = list
             else:
-                existing_value_type = type(computed_settings.get(key, ''))
+                existing_value_type = type(default.get(key, ''))
             if existing_value_type in (list, tuple):
                 computed_settings[key.lower()] = value.split(",")
             else:
