@@ -38,7 +38,7 @@ MAX_CONFIG_SEARCH_DEPTH = 25 # The number of parent directories frosted will loo
 
 # Note that none of these lists must be complete as they are simply fallbacks for when included auto-detection fails.
 default = {'skip': [],
-           'ignore_frosted_errors': [],
+           'ignore_frosted_errors': ['W201'],
            'ignore_frosted_errors_for__init__.py': ['E101', 'E103'],
            'verbose': False}
 
