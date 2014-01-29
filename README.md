@@ -157,6 +157,16 @@ Frosted exposes a simple API for checking Python code from withing other Python 
 Additionally, you can use the command line tool in an API fashion, by passing '-' in as the filename and then sending
 file content to stdin.
 
+Text Editor Integration
+===================
+
+Integration with text editors and tools is a priority for the project. As such, any pull request that adds integration support
+or links to a third-party project that does will be enthusiastically accepted.
+
+Current list of known supported text-editors:
+
+- **vim** - Support has been added via syntastic: https://github.com/scrooloose/syntastic
+
 Why did you fork pyflakes?
 ===================
 
