@@ -92,6 +92,9 @@ project. frosted will look up to 25 directories up, from the one it is ran, to f
 You can then override any of these settings by using command line arguments, or by passing in kwargs into any of the
 exposed api checking methods.
 
+Beyond that, frosted supports setup.cfg based configuration. All you need to do is add a [frosted] section to your
+project's setup.cfg file with any desired settings.
+
 Finally, frosted supports editorconfig files using the standard syntax defined here:
 http://editorconfig.org/
 

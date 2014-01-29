@@ -52,7 +52,7 @@ def check(codeString, filename, reporter=modReporter.Default, settings_path=None
         elif active_settings.get('verbose', False):
             ignore = active_settings.get('ignore_frosted_errors', [])
             if(not "W200" in ignore and not "W201" in ignore):
-                reporter.flake(FileSkipped(filename, verbose=active_settings.get('verbose')))
+                reporter.flake(FileSkipped(filename, None, verbose=active_settings.get('verbose')))
         return 0
 
     # First, compile into an AST and handle syntax errors.

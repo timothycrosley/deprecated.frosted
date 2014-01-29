@@ -112,5 +112,5 @@ NeedKwOnlyArgument = MessageType('E205', 'NeedKwOnlyArgument', "{0!s}() needs kw
 ReturnWithArgsInsideGenerator = MessageType('E208', 'ReturnWithArgsInsideGenerator',
                                             "'return' with argument inside generator", 'return')
 BareExcept = MessageType('W101', 'BareExcept', "bare except used: this is dangerous and should be avoided", 'except')
-FileSkipped = MessageType('W201', 'FileSkipped', "Skipped because of the current configuration")
+FileSkipped = MessageType('W201', 'FileSkipped', "Skipped because of the current configuration", 'skipped')
 PythonSyntaxError = SyntaxErrorType('E402', 'PythonSyntaxError', "{0!s}", "syntax")
