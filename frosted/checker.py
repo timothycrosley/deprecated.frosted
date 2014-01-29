@@ -30,7 +30,7 @@ from pies import ast
 from pies.overrides import *
 
 PY34_GTE = sys.version_info >= (3, 4)
-BUILTIN_VARS = set(dir(builtins) + ['__file__', '__builtins__', 'WindowsError'] +
+BUILTIN_VARS = set(dir(builtins) + ['__file__', '__builtins__', '__debug__', '__name__', 'WindowsError'] +
                    os.environ.get('PYFLAKES_BUILTINS', '').split(','))
 
 

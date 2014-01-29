@@ -857,7 +857,7 @@ def test_augmentedAssignmentImportedFunctionCall():
 
 @pytest.mark.skipif('''version_info < (3, 3)''')
 def test_yieldFromUndefined():
-    """Test C{yield from} statement."""
+    """Test yield from statement."""
     flakes('''
     def bar():
         yield from foo()
@@ -874,3 +874,12 @@ def test_bareExcept():
         except:
             pass
         ''', m.BareExcept)
+
+
+def test_access_debug():
+    """Test accessing __debug__ returns no errors"""
+    flakes('''
+    if __debug__:
+        print("success!")
+        print(__debug__)
+    ''')
