@@ -26,7 +26,7 @@ from io import StringIO
 
 import pytest
 from frosted.api import check_path, check_recursive
-from frosted.messages import UnusedImport
+from frosted.messages import UnusedImport, PythonSyntaxError
 from frosted.reporter import Reporter
 from pies.overrides import *
 
@@ -41,9 +41,9 @@ def test_syntax_error():
 
     """
     err = StringIO()
-    reporter = Reporter(None, err)
-    reporter.syntax_error('foo.py', 'a problem', 3, 7, 'bad line of source')
-    assert ("foo.py:3:7: a problem\n"
+    reporter = Reporter(err, err)
+    reporter.flake(PythonSyntaxError('foo.py', 'a problem', 3, 7, 'bad line of source', verbose=True))
+    assert ("foo.py:3:7:E402:syntax:a problem\n"
             "bad line of source\n"
             "       ^\n") == err.getvalue()
 
@@ -51,9 +51,9 @@ def test_syntax_error():
 def test_syntax_errorNoOffset():
     """syntax_error doesn't include a caret pointing to the error if offset is passed as None."""
     err = StringIO()
-    reporter = Reporter(None, err)
-    reporter.syntax_error('foo.py', 'a problem', 3, None, 'bad line of source')
-    assert ("foo.py:3: a problem\n"
+    reporter = Reporter(err, err)
+    reporter.flake(PythonSyntaxError('foo.py', 'a problem', 3, None, 'bad line of source', verbose=True))
+    assert ("foo.py:3:0:E402:syntax:a problem\n"
             "bad line of source\n") == err.getvalue()
 
 
@@ -65,10 +65,9 @@ def test_multiLineSyntaxError():
     """
     err = StringIO()
     lines = ['bad line of source', 'more bad lines of source']
-    reporter = Reporter(None, err)
-    reporter.syntax_error('foo.py', 'a problem', 3, len(lines[0]) + 7,
-                          '\n'.join(lines))
-    assert ("foo.py:3:6: a problem\n" +
+    reporter = Reporter(err, err)
+    reporter.flake(PythonSyntaxError('foo.py', 'a problem', 3, len(lines[0]) + 7, '\n'.join(lines), verbose=True))
+    assert ("foo.py:3:6:E402:syntax:a problem\n" +
             lines[-1] + "\n" +
             "      ^\n") == err.getvalue()
 
@@ -105,14 +104,14 @@ def make_temp_file(content):
     return fpath
 
 
-def assert_contains_errors(path, errorList):
+def assert_contains_output(path, flakeList):
     """Assert that provided causes at minimal the errors provided in the error list."""
-    error = StringIO()
-    count = check_path(path, Reporter(sys.stdout, error))
-    error_string = error.getvalue()
-    assert len(errorList) >= count
-    for error in errorList:
-        assert error in error_string
+    out = StringIO()
+    count = check_path(path, Reporter(out, out), verbose=True)
+    out_string = out.getvalue()
+    assert len(flakeList) >= count
+    for flake in flakeList:
+        assert flake in out_string
 
 
 def get_errors(path):
@@ -130,7 +129,7 @@ def test_missingTrailingNewline():
 
     """
     fName = make_temp_file("def foo():\n\tpass\n\t")
-    assert_contains_errors(fName, [])
+    assert_contains_output(fName, [])
 
 
 def test_check_pathNonExisting():
@@ -170,10 +169,10 @@ def baz():
         assert False
 
     sourcePath = make_temp_file(source)
-    assert_contains_errors(
+    assert_contains_output(
         sourcePath,
         ["""\
-%s:8:10: invalid syntax
+%s:8:10:E402:syntax:invalid syntax
     '''quux'''
           ^
 """ % (sourcePath,)])
@@ -185,8 +184,8 @@ def test_eofSyntaxError():
 
     """
     sourcePath = make_temp_file("def foo(")
-    assert_contains_errors(sourcePath, ["""\
-%s:1:8: unexpected EOF while parsing
+    assert_contains_output(sourcePath, ["""\
+%s:1:8:E402:syntax:unexpected EOF while parsing
 def foo(
         ^
 """ % (sourcePath,)])
@@ -205,9 +204,9 @@ def foo(bar=baz, bax):
 """
     sourcePath = make_temp_file(source)
     last_line = '       ^\n' if sys.version_info >= (3, 2) else ''
-    column = '7:' if sys.version_info >= (3, 2) else ''
-    assert_contains_errors(sourcePath, ["""\
-%s:1:%s non-default argument follows default argument
+    column = '7:' if sys.version_info >= (3, 2) else '0:'
+    assert_contains_output(sourcePath, ["""\
+%s:1:%sE402:syntax:non-default argument follows default argument
 def foo(bar=baz, bax):
 %s""" % (sourcePath, column, last_line)])
 
@@ -223,11 +222,11 @@ foo(bar=baz, bax)
 """
     sourcePath = make_temp_file(source)
     last_line = '            ^\n' if sys.version_info >= (3, 2) else ''
-    column = '12:' if sys.version_info >= (3, 2) else ''
-    assert_contains_errors(
+    column = '12:' if sys.version_info >= (3, 2) else '0:'
+    assert_contains_output(
         sourcePath,
         ["""\
-%s:1:%s non-keyword arg after keyword arg
+%s:1:%sE402:syntax:non-keyword arg after keyword arg
 foo(bar=baz, bax)
 %s""" % (sourcePath, column, last_line)])
 
@@ -239,7 +238,7 @@ def test_invalidEscape():
         decoding_error = "%s: problem decoding source\n" % (sourcePath,)
     else:
         decoding_error = "(unicode error) 'unicodeescape' codec can't decode bytes"
-    assert_contains_errors(sourcePath, (decoding_error, ))
+    assert_contains_output(sourcePath, (decoding_error, ))
 
 
 def test_permissionDenied():
@@ -268,7 +267,7 @@ def test_misencodedFileUTF8():
 x = "%s"
 """ % SNOWMAN).encode('utf-8')
     sourcePath = make_temp_file(source)
-    assert_contains_errors(sourcePath, ["%s: problem decoding source\n" % (sourcePath, )])
+    assert_contains_output(sourcePath, ["%s: problem decoding source\n" % (sourcePath, )])
 
 
 def test_misencodedFileUTF16():
@@ -279,7 +278,7 @@ def test_misencodedFileUTF16():
 x = "%s"
 """ % SNOWMAN).encode('utf-16')
     sourcePath = make_temp_file(source)
-    assert_contains_errors(sourcePath, ["%s: problem decoding source\n" % (sourcePath,)])
+    assert_contains_output(sourcePath, ["%s: problem decoding source\n" % (sourcePath,)])
 
 
 def test_check_recursive():
