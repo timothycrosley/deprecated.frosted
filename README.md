@@ -170,6 +170,13 @@ Current list of known supported text-editors:
 
 - **vim** - Support has been added via syntastic: https://github.com/scrooloose/syntastic
 
+Contributing to Frosted
+===================
+
+Our preferred contributions come in the form of pull requests and issue reports. That said, we will not deny monetary contributions.
+If you desire to do this using flattr etc, please make sure you flattr @bitglue as he is the original creator of pyflakes and without his contribution
+Frosted would not be possible.
+
 Why did you fork pyflakes?
 ===================
 
