@@ -148,7 +148,7 @@ ignored.
 - **W201**: FileSkipped
 
 
-When deciding whether or not 
+When deciding whether or not to include an error for reporting, Frosted uses the 99% approach as a yard stick. If it is agreed that 99% of the time (or more) that a pattern occurs it's an error, Frosted will report on it, if not it will not be added to the Frosted project.
 
 Frosted Code API
 ===================
