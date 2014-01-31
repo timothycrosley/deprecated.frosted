@@ -2,7 +2,9 @@
 
 Defines how frosted should be installed on a standard Python system.
 
-Copyright (C) 2013  Timothy Edmund Crosley
+Copyright (C) 2005-2011 Divmod, Inc.
+Copyright (C) 2013 Florent Xicluna. 
+Copyright (C) 2014 Timothy Edmund Crosley
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 documentation files (the "Software"), to deal in the Software without restriction, including without limitation
@@ -68,8 +70,8 @@ setup(name="frosted",
       version="1.3.2",
       description="A passive Python syntax checker",
       long_description=readme,
-      author="Timothy Crosley",
-      author_email="timothy.crosley@gmail.com",
+      author="Phil Frost",
+      author_email="indigo@bitglue.com",
       maintainer="Timothy Crosley",
       maintainer_email="timothy.crosley@gmail.com",
       url="https://github.com/timothycrosley/frosted",
