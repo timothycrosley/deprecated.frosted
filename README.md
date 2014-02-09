@@ -7,7 +7,7 @@
 [![License](https://pypip.in/license/frosted/badge.png)](https://pypi.python.org/pypi/frosted/)
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/timothycrosley/frosted/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
-Frosted is a fork of pyflakes that aims at more open contribution from the outside public, a smaller more maintainable code base, and a better Python checker for all.
+Frosted is a fork of pyflakes (originally created by Phil Frost) that aims at more open contribution from the outside public, a smaller more maintainable code base, and a better Python checker for all.
 It currently cleanly supports Python 2.6 - 3.4 using pies (https://github.com/timothycrosley/pies) to achieve this without ugly hacks and/or py2to3.
 
 Installing Frosted
@@ -113,6 +113,7 @@ ignored.
 
 **E100 Series** - *Import Errors*
 - **E101**: UnusedImport
+    - Note that it is common practice to import something and not use it for the purpose of exposing it as an API, or using it in an exec statment below. Frosted tries to circumvent most of this by ignoring this error by default in __init__.py
 - **E102**: ImportShadowedByLoopVar
 - **E103**: ImportStarUsed
 
@@ -141,9 +142,13 @@ ignored.
 
 **W100 Series** - *Exception Warning*
 - **W101**: BareExcept
+    - Note that one common case where a bare except is okay, and should be ignored is when handling the rollback of database transactions. In this or simular cases the warning can safely be ignored.
 
 **W200 Series** - *Handling Warning*
 - **W201**: FileSkipped
+
+
+When deciding whether or not to include an error for reporting, Frosted uses the 99% approach as a yard stick. If it is agreed that 99% of the time (or more) that a pattern occurs it's an error, Frosted will report on it, if not it will not be added to the Frosted project.
 
 Frosted Code API
 ===================
@@ -170,6 +175,13 @@ Current list of known supported text-editors:
 
 - **vim** - Support has been added via syntastic: https://github.com/scrooloose/syntastic
 
+Contributing to Frosted
+===================
+
+Our preferred contributions come in the form of pull requests and issue reports. That said, we will not deny monetary contributions.
+If you desire to do this using flattr etc, please make sure you flattr @bitglue as he is the original creator of pyflakes and without his contribution
+Frosted would not be possible.
+
 Why did you fork pyflakes?
 ===================
 
@@ -180,6 +192,11 @@ As I genuinely believe open source projects need constant improvement (releasing
 input as possible from the Python community. I'm hoping together we can build an even more awesome code checker!
 
 Note: the maintainer of pyflakes has been added as a contributer to frosted.
+
+Why Frosted?
+===================
+
+Frosted is a homage to the original pyflakes creator Phil Frost.
 
 --------------------------------------------
 
