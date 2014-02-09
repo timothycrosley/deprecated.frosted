@@ -75,7 +75,7 @@ setup(name="frosted",
       url="https://github.com/timothycrosley/frosted",
       packages=["frosted", "frosted.test"],
       requires=['pies'],
-      install_requires=['pies>=2.5.5'],
+      install_requires=['pies>=2.6.0'],
       entry_points={
         'console_scripts': [
             'frosted = frosted.main:main',
