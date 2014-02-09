@@ -113,6 +113,7 @@ ignored.
 
 **E100 Series** - *Import Errors*
 - **E101**: UnusedImport
+    - Note that it is common practice to import something and not use it for the purpose of exposing it as an API, or using it in an exec statment below. Frosted tries to circumvent most of this by ignoring this error by default in __init__.py
 - **E102**: ImportShadowedByLoopVar
 - **E103**: ImportStarUsed
 
@@ -141,9 +142,13 @@ ignored.
 
 **W100 Series** - *Exception Warning*
 - **W101**: BareExcept
+    - Note that one common case where a bare except is okay, and should be ignored is when handling the rollback of database transactions. In this or simular cases the warning can safely be ignored.
 
 **W200 Series** - *Handling Warning*
 - **W201**: FileSkipped
+
+
+When deciding whether or not to include an error for reporting, Frosted uses the 99% approach as a yard stick. If it is agreed that 99% of the time (or more) that a pattern occurs it's an error, Frosted will report on it, if not it will not be added to the Frosted project.
 
 Frosted Code API
 ===================
