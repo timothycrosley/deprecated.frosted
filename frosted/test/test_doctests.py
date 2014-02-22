@@ -50,7 +50,7 @@ def test_doubleNestingReportsClosestName():
                 ...     return x
 
             """
-        ''', m.UndefinedLocal).messages[0]
+        ''', m.UndefinedLocal, run_doctests=True).messages[0]
 
     assert "local variable 'x'" in exc.message and 'line 7' in exc.message
 
@@ -63,7 +63,7 @@ def test_importBeforeDoctest():
                 '''
                     >>> foo
                 '''
-            """)
+            """, run_doctests=True)
 
 
 @pytest.mark.skipif("'todo'")
@@ -78,7 +78,7 @@ def test_importBeforeAndInDoctest():
                 """
 
             foo
-            ''', m.Redefined)
+            ''', m.Redefined, run_doctests=True)
 
 
 def test_importInDoctestAndAfter():
@@ -91,7 +91,7 @@ def test_importInDoctestAndAfter():
 
             import foo
             foo()
-            ''')
+            ''', run_doctests=True)
 
 
 def test_offsetInDoctests():
@@ -102,10 +102,20 @@ def test_offsetInDoctests():
                     >>> x # line 5
                 """
 
-            ''', m.UndefinedName).messages[0]
+            ''', m.UndefinedName, run_doctests=True).messages[0]
     assert exc.lineno == 5
     assert exc.col == 12
 
+
+def test_ignoreErrorsByDefault():
+    flakes('''
+
+            def doctest_stuff():
+                """
+                    >>> x # line 5
+                """
+
+            ''')
 
 def test_offsetInLambdasInDoctests():
     exc = flakes('''
@@ -115,7 +125,7 @@ def test_offsetInLambdasInDoctests():
                     >>> lambda: x # line 5
                 """
 
-            ''', m.UndefinedName).messages[0]
+            ''', m.UndefinedName, run_doctests=True).messages[0]
     assert exc.lineno == 5
     assert exc.col == 20
 
@@ -130,7 +140,7 @@ def test_offsetAfterDoctests():
 
             x
 
-            ''', m.UndefinedName).messages[0]
+            ''', m.UndefinedName, run_doctests=True).messages[0]
     assert exc.lineno == 8
     assert exc.col == 0
 
@@ -146,7 +156,7 @@ def test_syntax_errorInDoctest():
                 """
             ''',
             m.DoctestSyntaxError,
-            m.DoctestSyntaxError).messages
+            m.DoctestSyntaxError, run_doctests=True).messages
     exc = exceptions[0]
     assert exc.lineno == 4
     assert exc.col == 26
@@ -162,7 +172,7 @@ def test_indentationErrorInDoctest():
                     >>> if True:
                     ... pass
                 """
-            ''', m.DoctestSyntaxError).messages[0]
+            ''', m.DoctestSyntaxError, run_doctests=True).messages[0]
     assert exc.lineno == 5
     assert exc.col == 16
 
@@ -179,7 +189,7 @@ def test_offsetWithMultiLineArgs():
                 """
             ''',
         m.DoctestSyntaxError,
-        m.UndefinedName).messages
+        m.UndefinedName, run_doctests=True).messages
     assert exc1.lineno == 6
     assert exc1.col == 19
     assert exc2.lineno == 7
@@ -192,7 +202,7 @@ def test_doctestCanReferToFunction():
                 '''
                     >>> foo
                 '''
-            """)
+            """, run_doctests=True)
 
 
 def test_doctestCanReferToClass():
@@ -205,7 +215,7 @@ def test_doctestCanReferToClass():
                     '''
                         >>> Foo
                     '''
-            """)
+            """, run_doctests=True)
 
 
 def test_noOffsetSyntaxErrorInDoctest():
@@ -220,7 +230,7 @@ def test_noOffsetSyntaxErrorInDoctest():
                 pass
             ''',
         m.DoctestSyntaxError,
-        m.DoctestSyntaxError).messages
+        m.DoctestSyntaxError, run_doctests=True).messages
     exc = exceptions[0]
     assert exc.lineno == 4
     exc = exceptions[1]
