@@ -16,12 +16,14 @@ def main():
     warnings = 0
 
     parser = argparse.ArgumentParser(description='Quickly check the correctness of your Python scripts.')
-    parser.add_argument('files', nargs='+', help='One or more Python source files that need their imports sorted.')
+    parser.add_argument('files', nargs='+', help='One file or a list of Python source files to check the syntax of.')
     parser.add_argument('-r', '--recursive', dest='recursive', action='store_true',
                         help='Recursively look for Python files to check')
     parser.add_argument('-s', '--skip', help='Files that frosted should skip over.', dest='skip', action='append')
-    parser.add_argument('-i', '--ignore', help='Specify error codes that should be ignored.', dest='ignore_frosted_errors',
-                        action='append')
+    parser.add_argument('-d', '--with-doctests', help='Run frosted against doctests', dest='run_doctests',
+                        action='store_true')
+    parser.add_argument('-i', '--ignore', help='Specify error codes that should be ignored.',
+                        dest='ignore_frosted_errors', action='append')
     parser.add_argument('-vb', '--verbose', help='Explicitly separate each section of data when displaying errors.',
                         dest='verbose', action='store_true')
     parser.add_argument('-v', '--version', action='version', version='frosted {0}'.format(__version__))

@@ -82,6 +82,7 @@ To configure frosted for a single user create a ~/.frosted.cfg file:
     [settings]
     skip=file3.py,file4.py
     ignore_frosted_errors=E101,E205,E300
+    run_doctests=True
 
 - **skip** - A comma delimited list of file or directory names to skip. The name must exactly match the entire path, the name of the file, or one of it's parent directories for it to be skipped.
 - **ignore_frosted_errors** - A comma delimited list of Frosted error codes to ignore. You can see a definition of all error codes in the next section.
@@ -186,7 +187,7 @@ Why did you fork pyflakes?
 ===================
 
 Pyflakes was a great project, and introduced a great approach for quickly checking for Python coding errors. I am very grateful to the original creators.
-However, I feel over the last year it has become stagnate, without a clear vision and someone willing to take true ownership of the project.
+However, I feel over the last year it has become stagnant, without a clear vision and someone willing to take true ownership of the project.
 While I know it is in no way intentional, critical failures have stayed open, despite perfectly complete and valid pull-requests open, without so much as an acknowledgement from the maintainer.
 As I genuinely believe open source projects need constant improvement (releasing early and often), I decided to start this project and look for as much
 input as possible from the Python community. I'm hoping together we can build an even more awesome code checker!

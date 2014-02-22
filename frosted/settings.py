@@ -40,7 +40,8 @@ MAX_CONFIG_SEARCH_DEPTH = 25 # The number of parent directories frosted will loo
 default = {'skip': [],
            'ignore_frosted_errors': ['W201'],
            'ignore_frosted_errors_for__init__.py': ['E101', 'E103'],
-           'verbose': False}
+           'verbose': False,
+           'run_doctests': False}
 
 
 @lru_cache()
@@ -96,6 +97,8 @@ def _read_config_file(file_path, sections):
                 existing_value_type = type(default.get(key, ''))
             if existing_value_type in (list, tuple):
                 computed_settings[key.lower()] = value.split(",")
+            elif existing_value_type == bool and value.lower().strip() == "false":
+                computed_settings[access_key] = False
             else:
                 computed_settings[key.lower()] = existing_value_type(value)
     return computed_settings

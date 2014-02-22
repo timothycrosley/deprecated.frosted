@@ -239,7 +239,6 @@ class Checker(object):
     node_depth = 0
     offset = None
     trace_tree = False
-    with_doctest = ('PYFLAKES_NODOCTEST' not in os.environ)
     builtin_vars = BUILTIN_VARS
 
     def __init__(self, tree, filename='(none)', builtins=None, **settings):
@@ -730,7 +729,7 @@ class Checker(object):
             self.handleNode(deco, node)
         self.add_binding(node, FunctionDefinition(node.name, node))
         self.LAMBDA(node)
-        if self.with_doctest:
+        if self.settings.get('run_doctests', False):
             self.defer_function(lambda: self.handle_doctests(node))
 
     def LAMBDA(self, node):
@@ -829,7 +828,7 @@ class Checker(object):
             for keywordNode in node.keywords:
                 self.handleNode(keywordNode, node)
         self.push_scope(ClassScope)
-        if self.with_doctest:
+        if self.settings.get('run_doctests', False):
             self.defer_function(lambda: self.handle_doctests(node))
         for stmt in node.body:
             self.handleNode(stmt, node)
