@@ -67,7 +67,7 @@ except (IOError, ImportError, OSError, RuntimeError):
 
 setup(name="frosted",
       license="MIT",
-      version="1.3.3",
+      version="1.4.0",
       description="A passive Python syntax checker",
       long_description=readme,
       author="Phil Frost",
