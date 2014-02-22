@@ -26,7 +26,7 @@ from io import StringIO
 
 import pytest
 from frosted.api import check_path, check_recursive
-from frosted.messages import UnusedImport, PythonSyntaxError
+from frosted.messages import PythonSyntaxError, UnusedImport
 from frosted.reporter import Reporter
 from pies.overrides import *
 
