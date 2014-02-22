@@ -82,6 +82,7 @@ To configure frosted for a single user create a ~/.frosted.cfg file:
     [settings]
     skip=file3.py,file4.py
     ignore_frosted_errors=E101,E205,E300
+    run_doctests=True
 
 - **skip** - A comma delimited list of file or directory names to skip. The name must exactly match the entire path, the name of the file, or one of it's parent directories for it to be skipped.
 - **ignore_frosted_errors** - A comma delimited list of Frosted error codes to ignore. You can see a definition of all error codes in the next section.

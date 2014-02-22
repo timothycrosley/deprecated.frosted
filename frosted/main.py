@@ -20,6 +20,8 @@ def main():
     parser.add_argument('-r', '--recursive', dest='recursive', action='store_true',
                         help='Recursively look for Python files to check')
     parser.add_argument('-s', '--skip', help='Files that frosted should skip over.', dest='skip', action='append')
+    parser.add_argument('-d', '--with-doctests', help='Run frosted against doctests', dest='run_doctests',
+                        action='store_true')
     parser.add_argument('-i', '--ignore', help='Specify error codes that should be ignored.',
                         dest='ignore_frosted_errors', action='append')
     parser.add_argument('-vb', '--verbose', help='Explicitly separate each section of data when displaying errors.',

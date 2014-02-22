@@ -40,7 +40,8 @@ MAX_CONFIG_SEARCH_DEPTH = 25 # The number of parent directories frosted will loo
 default = {'skip': [],
            'ignore_frosted_errors': ['W201'],
            'ignore_frosted_errors_for__init__.py': ['E101', 'E103'],
-           'verbose': False}
+           'verbose': False,
+           'run_doctests': False}
 
 
 @lru_cache()
