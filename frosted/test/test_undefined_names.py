@@ -49,6 +49,10 @@ def test_magicGlobalsBuiltins():
     flakes('__builtins__')
 
 
+def test_magicGlobalImport():
+    """Use of the __import__ magic global should not emit an undefined name warning."""
+    flakes('__import__')
+
 def test_magicGlobalsName():
     """Use of the __name magic global should not emit an undefined name warning."""
     flakes('__name__')
