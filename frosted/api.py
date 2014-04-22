@@ -17,16 +17,35 @@ CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFT
 
 """
 import os
+import re
 import sys
+import tokenize
+from StringIO import StringIO
+from token import N_TOKENS
 
-from frosted import reporter as modReporter
-from frosted import checker, settings
-from frosted.messages import FileSkipped, PythonSyntaxError
 from pies.overrides import *
 
 import _ast
+from frosted import reporter as modReporter
+from frosted import checker, settings
+from frosted.messages import FileSkipped, PythonSyntaxError
 
 __all__ = ['check', 'check_path', 'check_recursive', 'iter_source_code']
+
+_re_noqa = re.compile(r'((pyflakes|flake8)[:=]\s*noqa)|(#\s*noqa)', re.I)
+
+
+def _noqa_lines(codeString):
+    line_nums = []
+    g = tokenize.generate_tokens(StringIO(codeString).readline)   # tokenize the string
+    for toknum, tokval, begins, _, _ in g:
+        lineno = begins[0]
+        # not sure what N_TOKENS really means, but in testing, that was what comments were
+        # tokenized as
+        if toknum == N_TOKENS:
+            if _re_noqa.search(tokval):
+                line_nums.append(lineno)
+    return line_nums
 
 
 def _should_skip(filename, skip):
@@ -83,7 +102,7 @@ def check(codeString, filename, reporter=modReporter.Default, settings_path=None
         reporter.unexpected_error(filename, 'problem decoding source')
         return 1
     # Okay, it's syntactically valid.  Now check it.
-    w = checker.Checker(tree, filename, None, **active_settings)
+    w = checker.Checker(tree, filename, None, ignore_lines=_noqa_lines(codeString), **active_settings)
     w.messages.sort(key=lambda m: m.lineno)
     for warning in w.messages:
         reporter.flake(warning)

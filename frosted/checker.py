@@ -241,7 +241,7 @@ class Checker(object):
     trace_tree = False
     builtin_vars = BUILTIN_VARS
 
-    def __init__(self, tree, filename='(none)', builtins=None, **settings):
+    def __init__(self, tree, filename='(none)', builtins=None, ignore_lines=(), **settings):
         self.settings = settings
         self.ignore_errors = settings.get('ignore_frosted_errors', [])
         file_specifc_ignores = settings.get('ignore_frosted_errors_for_' + (os.path.basename(filename) or ""), None)
