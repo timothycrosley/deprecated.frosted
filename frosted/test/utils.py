@@ -3,8 +3,9 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import textwrap
 from collections import namedtuple
 
-from frosted import checker
 from pies.overrides import *
+
+from frosted import checker
 
 PyCF_ONLY_AST = 1024
 __all__ = ['flakes', 'Node', 'LoggingReporter']

@@ -2,7 +2,7 @@ from frosted import messages as m
 from frosted.api import _noqa_lines, _re_noqa, check
 from frosted.reporter import Reporter
 
-from .utils import flakes, LoggingReporter
+from .utils import LoggingReporter, flakes
 
 
 def test_regex():
