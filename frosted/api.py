@@ -20,7 +20,7 @@ import os
 import re
 import sys
 import tokenize
-from StringIO import StringIO
+from io import StringIO
 from token import N_TOKENS
 
 from pies.overrides import *
