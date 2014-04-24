@@ -7,9 +7,10 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import argparse
 import sys
 
+from pies.overrides import *
+
 from frosted import __version__
 from frosted.api import check, check_path, check_recursive
-from pies.overrides import *
 
 
 def main():

@@ -3,8 +3,9 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import textwrap
 
 import pytest
-from frosted import messages as m
 from pies.overrides import *
+
+from frosted import messages as m
 
 from .utils import flakes
 

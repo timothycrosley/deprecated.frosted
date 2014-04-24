@@ -25,9 +25,10 @@ import itertools
 import os
 import sys
 
-from frosted import messages
 from pies import ast
 from pies.overrides import *
+
+from frosted import messages
 
 PY34_GTE = sys.version_info >= (3, 4)
 FROSTED_BUILTINS = set(dir(builtins) + ['__file__', '__builtins__', '__debug__', '__name__', 'WindowsError',

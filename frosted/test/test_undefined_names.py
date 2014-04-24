@@ -3,11 +3,11 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from sys import version_info
 
 import pytest
-from frosted import messages as m
-from frosted import checker
 from pies.overrides import *
 
 from _ast import PyCF_ONLY_AST
+from frosted import messages as m
+from frosted import checker
 
 from.utils import flakes
 
