@@ -67,6 +67,15 @@ def check(codeString, filename, reporter=modReporter.Default, settings_path=None
     settings_path = settings_path or os.getcwd()
 
     active_settings = settings.from_path(settings_path).copy()
+    for key, value in itemsview(setting_overrides):
+        access_key = key.replace('not_', '').lower()
+        if type(active_settings.get(access_key)) in (list, tuple):
+            if key.startswith('not_'):
+                active_settings[access_key] = list(set(active_settings[access_key]).difference(value))
+            else:
+                active_settings[access_key] = list(set(active_settings[access_key]).union(value))
+        else:
+            active_settings[key] = value
     active_settings.update(setting_overrides)
 
     if _should_skip(filename, active_settings.get('skip', [])):
