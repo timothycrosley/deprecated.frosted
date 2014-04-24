@@ -24,6 +24,8 @@ def main():
                         action='store_true')
     parser.add_argument('-i', '--ignore', help='Specify error codes that should be ignored.',
                         dest='ignore_frosted_errors', action='append')
+    parser.add_argument('-di', '--dont-ignore', help='Specify error codes that should not be ignored in any case.',
+                        dest='not_ignore_frosted_errors', action='append')
     parser.add_argument('-vb', '--verbose', help='Explicitly separate each section of data when displaying errors.',
                         dest='verbose', action='store_true')
     parser.add_argument('-v', '--version', action='version', version='frosted {0}'.format(__version__))
