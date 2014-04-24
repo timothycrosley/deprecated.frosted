@@ -32,7 +32,7 @@ from frosted.messages import FileSkipped, PythonSyntaxError
 
 __all__ = ['check', 'check_path', 'check_recursive', 'iter_source_code']
 
-_re_noqa = re.compile(r'((pyflakes|flake8)[:=]\s*noqa)|(#\s*noqa)', re.I)
+_re_noqa = re.compile(r'((frosted)[:=]\s*noqa)|(#\s*noqa)', re.I)
 
 
 def _noqa_lines(codeString):
