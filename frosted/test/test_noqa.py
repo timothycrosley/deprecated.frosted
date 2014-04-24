@@ -1,7 +1,6 @@
 from frosted import messages as m
 from frosted.api import _noqa_lines, _re_noqa, check
 from frosted.reporter import Reporter
-from frosted.test.harness import ListWriter, TestCase
 
 from .utils import flakes
 
@@ -27,9 +26,9 @@ def test_checker_ignore_lines():
 
 
 def test_noqa_lines():
-    self.assertEqual(_noqa_lines('from fu import bar; bar'), [])
-    self.assertEqual(_noqa_lines('from fu import * # noqa; bar'), [1])
-    self.assertEqual(_noqa_lines('from fu import * #noqa\nbar\nfoo # frosted: noqa'), [1, 3])
+    assert _noqa_lines('from fu import bar; bar') == []
+    assert _noqa_lines('from fu import * # noqa; bar') == [1]
+    assert _noqa_lines('from fu import * #noqa\nbar\nfoo # frosted: noqa') == [1, 3]
 
 
 def test_check_integration():
@@ -39,9 +38,8 @@ def test_check_integration():
     result = check('from fu import *', 'test', reporter)
 
     # errors reported
-    self.assertEqual(result, 1)
-    self.assertEqual(reporter._stdout.pop(0), "test:1: 'from fu import *' used;"
-                        " unable to detect undefined names")
+    assert result == 1
+    assert reporter._stdout.pop(0) == "test:1: 'from fu import *' used;"
 
     # same test, but with ignore set
     reporter = Reporter(ListWriter(), ListWriter())
@@ -49,5 +47,5 @@ def test_check_integration():
     result = check('from fu import * # noqa', 'test', reporter)
 
     # errors reported
-    self.assertEqual(result, 0)
-    self.assertEqual(len(reporter._stdout), 0)
+    assert result == 0
+    assert len(reporter._stdout) == 0
