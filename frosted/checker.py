@@ -241,9 +241,10 @@ class Checker(object):
     trace_tree = False
     frosted_builtins = FROSTED_BUILTINS
 
-    def __init__(self, tree, filename='(none)', builtins=None, **settings):
+    def __init__(self, tree, filename='(none)', builtins=None, ignore_lines=(), **settings):
         self.settings = settings
         self.ignore_errors = settings.get('ignore_frosted_errors', [])
+        self.ignore_lines = ignore_lines
         file_specifc_ignores = settings.get('ignore_frosted_errors_for_' + (os.path.basename(filename) or ""), None)
         if file_specifc_ignores:
             self.ignore_errors += file_specifc_ignores
@@ -333,7 +334,9 @@ class Checker(object):
         if(not error_code[:2] + "00" in self.ignore_errors and not error_code in self.ignore_errors and not
            str(message_class.error_number) in self.ignore_errors):
             kwargs['verbose'] = self.settings.get('verbose')
-            self.messages.append(message_class(self.filename, *args, **kwargs))
+            message = message_class(self.filename, *args, **kwargs)
+            if message.lineno not in self.ignore_lines:
+                self.messages.append(message)
 
     def has_parent(self, node, kind):
         while hasattr(node, 'parent'):
