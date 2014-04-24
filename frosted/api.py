@@ -37,7 +37,7 @@ _re_noqa = re.compile(r'((frosted)[:=]\s*noqa)|(#\s*noqa)', re.I)
 
 def _noqa_lines(codeString):
     line_nums = []
-    g = tokenize.generate_tokens(StringIO(codeString).readline)   # tokenize the string
+    g = tokenize.generate_tokens(StringIO(str(codeString)).readline)   # tokenize the string
     for toknum, tokval, begins, _, _ in g:
         lineno = begins[0]
         # not sure what N_TOKENS really means, but in testing, that was what comments were
