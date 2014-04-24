@@ -3,11 +3,11 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from sys import version_info
 
 import pytest
-from frosted import messages as m
-from frosted import checker
 from pies.overrides import *
 
 from _ast import PyCF_ONLY_AST
+from frosted import messages as m
+from frosted import checker
 
 from.utils import flakes
 
@@ -48,6 +48,10 @@ def test_magicGlobalsBuiltins():
     """Use of the __builtins magic global should not emit an undefined name warning."""
     flakes('__builtins__')
 
+
+def test_magicGlobalImport():
+    """Use of the __import__ magic global should not emit an undefined name warning."""
+    flakes('__import__')
 
 def test_magicGlobalsName():
     """Use of the __name magic global should not emit an undefined name warning."""

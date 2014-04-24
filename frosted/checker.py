@@ -25,14 +25,15 @@ import itertools
 import os
 import sys
 
-from frosted import messages
 from pies import ast
 from pies.overrides import *
 
-PY34_GTE = sys.version_info >= (3, 4)
-BUILTIN_VARS = set(dir(builtins) + ['__file__', '__builtins__', '__debug__', '__name__', 'WindowsError'] +
-                   os.environ.get('PYFLAKES_BUILTINS', '').split(','))
+from frosted import messages
 
+PY34_GTE = sys.version_info >= (3, 4)
+FROSTED_BUILTINS = set(dir(builtins) + ['__file__', '__builtins__', '__debug__', '__name__', 'WindowsError',
+                                        '__import__'] +
+                       os.environ.get('PYFLAKES_BUILTINS', '').split(','))
 
 def node_name(node):
     """
@@ -239,11 +240,12 @@ class Checker(object):
     node_depth = 0
     offset = None
     trace_tree = False
-    builtin_vars = BUILTIN_VARS
+    frosted_builtins = FROSTED_BUILTINS
 
-    def __init__(self, tree, filename='(none)', builtins=None, **settings):
+    def __init__(self, tree, filename='(none)', builtins=None, ignore_lines=(), **settings):
         self.settings = settings
         self.ignore_errors = settings.get('ignore_frosted_errors', [])
+        self.ignore_lines = ignore_lines
         file_specifc_ignores = settings.get('ignore_frosted_errors_for_' + (os.path.basename(filename) or ""), None)
         if file_specifc_ignores:
             self.ignore_errors += file_specifc_ignores
@@ -255,7 +257,7 @@ class Checker(object):
         self.messages = []
         self.filename = filename
         if builtins:
-            self.builtin_vars = self.builtin_vars.union(builtins)
+            self.frosted_builtins = self.frosted_builtins.union(builtins)
         self.scope_stack = [ModuleScope()]
         self.except_handlers = [()]
         self.futures_allowed = True
@@ -333,7 +335,9 @@ class Checker(object):
         if(not error_code[:2] + "00" in self.ignore_errors and not error_code in self.ignore_errors and not
            str(message_class.error_number) in self.ignore_errors):
             kwargs['verbose'] = self.settings.get('verbose')
-            self.messages.append(message_class(self.filename, *args, **kwargs))
+            message = message_class(self.filename, *args, **kwargs)
+            if message.lineno not in self.ignore_lines:
+                self.messages.append(message)
 
     def has_parent(self, node, kind):
         while hasattr(node, 'parent'):
@@ -457,7 +461,7 @@ class Checker(object):
                 return
 
         # look in the built-ins
-        if importStarred or name in self.builtin_vars:
+        if importStarred or name in self.frosted_builtins:
             return
         if name == '__path__' and os.path.basename(self.filename) == '__init__.py':
             # the special name __path__ is valid only in packages
