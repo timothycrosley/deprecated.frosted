@@ -67,12 +67,34 @@ def _update_settings_with_config(path, name, default, sections, computed_setting
         tries += 1
 
     if editor_config_file and os.path.exists(editor_config_file):
-        computed_settings.update(_read_config_file(editor_config_file, sections).copy())
+        _update_with_config_file(computed_settings, editor_config_file, sections)
+
+
+def _update_with_config_file(computed_settings, file_path, sections):
+    settings = _get_config_data(file_path, sections)
+    if not settings:
+        return
+
+    for key, value in settings.items():
+        access_key = key.replace('not_', '').lower()
+        if key.startswith('ignore_frosted_errors_for'):
+            existing_value_type = list
+        else:
+            existing_value_type = type(default.get(access_key, ''))
+        if existing_value_type in (list, tuple):
+            existing_data = set(computed_settings.get(access_key, default.get(access_key)) or ())
+            if key.startswith('not_'):
+                computed_settings[access_key] = list(existing_data.difference(value.split(",")))
+            else:
+                computed_settings[access_key] = list(existing_data.union(value.split(",")))
+        elif existing_value_type == bool and value.lower().strip() == "false":
+            computed_settings[access_key] = False
+        else:
+            computed_settings[access_key] = existing_value_type(value)
 
 
 @lru_cache()
-def _read_config_file(file_path, sections):
-    computed_settings = {}
+def _get_config_data(file_path, sections):
     with open(file_path) as config_file:
         if file_path.endswith(".editorconfig"):
             line = "\n"
@@ -90,15 +112,7 @@ def _read_config_file(file_path, sections):
         for section in sections:
             if config.has_section(section):
                 settings.update(dict(config.items(section)))
-        for key, value in settings.items():
-            if key.startswith('ignore_frosted_errors_for'):
-                existing_value_type = list
-            else:
-                existing_value_type = type(default.get(key, ''))
-            if existing_value_type in (list, tuple):
-                computed_settings[key.lower()] = value.split(",")
-            elif existing_value_type == bool and value.lower().strip() == "false":
-                computed_settings[access_key] = False
-            else:
-                computed_settings[key.lower()] = existing_value_type(value)
-    return computed_settings
+
+        return settings
+
+    return None
