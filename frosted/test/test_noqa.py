@@ -2,7 +2,7 @@ from frosted import messages as m
 from frosted.api import _noqa_lines, _re_noqa, check
 from frosted.reporter import Reporter
 
-from .utils import flakes
+from .utils import flakes, LoggingReporter
 
 
 def test_regex():
@@ -33,19 +33,21 @@ def test_noqa_lines():
 
 def test_check_integration():
     """ make sure all the above logic comes together correctly in the check() function """
-    reporter = Reporter(ListWriter(), ListWriter())
+    output = []
+    reporter = LoggingReporter(output)
 
-    result = check('from fu import *', 'test', reporter)
+    result = check('from fu import *', 'test', reporter, not_ignore_frosted_errors=['E103'])
 
     # errors reported
     assert result == 1
-    assert reporter._stdout.pop(0) == "test:1: 'from fu import *' used;"
+    assert "unable to detect undefined names" in output.pop(0)[1]
 
     # same test, but with ignore set
-    reporter = Reporter(ListWriter(), ListWriter())
+    output = []
+    reporter = LoggingReporter(output)
 
     result = check('from fu import * # noqa', 'test', reporter)
 
     # errors reported
     assert result == 0
-    assert len(reporter._stdout) == 0
+    assert len(output) == 0
