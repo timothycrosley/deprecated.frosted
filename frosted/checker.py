@@ -23,6 +23,7 @@ import builtins
 import doctest
 import itertools
 import os
+import pkg_resources
 import sys
 
 from pies import ast
@@ -246,9 +247,9 @@ class Checker(object):
         self.settings = settings
         self.ignore_errors = settings.get('ignore_frosted_errors', [])
         self.ignore_lines = ignore_lines
-        file_specifc_ignores = settings.get('ignore_frosted_errors_for_' + (os.path.basename(filename) or ""), None)
-        if file_specifc_ignores:
-            self.ignore_errors += file_specifc_ignores
+        file_specific_ignores = settings.get('ignore_frosted_errors_for_' + (os.path.basename(filename) or ""), None)
+        if file_specific_ignores:
+            self.ignore_errors += file_specific_ignores
 
         self._node_handlers = {}
         self._deferred_functions = []
@@ -270,6 +271,22 @@ class Checker(object):
         del self.scope_stack[1:]
         self.pop_scope()
         self.check_dead_scopes()
+        self.check_plugins()
+
+    def check_plugins(self):
+        """ collect plugins from entry point 'frosted.plugins'
+
+        and run their check() method, passing the filename
+        """
+        checkers = {}
+        for ep in pkg_resources.iter_entry_points(group='frosted.plugins'):
+            checkers.update({ep.name: ep.load()})
+
+        for plugin_name, plugin in checkers.iteritems():
+            if self.filename != '(none)':
+                messages = plugin.check(self.filename)
+                for message, loc, args, kwargs in messages:
+                    self.report(message, loc, *args, **kwargs)
 
     def defer_function(self, callable):
         """Schedule a function handler to be called just before completion.
