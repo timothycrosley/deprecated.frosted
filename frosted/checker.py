@@ -282,7 +282,7 @@ class Checker(object):
         for ep in pkg_resources.iter_entry_points(group='frosted.plugins'):
             checkers.update({ep.name: ep.load()})
 
-        for plugin_name, plugin in checkers.iteritems():
+        for plugin_name, plugin in checkers.items():
             if self.filename != '(none)':
                 messages = plugin.check(self.filename)
                 for message, loc, args, kwargs in messages:
