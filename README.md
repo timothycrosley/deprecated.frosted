@@ -1,6 +1,5 @@
 ![frosted](https://raw.github.com/timothycrosley/frosted/master/logo.png)
 =====
-
 [![PyPI version](https://badge.fury.io/py/frosted.png)](http://badge.fury.io/py/frosted)
 [![PyPi downloads](https://pypip.in/d/frosted/badge.png)](https://crate.io/packages/frosted/)
 [![Build Status](https://travis-ci.org/timothycrosley/frosted.png?branch=master)](https://travis-ci.org/timothycrosley/frosted)
@@ -9,6 +8,10 @@
 
 Frosted is a fork of pyflakes (originally created by Phil Frost) that aims at more open contribution from the outside public, a smaller more maintainable code base, and a better Python checker for all.
 It currently cleanly supports Python 2.6 - 3.4 using pies (https://github.com/timothycrosley/pies) to achieve this without ugly hacks and/or py2to3.
+
+IMPORTANT NOTE: FROSTED IS DEPRECATED! LONG LIVE FLAKE8
+===================
+Frosted was born because pyflakes went for a period of around a year without a maintainer. At some point a maintainer reappeared and the original project continued the mantel of quickly checking code. At this point the best bet, if you are looking for a project to check your code quality is to use the newest version of PyFlakes or Flake8 (https://github.com/PyCQA/flake8) - which itself uses pyflakes in addition to some other great public tools.
 
 Installing Frosted
 ===================
